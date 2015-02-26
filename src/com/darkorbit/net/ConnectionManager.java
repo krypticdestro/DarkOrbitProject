@@ -6,13 +6,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
+import com.darkorbit.objects.Player;
 import com.darkorbit.packets.Packet;
 import com.darkorbit.utils.Console;
 
 /**
  * Administra las conexiones entrantes
- * 
  * @author Borja Sanchidrián
  */
 
@@ -23,16 +24,21 @@ public class ConnectionManager extends Global implements Runnable {
 	private Socket userSocket;
 	private Thread thread;
 	
+	private LoginAssembly loginAssembly;
+	
+	private int playerID = 0;
+	private Player player = null;
+	
+	
 	public ConnectionManager(Socket userSocket) {
 		this.userSocket = userSocket;
 		thread = new Thread(this);
 		thread.start();
 	}
 	
-	void closeSockets() throws IOException {
+	private void closeConnection() throws IOException {
 		userSocket.close();
 		in.close();
-		out.close();
 	}
 
 	/**
@@ -42,9 +48,6 @@ public class ConnectionManager extends Global implements Runnable {
 		try {
 			//entrada
 			in = new BufferedReader(new InputStreamReader(userSocket.getInputStream()));
-			
-			//salida - despreciado porque se inicia luego en Global.java, y esta clase extiende la anterior
-			//out = new PrintWriter(userSocket.getOutputStream(), false);
 		} catch (IOException e) {
 			Console.error("There was an error setting up the socket streams...");
 
@@ -87,7 +90,7 @@ public class ConnectionManager extends Global implements Runnable {
 			
 			//Un poco chapuza, pero no se me ocurre ahora mismo algo mejor :(
 			try {
-				closeSockets();
+				closeConnection();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -98,8 +101,12 @@ public class ConnectionManager extends Global implements Runnable {
 	 * Lee e interpreta los paquetes recibidos.
 	 * @param packet Paquete enviado desde run
 	 */
-	void checkPacket(String packet) {
-		Console.out(packet);
+	private void checkPacket(String packet) {
+		//Si el modo desarrollador esta activado se leen los paquetes entrantes
+		if(Launcher.developmentMode) {
+			Console.alert("Packet from user-" + playerID + ": " + packet);
+		}
+		
 		if(packet.startsWith("/")) {
 			//XDLOLTEST
 		} else {
@@ -112,13 +119,42 @@ public class ConnectionManager extends Global implements Runnable {
 					break;
 				
 				case Packet.LOGIN:
-					String test = "0|I|1|username|4|10|5|10|20|30|0|10|1000|1000|1|1|0|1|10|3|1|1|2|3|124|412312|3|1|CLAN|0|0|0";
-					sendPacket(userSocket, test);
+					//LOGIN|playerID|sessionID|clientVersion
+					try {
+						//Comprueba que el paquete este completo y la version del cliente sea correcta
+						if((p.length == 4) && (p[3].equals(Launcher.clientVersion))) {
+							/*
+							 * IF THE LOGIN ACCEPTS THE CONNECTION!!
+							 */
+							loginAssembly = new LoginAssembly(userSocket);
+							
+							//Comprueba si puede loguearse
+							if(loginAssembly.requestLogin(p)) {
+								//Set the playerID and threadName
+								player = loginAssembly.getPlayer();
+								playerID = player.getPlayerID();
+								thread.setName("ConnectionManager-User_" + playerID);
+								
+								GameManager.addPlayer(player);
+							} else {
+								//sino se cierra su socket
+								closeConnection();
+								
+							}
+						} else {
+							Console.error("Error with the login packet...");
+						}
+						
+					} catch(Exception e) {
+						//En caso de que el paquete falle :/
+						if(Launcher.developmentMode) {
+							e.printStackTrace();
+						}
+					}
 					break;
 					
 				//TODO: Una vez se sepa la estructura de los paqutes se debe decidir si finalmente
-				//	establece conexion o se cierra el socket de esa conexion
-				//			thread.setName("ConnectionManager-USER_NUM");
+				//	establece conexion o se cierra el socket de esa conexion	
 			}
 		}
 	}

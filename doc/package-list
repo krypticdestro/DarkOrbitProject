@@ -1,3 +1,4 @@
-com.sk7.main
-com.sk7.net
-com.sk7.utils
+com.darkorbit.main
+com.darkorbit.net
+com.darkorbit.packets
+com.darkorbit.utils

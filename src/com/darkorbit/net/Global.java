@@ -20,6 +20,11 @@ public class Global {
 			out = new PrintWriter(socket.getOutputStream(), false);
 			out.print(packet + (char)0x00);
 			out.flush();
+			
+			if(Launcher.developmentMode) {
+				Console.out("Packet sent: " + packet);
+			}
+			
 		} catch (IOException e) {
 			// error abriendo el stream...
 			Console.error("Error opening the output socket stream...");
