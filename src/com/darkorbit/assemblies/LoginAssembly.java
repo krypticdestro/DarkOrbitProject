@@ -45,7 +45,7 @@ public class LoginAssembly extends Global {
 				
 			} else {
 				//TODO / TO THINK XD
-				//check sessionID. Return false por ahora
+				//check sessionID Return false por ahora
 				Console.error("PLAYER " + playerID + " SE INTENTA RECONECTAR!");
 				return false;
 			}

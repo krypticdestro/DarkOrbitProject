@@ -121,8 +121,10 @@ public class ConnectionManager extends Global implements Runnable {
 				case Packet.LOGIN:
 					//LOGIN|playerID|sessionID|clientVersion
 					try {
+						
 						//Comprueba que el paquete este completo y la version del cliente sea correcta
 						if((p.length == 4) && (p[3].equals(Launcher.clientVersion))) {
+							
 							/*
 							 * IF THE LOGIN ACCEPTS THE CONNECTION!!
 							 */
@@ -130,6 +132,7 @@ public class ConnectionManager extends Global implements Runnable {
 							
 							//Comprueba si puede loguearse
 							if(loginAssembly.requestLogin(p)) {
+								
 								//Set the playerID and threadName
 								player = loginAssembly.getPlayer();
 								playerID = player.getPlayerID();
