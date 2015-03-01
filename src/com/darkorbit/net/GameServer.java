@@ -16,8 +16,6 @@ import com.darkorbit.utils.Console;
 public class GameServer implements Runnable {
 	private ServerSocket server;
 	private Thread serverThread;
-	//private Map<Integer, ConnectionHandler> usersConnected = new TreeMap<Integer, ConnectionHandler>();
-	
 	
 	public GameServer(int port) {
 		try {

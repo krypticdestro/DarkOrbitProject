@@ -171,3 +171,13 @@
 	
 	me veia en la obligación de volver a escribir algo. La función que salva los datos de los jugadores, concretamente la posición falla si se hace logout
 	mientras el usuario se esta moviendo 
+	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1 marzo 2015
+
+	Vuelvo con el desarrollo desde 0.
+	
+		- En el movementHelper cambiar la velocidad (ahora esta solo la de la nave, sin contar motores)
+		

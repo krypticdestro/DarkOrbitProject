@@ -2,9 +2,11 @@ package com.darkorbit.assemblies;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Map.Entry;
 
 import com.darkorbit.main.Launcher;
 import com.darkorbit.mysql.QueryManager;
+import com.darkorbit.net.ConnectionManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Player;
@@ -23,7 +25,7 @@ public class LoginAssembly extends Global {
 	
 	/**
 	 * Comprueba si el usuario se puede conectar
-	 * @param p Packet login
+	 * @param p Login packet
 	 * @return
 	 */
 	public boolean requestLogin(String[] p) {
@@ -46,7 +48,9 @@ public class LoginAssembly extends Global {
 			if(GameManager.isOnline(player.getPlayerID())) {
 				
 				try {
-					//Cierran los sockets antiguos que tenia abiertos
+					//Cierran los sockets antiguos que tenia abiertos y el timeout
+					GameManager.getConnectionManager(player.getPlayerID()).timeOutTimer.cancel();
+					GameManager.getConnectionManager(player.getPlayerID()).timeOutTimer.purge();
 					GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
 					
 					//login normal
@@ -87,11 +91,14 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
-		
+		checkPlayerPosition();
+		loadUsers();
+		sendMyShip();
 	}
 	
 	/* Login functions */
-	
+		
+		//Manda las opciones del cliente
 		private void setSettings() {
 			//Envia al cliente las opciones del juego
 			
@@ -111,11 +118,49 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|SHOW_DRONES|"+ player.getSettings().SHOW_DRONES);
 		}
 		
+		//Informacion básica del jugador
 		private void setPlayer() {
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|20|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|1000|1000|1|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|1|Borja mola mucho|0|0|0";
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|20|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|21|CLANTAG|0|0|0";
 			sendPacket(userSocket, loginPacket);
 		}
 		
+		//Actualiza la posicion de los usuarios para no verlos en su posicion inicial...
+		private void checkPlayerPosition() {
+			for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
+				
+				if(u.getValue().player().getMapID() == player.getMapID()) {
+					//Actualizo la posicion y el moving para falsear el movimiento mas abajo
+					u.getValue().player().setPosition(u.getValue().player().movement().position());
+				}
+			}
+		}
+				
+		//Los usuarios del mismo mapa
+		private void loadUsers() {
+			//Carga las naves de los jugadores del mismo mapID (cambiar en un futuro para el rango del minimapa)
+			for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
+				
+				//Si el mapa es el mismo que el "mio" y el playerID diferente
+				if((u.getValue().player().getMapID() == player.getMapID()) && (u.getValue().player().getPlayerID() != player.getPlayerID())) {
+					
+					//0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
+					String packet = "0|C|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().getShipID() + "|3|CLANTAG|" + u.getValue().player().getUserName() + "|" + u.getValue().player().getPosition().getX() + "|" + u.getValue().player().getPosition().getY() + "|" + u.getValue().player().getFactionID() + "|0|1|0|0|0|0|0";
+					sendPacket(userSocket, packet);
+					
+					if(u.getValue().player().isMoving()) {
+						//Si el player estaba moviendose falseo ese movimiento
+						sendPacket(userSocket, "0|1|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().movement().destination().getX() + "|" + u.getValue().player().movement().destination().getY() + "|" + u.getValue().player().movement().timeRemaining());
+					}
+				}
+			}
+		}
+		
+		//Envia mis datos a los usuarios del mapa
+		private void sendMyShip() {
+			//0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
+			String packet = "0|C|" + player.getPlayerID() + "|" + player.getShipID() + "|3|CLANTAG|" + player.getUserName() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getFactionID() + "|0|1|0|0|0|0|0";
+			sendToMap(player.getMapID(), packet);
+		}
 		
 }

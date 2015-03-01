@@ -3,6 +3,7 @@ package com.darkorbit.net;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Map.Entry;
 
 import com.darkorbit.main.Launcher;
 import com.darkorbit.utils.Console;
@@ -31,6 +32,14 @@ public class Global {
 			
 			if(Launcher.developmentMode) {
 				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void sendToMap(short mapID, String packet) {
+		for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
+			if(u.getValue().player().getMapID() == mapID) {
+				sendPacket(u.getValue().getSocket(), packet);
 			}
 		}
 	}

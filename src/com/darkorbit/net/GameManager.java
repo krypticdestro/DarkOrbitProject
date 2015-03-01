@@ -10,7 +10,7 @@ public class GameManager {
 		public static Map<Integer, ConnectionManager> onlinePlayers = new TreeMap<Integer, ConnectionManager>();
 		
 		public static void connectPlayer(ConnectionManager c) {
-			onlinePlayers.put(c.get().getPlayerID(), c);
+			onlinePlayers.put(c.player().getPlayerID(), c);
 		}
 		
 		public static void disconnectPlayer(int playerID) {

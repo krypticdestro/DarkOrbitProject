@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
@@ -21,22 +24,28 @@ public class ConnectionManager extends Global implements Runnable {
 	private BufferedReader in;
 	private Socket userSocket;
 	private Thread thread;
+	private Player player = null;
+	public Timer timeOutTimer;
 	
 	private LoginAssembly loginAssembly;
 	
 	private int playerID = 0;
-	private Player player = null;
+	private long lastPacket = 0;
 	
-	
+
 	public ConnectionManager(Socket userSocket) {
 		this.userSocket = userSocket;
 		thread = new Thread(this);
+		thread.setDaemon(true);
 		thread.start();
 	}
 	
 	public void closeConnection() throws IOException {
 		userSocket.close();
 		in.close();
+		
+		//Borramos el connection de este usuario
+		GameManager.onlinePlayers.remove(playerID);
 	}
 
 	/**
@@ -59,8 +68,66 @@ public class ConnectionManager extends Global implements Runnable {
 	 * Devuelve la cuenta del jugador
 	 * @return
 	 */
-	public Player get() {
+	public Player player() {
 		return player;
+	}
+	
+	public Socket getSocket() {
+		return userSocket;
+	}
+	
+	/**
+	 * Inicia el timer del timeout
+	 */
+	private void startTimeOut() {
+		final int timeOut = 30000;
+		final int minTimeOut = 10000;
+		
+		
+		timeOutTimer = new Timer("TimeOut - Player " + playerID);
+		timeOutTimer.schedule(new TimerTask() {
+			
+			public void run() {
+				boolean timedOut = false;
+				
+				while(!timedOut) {
+					long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastPacket;
+					
+					//En caso de que haya pasado mas de 'timeOut' desde el ultimo paquete se inicia la desconexion 
+					if(timeElapsed >= timeOut) {
+						try {
+							//espera otros 10 segundos mas para asegurar que el usuario se ha desconectado
+							Thread.sleep(minTimeOut);
+							disconnectPlayer();
+							timedOut = true;
+							Console.alert("Player " + playerID + " time-out");
+							
+						} catch (InterruptedException e) {
+							if(Launcher.developmentMode) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+				cancelTimeOut();
+			}
+		}, 0);
+		
+	}
+
+	
+	/**
+	 * Cancela el timer del timeout
+	 */
+	public void cancelTimeOut() {
+		timeOutTimer.cancel();
+		timeOutTimer.purge();
+	}
+
+	
+	public void disconnectPlayer() {
+		//saveData();
+		sendToMap(player.getMapID(), "0|R|" + playerID);
 	}
 	
 	/**
@@ -85,7 +152,8 @@ public class ConnectionManager extends Global implements Runnable {
 					packet = new String(packet.getBytes(), "UTF-8");
 					
 					checkPacket(packet);
-
+					lastPacket = Calendar.getInstance().getTimeInMillis();
+					
 					//Set the packet again to ""
 					packet = "";
 				}
@@ -100,6 +168,7 @@ public class ConnectionManager extends Global implements Runnable {
 		}
 	}
 	
+	
 	/**
 	 * Lee e interpreta los paquetes recibidos.
 	 * @param packet Paquete enviado desde run
@@ -111,7 +180,21 @@ public class ConnectionManager extends Global implements Runnable {
 		}
 		
 		if(packet.startsWith("/")) {
-			//XDLOLTEST
+			String[] p = packet.split(" ");
+			
+			switch(p[0]) {
+				case "/p":
+					//Envia un paquete directamente al usuario
+					try {
+						sendPacket(userSocket, p[1]);
+					} catch(Exception e) {
+						if(Launcher.developmentMode) {
+							e.printStackTrace();
+						}
+					}
+					break;
+			}
+			
 		} else {
 			String[] p = packet.split("\\|");
 			
@@ -139,11 +222,17 @@ public class ConnectionManager extends Global implements Runnable {
 								//Set the playerID and threadName
 								player = loginAssembly.getPlayer();
 								playerID = player.getPlayerID();
+
+								//Añade el connectionManager al de jugadores online
+								GameManager.connectPlayer(this);
+								
+								//Inicia el movementHelper del player
+								player.setMovementHelper();
 								
 								thread.setName("ConnectionManager-User_" + player.getPlayerID());
 								
-								//Añade el connectionManager al de jugadores online
-								GameManager.connectPlayer(this);
+								//Inicia el timeout
+								startTimeOut();
 								
 							} else {
 								//sino se cierra su socket
@@ -167,10 +256,10 @@ public class ConnectionManager extends Global implements Runnable {
 					}
 					break;
 					
-				case "PNG":
-					Console.out("PONG!");
+				case ServerCommands.SHIP_MOVEMENT:
+					//Mueve la nave
+					player.movement().moveShip(p);
 					break;
-				
 				
 			}
 		}

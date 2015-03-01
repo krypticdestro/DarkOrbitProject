@@ -9,6 +9,7 @@ import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Settings;
 import com.darkorbit.objects.Ship;
 import com.darkorbit.utils.Console;
+import com.darkorbit.utils.Vector;
 
 public class QueryManager extends MySQLManager {
 	
@@ -80,7 +81,9 @@ public class QueryManager extends MySQLManager {
 					player = new Player(playerID, playerSettings, 
 							playerResult.getString("username"),
 							playerResult.getShort("shipId"),
-							playerResult.getShort("factionId")
+							playerResult.getShort("factionId"),
+							playerResult.getShort("mapId"),
+							new Vector(playerResult.getInt("x"), playerResult.getInt("y"))
 							);
 					
 					return player;
