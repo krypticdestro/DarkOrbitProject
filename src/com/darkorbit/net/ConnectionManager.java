@@ -3,13 +3,12 @@ package com.darkorbit.net;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.objects.Player;
-import com.darkorbit.packets.Packet;
+import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.utils.Console;
 
 /**
@@ -20,7 +19,6 @@ import com.darkorbit.utils.Console;
 public class ConnectionManager extends Global implements Runnable {
 
 	private BufferedReader in;
-	private PrintWriter out;
 	private Socket userSocket;
 	private Thread thread;
 	
@@ -57,6 +55,13 @@ public class ConnectionManager extends Global implements Runnable {
 		}
 	}
 	
+	/**
+	 * Devuelve la cuenta del jugador
+	 * @return
+	 */
+	public Player get() {
+		return player;
+	}
 	
 	/**
 	 * Lee la entrada del socket
@@ -113,12 +118,12 @@ public class ConnectionManager extends Global implements Runnable {
 			String[] p = packet.split("\\|");
 			
 			switch(p[0]) {
-				case Packet.POLICY:
+				case ServerCommands.REQUEST_POLICY:
 					//Envia la informacion necesaria a flash para la conexión
 					sendPolicy(userSocket);
 					break;
 				
-				case Packet.LOGIN:
+				case ServerCommands.REQUEST_LOGIN:
 					//LOGIN|playerID|sessionID|clientVersion
 					try {
 						
@@ -138,7 +143,10 @@ public class ConnectionManager extends Global implements Runnable {
 								playerID = player.getPlayerID();
 								thread.setName("ConnectionManager-User_" + playerID);
 								
+								//Añade al jugador al mapa y el connectionManager al de jugadores online
 								GameManager.addPlayer(player);
+								GameManager.connectPlayer(this);
+								
 							} else {
 								//sino se cierra su socket
 								closeConnection();

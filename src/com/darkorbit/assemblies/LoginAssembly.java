@@ -25,6 +25,7 @@ public class LoginAssembly extends Global {
 			
 			this.playerID = Integer.parseInt(p[1]);
 			this.sessionID = Long.parseLong(p[2]);
+			player = QueryManager.loadAccount(playerID);
 			
 		} catch(Exception e) {
 			if(Launcher.developmentMode) {
@@ -32,21 +33,20 @@ public class LoginAssembly extends Global {
 			}
 		}
 		
-		player = QueryManager.loadAccount(playerID);
-		
+		//Si la cuenta existe
 		if(!player.equals(null)) {
-			//Cuenta cargada!
-			
-			//Si la cuenta no esta ya en el mapa, es decir logueada
+
+			//Si la cuenta no esta ya en el mapa, es decir cargada anteriormente
 			if(!GameManager.playerExist(player.getPlayerID())) {
-				//pos te logueas
+				//normal login
 				startLogin();
 				return true;
 				
 			} else {
-				//TODO / TO THINK XD
-				//check sessionID Return false por ahora
-				Console.error("PLAYER " + playerID + " SE INTENTA RECONECTAR!");
+				
+				//Borrar cuenta del mapa
+				
+				
 				return false;
 			}
 		} else {
