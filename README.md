@@ -8,3 +8,6 @@ Official releases or pre-releases will be here -> https://github.com/BorjaSanchi
 -> Still In Development <-
 
 Private project with educational purposes only. The original game is propety of Bigpoint
+
+Dark Orbit is a registered trademark of BigPoint GmbH. All rights reserved to their respective owner(s). 
+I am not endorsed, affiliated or offered by BigPoint.
