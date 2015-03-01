@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Map.Entry;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
@@ -171,6 +170,7 @@ public class ConnectionManager extends Global implements Runnable {
 				case "PNG":
 					Console.out("PONG!");
 					break;
+				
 				
 			}
 		}
