@@ -3,7 +3,7 @@ Game Server coded in Java
 
 This repository is private so if you're here means that you got access to the repo. Keep that in mind.
 
-Official releases or pre-releases will be here -> https://github.com/BorjaSanchidrian/DarkOrbitProject/releases
+Official releases or pre-releases will be [Here](https://github.com/BorjaSanchidrian/DarkOrbitProject/releases)
 
 -> Still In Development <-
 
