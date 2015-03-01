@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.darkorbit.main.Launcher;
+import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Settings;
+import com.darkorbit.objects.Ship;
 import com.darkorbit.utils.Console;
 
 public class QueryManager extends MySQLManager {
@@ -75,7 +77,11 @@ public class QueryManager extends MySQLManager {
 				if(playerResult.next()) {
 					//TODO: Rellenar con valores de la db xD
 					//Una vez tiene las opciones del jugador y sus datos los retorna
-					player = new Player(playerID, playerSettings);
+					player = new Player(playerID, playerSettings, 
+							playerResult.getString("username"),
+							playerResult.getShort("shipId"),
+							playerResult.getShort("factionId")
+							);
 					
 					return player;
 				} else {
@@ -91,5 +97,41 @@ public class QueryManager extends MySQLManager {
 			}
 			return null;
 		}	
+	}
+
+
+	public static int loadShips() {
+		query = "SELECT * FROM ships";
+		ResultSet result;
+		int num = 0;
+		
+		try {
+			result = query(query);
+			
+			while(result.next()) {
+				Ship ship = new Ship(
+						result.getShort("Id"),
+						result.getInt("HP"),
+						result.getInt("Speed"),
+						result.getInt("Batteries"),
+						result.getInt("Rockets"),
+						result.getInt("Cargo")
+						);
+				
+				GameManager.addShip(ship);
+				num++;
+			}
+			return num;
+		} catch (SQLException e) {
+			Console.error("Couldn't load ships");
+			
+			if(Launcher.developmentMode) {
+				e.printStackTrace();	
+			}
+			
+			//No se puede jugar sin naves
+			System.exit(0);
+			return num;
+		}
 	}
 }

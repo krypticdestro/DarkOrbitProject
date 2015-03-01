@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Map.Entry;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
@@ -34,7 +35,7 @@ public class ConnectionManager extends Global implements Runnable {
 		thread.start();
 	}
 	
-	private void closeConnection() throws IOException {
+	public void closeConnection() throws IOException {
 		userSocket.close();
 		in.close();
 	}
@@ -96,9 +97,7 @@ public class ConnectionManager extends Global implements Runnable {
 			//Un poco chapuza, pero no se me ocurre ahora mismo algo mejor :(
 			try {
 				closeConnection();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			} catch (IOException e1) {}
 		}
 	}
 	
@@ -141,10 +140,10 @@ public class ConnectionManager extends Global implements Runnable {
 								//Set the playerID and threadName
 								player = loginAssembly.getPlayer();
 								playerID = player.getPlayerID();
-								thread.setName("ConnectionManager-User_" + playerID);
 								
-								//Añade al jugador al mapa y el connectionManager al de jugadores online
-								GameManager.addPlayer(player);
+								thread.setName("ConnectionManager-User_" + player.getPlayerID());
+								
+								//Añade el connectionManager al de jugadores online
 								GameManager.connectPlayer(this);
 								
 							} else {
@@ -154,6 +153,7 @@ public class ConnectionManager extends Global implements Runnable {
 							}
 						} else {
 							Console.error("Error with the login packet...");
+							closeConnection();
 						}
 						
 					} catch(Exception e) {
@@ -161,11 +161,17 @@ public class ConnectionManager extends Global implements Runnable {
 						if(Launcher.developmentMode) {
 							e.printStackTrace();
 						}
+						
+						try {
+							closeConnection();
+						} catch (IOException e1) {}
 					}
 					break;
 					
-				//TODO: Una vez se sepa la estructura de los paqutes se debe decidir si finalmente
-				//	establece conexion o se cierra el socket de esa conexion	
+				case "PNG":
+					Console.out("PONG!");
+					break;
+				
 			}
 		}
 	}

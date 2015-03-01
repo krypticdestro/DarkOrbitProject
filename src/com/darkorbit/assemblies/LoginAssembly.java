@@ -1,5 +1,6 @@
 package com.darkorbit.assemblies;
 
+import java.io.IOException;
 import java.net.Socket;
 
 import com.darkorbit.main.Launcher;
@@ -13,18 +14,23 @@ import com.darkorbit.utils.Console;
 public class LoginAssembly extends Global {
 	private Socket userSocket;
 	private int playerID;
-	private long sessionID;
+	//private long sessionID; no usado aun
 	private Player player;
 	
 	public LoginAssembly(Socket userSocket) {
 		this.userSocket = userSocket;
 	}
 	
+	/**
+	 * Comprueba si el usuario se puede conectar
+	 * @param p Packet login
+	 * @return
+	 */
 	public boolean requestLogin(String[] p) {
 		try {
 			
 			this.playerID = Integer.parseInt(p[1]);
-			this.sessionID = Long.parseLong(p[2]);
+			//this.sessionID = Long.parseLong(p[2]); no usado
 			player = QueryManager.loadAccount(playerID);
 			
 		} catch(Exception e) {
@@ -36,19 +42,34 @@ public class LoginAssembly extends Global {
 		//Si la cuenta existe
 		if(!player.equals(null)) {
 
-			//Si la cuenta no esta ya en el mapa, es decir cargada anteriormente
-			if(!GameManager.playerExist(player.getPlayerID())) {
-				//normal login
-				startLogin();
-				return true;
+			//Pierde la conexion y se reconecta antes del timeOut 
+			if(GameManager.isOnline(player.getPlayerID())) {
 				
+				try {
+					//Cierran los sockets antiguos que tenia abiertos
+					GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
+					
+					//login normal
+					startLogin();
+					Console.out("Player " + player.getPlayerID() + " reconnected!");
+					
+					return true;
+					
+				} catch (IOException e) {
+					//Error cerrando los sockets...
+					if(Launcher.developmentMode) {
+						e.printStackTrace();
+					}
+					
+					return false;
+				}
 			} else {
-				
-				//Borrar cuenta del mapa
-				
-				
-				return false;
+				//El timeOut cierra los sockets solito... | Login normal
+				startLogin();
+				Console.out("Player " + player.getPlayerID() + " connected!");
+				return true;
 			}
+			
 		} else {
 			//La cuenta no ha podido ser cargada -> no hay login
 			return false;
@@ -91,8 +112,9 @@ public class LoginAssembly extends Global {
 		}
 		
 		private void setPlayer() {
-			String test = "0|I|1|username|4|1000|5|10|20|30|0|1|1000|1000|1|1|0|1|10|3|1|1|2|3|124|412312|3|1|CLAN|0|0|0";
-			sendPacket(userSocket, test);
+			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|20|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|1000|1000|1|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|1|Borja mola mucho|0|0|0";
+			sendPacket(userSocket, loginPacket);
 		}
 		
 		

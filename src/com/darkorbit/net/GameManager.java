@@ -3,7 +3,7 @@ package com.darkorbit.net;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.darkorbit.objects.Player;
+import com.darkorbit.objects.Ship;
 
 public class GameManager {
 	/* Online players map */
@@ -17,6 +17,10 @@ public class GameManager {
 			onlinePlayers.remove(playerID);
 		}
 		
+		public static ConnectionManager getConnectionManager(int playerID) {
+			return onlinePlayers.get(playerID);
+		}
+		
 		public static boolean isOnline(int playerID) {
 			if(onlinePlayers.containsKey(playerID)) {
 				return true;
@@ -24,20 +28,15 @@ public class GameManager {
 				return false;
 			}
 		}
+
+	/* Ships map */
+		public static Map<Short, Ship> ships = new TreeMap<Short, Ship>();
 		
-	/* Players map */
-		public static Map<Integer, Player> players = new TreeMap<Integer, Player>();
-		
-		public static void addPlayer(Player player) {
-			players.put(player.getPlayerID(), player);
+		public static void addShip(Ship ship) {
+			ships.put(ship.getShipID(), ship);
 		}
 		
-		public static boolean playerExist(int playerID) {
-			if(players.containsKey(playerID)) {
-				return true;
-			} else {
-				return false;
-			}
+		public static Ship getShip(short shipID) {
+			return ships.get(shipID);
 		}
-	
 }

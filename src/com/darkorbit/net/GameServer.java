@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.darkorbit.main.Launcher;
+import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.utils.Console;
 
 /**
@@ -25,6 +26,10 @@ public class GameServer implements Runnable {
 			serverThread.setName("Server-Thread");
 			serverThread.start();
 			Console.out("Server initialized in port " + port);
+			
+			int nShips = QueryManager.loadShips();
+			Console.out(nShips + " Ships loaded!");
+			
 			Console.out("Waiting connections...");
 		} catch (IOException e) {
 			Console.error("Error starting the ServerSocker... Probably the port " + port + " is in use..");

@@ -14,6 +14,7 @@ public class Launcher {
 	private static final int PORT = 8080;
 	public static final String clientVersion = "4.1";
 	/***********************************************/
+	
 	private static String mysqlHost 	= null;
 	private static String mysqlUserName = null;
 	private static String mysqlPassword = null;
