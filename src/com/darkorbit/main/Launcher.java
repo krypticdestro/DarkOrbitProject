@@ -22,7 +22,7 @@ public class Launcher {
 	
 	private static BufferedReader configReader = null;
 	public static boolean developmentMode = false;
-	private static final String version = "Development version v0.1.6";
+	private static final String version = "Development version v0.2";
 
 	/**
 	 * Main method. Reads the config file and set-up the server
@@ -41,7 +41,7 @@ public class Launcher {
 	}
 	
 	/**
-	 * Lee el archivo de configuraciÃ³n
+	 * Lee el archivo de configuración
 	 */
 	static void readConfigFile() {
 		Console.out("Reading config file...");
