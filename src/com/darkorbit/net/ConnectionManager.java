@@ -25,18 +25,21 @@ public class ConnectionManager extends Global implements Runnable {
 	private Socket userSocket;
 	private Thread thread;
 	private Player player = null;
-	public Timer timeOutTimer;
+	private Timer timeOutTimer;
 	
 	private LoginAssembly loginAssembly;
 	
 	private int playerID = 0;
+	private int idle = 0;
+	private final int maxIdle = 24; // 1 = 25 segundos ; 24 = 600 segundos = 10 minutos
 	private long lastPacket = 0;
+	public boolean timedOut = false;
+
 	
 
 	public ConnectionManager(Socket userSocket) {
 		this.userSocket = userSocket;
 		thread = new Thread(this);
-		thread.setDaemon(true);
 		thread.start();
 	}
 	
@@ -80,17 +83,16 @@ public class ConnectionManager extends Global implements Runnable {
 	 * Inicia el timer del timeout
 	 */
 	private void startTimeOut() {
-		final int timeOut = 30000;
+		final int timeOut = 25000;
 		final int minTimeOut = 10000;
 		
 		
 		timeOutTimer = new Timer("TimeOut - Player " + playerID);
 		timeOutTimer.schedule(new TimerTask() {
-			
+						
 			public void run() {
-				boolean timedOut = false;
 				
-				while(!timedOut) {
+				if(!timedOut) {
 					long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastPacket;
 					
 					//En caso de que haya pasado mas de 'timeOut' desde el ultimo paquete se inicia la desconexion 
@@ -100,18 +102,21 @@ public class ConnectionManager extends Global implements Runnable {
 							Thread.sleep(minTimeOut);
 							disconnectPlayer();
 							timedOut = true;
-							Console.alert("Player " + playerID + " time-out");
 							
+							Console.alert("Player " + playerID + " time-out");
+							cancelTimeOut();
 						} catch (InterruptedException e) {
 							if(Launcher.developmentMode) {
 								e.printStackTrace();
 							}
+						} catch (IOException e) {
+							// Por el disconnectPlayer
+							e.printStackTrace();
 						}
 					}
 				}
-				cancelTimeOut();
 			}
-		}, 0);
+		}, 0, 30000);
 		
 	}
 
@@ -124,10 +129,20 @@ public class ConnectionManager extends Global implements Runnable {
 		timeOutTimer.purge();
 	}
 
-	
-	public void disconnectPlayer() {
+	/**
+	 * Desconecta al usuario y closeConnection()
+	 * @throws IOException
+	 */
+	public void disconnectPlayer() throws IOException {
+		
+		//if(player.canDisconnect()) - por si le estan atacando, etc...
 		//saveData();
+		
+		//Borra al usuario del mapa
 		sendToMap(player.getMapID(), "0|R|" + playerID);
+		GameManager.onlinePlayers.remove(playerID);
+		cancelTimeOut();
+		closeConnection();
 	}
 	
 	/**
@@ -153,6 +168,21 @@ public class ConnectionManager extends Global implements Runnable {
 					
 					checkPacket(packet);
 					lastPacket = Calendar.getInstance().getTimeInMillis();
+					
+					/*
+					 * Si el paquete es un ping aumento la variable idle en 1, sino resto 1...
+					 * 
+					 * De esta forma si se reciven X pings seguidos se considera timeOut
+					 */
+					if(packet.equals("PNG")) {
+						if(idle >= (maxIdle - 1)) {
+							disconnectPlayer();
+						} else {
+							idle++;
+						}
+					} else {
+						idle = 0;
+					}
 					
 					//Set the packet again to ""
 					packet = "";
@@ -260,6 +290,7 @@ public class ConnectionManager extends Global implements Runnable {
 					//Mueve la nave
 					player.movement().moveShip(p);
 					break;
+				
 				
 			}
 		}
