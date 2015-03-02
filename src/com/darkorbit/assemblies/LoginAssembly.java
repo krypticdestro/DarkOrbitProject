@@ -49,7 +49,8 @@ public class LoginAssembly extends Global {
 				
 				try {
 					//Cierran los sockets antiguos que tenia abiertos y el timeout
-					GameManager.getConnectionManager(player.getPlayerID()).cancelTimeOut();
+					GameManager.getConnectionManager(player.getPlayerID()).timeOutTimer.cancel();
+					GameManager.getConnectionManager(player.getPlayerID()).timeOutTimer.purge();
 					GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
 					
 					//login normal
@@ -90,7 +91,6 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
-		setAmmunition();
 		checkPlayerPosition();
 		loadUsers();
 		sendMyShip();
@@ -121,15 +121,8 @@ public class LoginAssembly extends Global {
 		//Informacion básica del jugador
 		private void setPlayer() {
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|21|CLANTAG|0|0|0";
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|20|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|21|CLANTAG|0|0|0";
 			sendPacket(userSocket, loginPacket);
-		}
-		
-		
-		//Carga la munición
-		private void setAmmunition() {
-			// 0|B|x1|x2|x3|x4|sab|rsb
-	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|0");
 		}
 		
 		//Actualiza la posicion de los usuarios para no verlos en su posicion inicial...
