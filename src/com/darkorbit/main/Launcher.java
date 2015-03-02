@@ -37,7 +37,6 @@ public class Launcher {
 		Console.out("Connecting to MySQL...");
 		new MySQLManager(mysqlHost, mysqlUserName, mysqlPassword, mysqlDatabase);
 		
-		
 		new GameServer(PORT);
 	}
 	

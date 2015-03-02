@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
+import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Settings;
 import com.darkorbit.objects.Ship;
@@ -83,7 +84,8 @@ public class QueryManager extends MySQLManager {
 							playerResult.getShort("shipId"),
 							playerResult.getShort("factionId"),
 							playerResult.getShort("mapId"),
-							new Vector(playerResult.getInt("x"), playerResult.getInt("y"))
+							new Vector(playerResult.getInt("x"), playerResult.getInt("y")),
+							playerResult.getInt("Health")
 							);
 					
 					return player;
@@ -102,7 +104,10 @@ public class QueryManager extends MySQLManager {
 		}	
 	}
 
-
+	/**
+	 * Carga todas las naves guardadas en la base de datos al iniciar el emulador
+	 * @return
+	 */
 	public static int loadShips() {
 		query = "SELECT * FROM ships";
 		ResultSet result;
@@ -136,5 +141,52 @@ public class QueryManager extends MySQLManager {
 			System.exit(0);
 			return num;
 		}
+	}
+
+
+	public static Ammunition loadAmmunition(int playerID) {
+		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%ammunition_laser%'";
+		ResultSet result;
+		int lcb10 = 0, mcb25 = 0, mcb50 = 0, sab50 = 0, ucb100 = 0;
+		
+		try {
+			result = query(query);
+			
+			while(result.next()) {
+				String[] ammoType = result.getString("lootid").split("_");
+				
+				//lcb-10 | mcb-25 | mcb-50 | sab-50 | ucb-100 | rsb-75
+				switch(ammoType[2]) {
+					case "lcb-10":
+						lcb10 = result.getInt("Q");
+						break;
+						
+					case "mcb-25":
+						mcb25 = result.getInt("Q");
+						break;
+						
+					case "mcb-50":
+						mcb50 = result.getInt("Q");
+						break;
+						
+					case "sab-50":
+						sab50 = result.getInt("Q");
+						break;
+						
+					case "ucb-100":
+						ucb100 = result.getInt("Q");
+						break;
+				}
+			}
+			
+		} catch (SQLException e) {
+			
+			Console.error("Couldn't load the player ammunition...");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+		}
+		
+		return new Ammunition(lcb10, mcb25, mcb50, sab50, ucb100);
 	}
 }

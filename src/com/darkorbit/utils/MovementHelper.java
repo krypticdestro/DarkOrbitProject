@@ -2,7 +2,6 @@ package com.darkorbit.utils;
 
 import java.util.Calendar;
 
-import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Player;
@@ -36,10 +35,6 @@ public class MovementHelper extends Global {
 		distance = oldPosition.distanceTo(destination);
 		
 		time = (distance / (vel * vtRel)) * 1000;
-		
-		if(Launcher.developmentMode) {
-			System.out.println("t = " + time);
-		}
 		
 		if((oldPosition.getX() != destination.getX()) || (oldPosition.getY() != destination.getY())) {
 			player.isMoving(true);

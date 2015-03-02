@@ -38,6 +38,9 @@
 		0|C|4|70||||8900|2800|
 		0|C|objectID(?)|shipId||||x|y -> Spawmea esa nave
 		
+		//Carga la municion -> 0|B|x1|x2|x3|x4|sab|rsb
+        sendPacket(socket, "0|B|" + user.x1Ammo + "|" + user.x2Ammo + "|" + user.x3Ammo + "|" + user.x4Ammo + "|0");
+		
 		0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
 		
 		Example:
@@ -177,7 +180,8 @@
 
 1 marzo 2015
 
-	Vuelvo con el desarrollo desde 0.
+	Vuelvo con el desarrollo desde 0. TODO:
 	
 		- En el movementHelper cambiar la velocidad (ahora esta solo la de la nave, sin contar motores)
-		
+		- Arreglar los timeOut - HECHO
+		- Cuando el jugador se desconecta (timeOut) comprobar si le estan atacando, etc...
