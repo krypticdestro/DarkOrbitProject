@@ -84,7 +84,7 @@
 		
 		
 		
-		0|A|ITM|repVants(1,2)|0|cpuSalto(1,2)|compraMunicion (1-6)|repBot(1,2,3,4)|tradeDrone|1|1|0|0|chipAcierta(1,2)|autoMisiles|cpuCamu(1,2)|autoLanzamisiles|0|cpuSaltoAvanzada
+		0|A|ITM|repVants(1,2)|0|cpuSalto(1,2)|compraMunicion (1-6)|repBot(1,2,3,4)|tradeDrone|1|1|0|0|chipAcierta(1,2)|autoMisiles|cpuCamu(1,2)|autoLanzamisiles|autoBuyRockets|cpuSaltoAvanzada
 		0|A|ITM|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0 -> HAY QUE INICIARLIZAR LOS EXTRAS PARA SOLUCIONAR EL PROBLEMA DEL MAPA (VER TODOS MAPAS)
 		
 		0|TX|S|1|1|0|1|2|0|1|3|0|1|4|0|1|5 -> Activa tecnofabrica Energy leech - chain impulse - precision targeter - backup shields - battle repair bot
@@ -188,4 +188,45 @@
 		- En el movementHelper cambiar la velocidad (ahora esta solo la de la nave, sin contar motores)
 		- Arreglar los timeOut - HECHO
 		- Cuando el jugador se desconecta (timeOut) comprobar si le estan atacando, etc...
+		
+		
+		
+		
+		
+		
+		
+		
+		
+----------------------------------
+Funcion util
+private void drawRange(Socket socket, short mapId, double positionX, double positionY) {
+			
+			double range = 500;
+			double x = Math.sin(Math.toRadians(45)) * range;
+			Random r = new Random();
+			int i = r.nextInt(Integer.MAX_VALUE);
+			String packet = "0|I|" + (i++) + "|X: " + (positionX + x) + " Y: " + (positionY + x) + "|1||||||0||" + (positionX + x) + "|" + (positionY + x)  + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX + range) + " Y: " + (positionY) + "|1||||||0||" + (positionX + range) + "|" + (positionY) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX) + " Y: " + (positionY + range) + "|1||||||0||" + (positionX) + "|" + (positionY + range) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX - x) + " Y: " + (positionY - x) + "|1||||||0||" + (positionX - x) + "|" + (positionY - x) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX - x) + " Y: " + (positionY + x) + "|1||||||0||" + (positionX - x) + "|" + (positionY + x) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX + x) + " Y: " + (positionY - x) + "|1||||||0||" + (positionX + x) + "|" + (positionY - x) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX - range) + " Y: " + (positionY) + "|1||||||0||" + (positionX - range) + "|" + (positionY) + "|" + mapId;
+			sendPacket(socket, packet);
+			
+			packet = "0|I|" + (i++) + "|X: " + (positionX) + " Y: " + (positionY - range) + "|1||||||0||" + (positionX) + "|" + (positionY - range) + "|" + mapId;
+			sendPacket(socket, packet);
+		}
 		

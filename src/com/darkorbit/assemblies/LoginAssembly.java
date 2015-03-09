@@ -11,6 +11,7 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
+import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.utils.Console;
 
 
@@ -91,16 +92,20 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
-		setDrones();
+		setDrones(player);
 		setAmmunition();
 		setRocketsAndMines();
+		setExtras();
 		checkPlayerPosition();
 		loadUsers();
 		sendMyShip();
+		loadHUD();
+		sendStations();
 	}
 	
 	/* Login functions */
 		
+
 		//Manda las opciones del cliente
 		private void setSettings() {
 			//Envia al cliente las opciones del juego
@@ -136,8 +141,8 @@ public class LoginAssembly extends Global {
 		 * Envia la informacion para cargar los drones
 		 * TODO: Rehacer de una mejor forma..
 		 */
-		private void setDrones() {
-			Drone[] playerDrones = player.getDrones();
+		private void setDrones(Player p) {
+			Drone[] playerDrones = p.getDrones();
 			String packet = "";
 			
 			//Suponiendo que la nave mira hacia arriba, ire poniendolos true cuando el grupo de drones se haya llenado
@@ -152,7 +157,7 @@ public class LoginAssembly extends Global {
 			}
 			
 			//Si el usuario tiene activados los drones
-			if(player.getSettings().SHOW_DRONES.equals("1")) {
+			if(p.getSettings().SHOW_DRONES.equals("1")) {
 				while(numDrones > 0) {
 					
 					/* Si solo se tienen entre 0 y 4 drones (bottom group) */
@@ -262,8 +267,7 @@ public class LoginAssembly extends Global {
 				}
 				
 
-				sendPacket(userSocket, "0|n|d|" + player.getPlayerID() + "|" + packet);
-				sendToMap(player.getMapID(), "0|n|d|" + player.getPlayerID() + "|" + packet);
+				sendPacket(userSocket, "0|n|d|" + p.getPlayerID() + "|" + packet);
 				
 			} else {
 				//Si el usuario no quiere ver los drones
@@ -279,9 +283,8 @@ public class LoginAssembly extends Global {
 						}
 					}
 				}
-				
-				sendPacket(userSocket, "0|n|e|" + player.getPlayerID() + "|" + numFlax + "/" + numIris);
-				sendToMap(player.getMapID(), "0|n|e|" + player.getPlayerID() + "|" + numFlax + "/" + numIris);
+				//Send F:******* I:******* packet
+				sendPacket(userSocket, "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris);
 			}
 		}
 		
@@ -295,6 +298,12 @@ public class LoginAssembly extends Global {
 		private void setRocketsAndMines() {
 			//0|3|m1|m2|m3|m4|PLD-8|DRC|Wiz|minas|SMB|ISH|PEM|MinaPem|mina2|mina3
 	        sendPacket(userSocket, "0|3|" + player.getRocket().getR310() + "|" + player.getRocket().getPlt2026() + "|" + player.getRocket().getPlt2021() + "|" + player.getRocket().getPlt3030() + "|0|0|0|0|0|0|0|0|0");
+		}
+	
+		//Carga los extras -> TODO:
+		private void setExtras() {
+			//Inicializa los extras vacios. TODO:
+			sendPacket(userSocket, "0|A|ITM|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
 		}
 		
 		//Actualiza la posicion de los usuarios para no verlos en su posicion inicial...
@@ -320,6 +329,8 @@ public class LoginAssembly extends Global {
 					String packet = "0|C|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().getShipID() + "|3|CLANTAG|" + u.getValue().player().getUserName() + "|" + u.getValue().player().getPosition().getX() + "|" + u.getValue().player().getPosition().getY() + "|" + u.getValue().player().getFactionID() + "|0|1|0|0|0|0|0";
 					sendPacket(userSocket, packet);
 					
+					setDrones(u.getValue().player());
+					
 					if(u.getValue().player().isMoving()) {
 						//Si el player estaba moviendose falseo ese movimiento
 						sendPacket(userSocket, "0|1|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().movement().destination().getX() + "|" + u.getValue().player().movement().destination().getY() + "|" + u.getValue().player().movement().timeRemaining());
@@ -335,4 +346,68 @@ public class LoginAssembly extends Global {
 			sendToMap(player.getMapID(), packet);
 		}
 		
+		//Varios paquetes sobre el cliente
+		private void loadHUD() {
+			//quita icono de ayuda
+			sendPacket(userSocket, "0|UI|W|HW|11");
+			
+			//quita icono de grupo
+			sendPacket(userSocket, "0|UI|W|HW|23");
+			
+			//quita chat
+			sendPacket(userSocket, "0|UI|W|HW|20");
+			
+			//crea menu de compra rapida
+			sendPacket(userSocket, "0|g|a|b,1000,1,10000.0,C,2,500.0,U,3,1000.0,U,5,1000.0,U|r,100,1,10000,C,2,50000,C,3,500.0,U,4,700.0,U");
+		}
+
+		//Crea las estaciones espaciales
+		private void sendStations() {
+				switch(player.getMapID())
+				{
+					//hero is in 1-1, send MMO station
+					case 1:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|redStation|1|1500|1000|1000");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|1");
+						break;
+					//hero is in 2-1, send EIC station
+					case 5:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|blueStation|2|1500|19500|1250");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|2");
+						break;
+					//hero is in 3-1, send VRU station
+					case 9:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|greenStation|3|1500|19500|12500");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|3");
+						break;
+					//hero is in 1-8, send MMO station
+					case 20:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|redStation|1|1500|1000|6200");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|3");
+						break;
+					//hero is in 2-8, send EIC station
+					case 24:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|blueStation|2|1500|10000|1000");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|3");
+						break;
+					//hero is in 3-8, send VRU station
+					case 28:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|greenStation|3|1500|20000|6200");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|3");
+						break;
+					//hero is in 5-2, send Pirate station
+					case 92:
+						sendPacket(userSocket, "0|" + ServerCommands.CREATE_STATION + "|0|1|pirateStation|6|1500|11000|6400");
+						sendPacket(userSocket, "0|" + ServerCommands.CHANGE_HEALTH_STATION_STATUS + "|1");
+						sendPacket(userSocket, "0|" + ServerCommands.SET_MAP_PVP_STATUS + "|1|3");
+						break;
+				}
+			}
+
 }
