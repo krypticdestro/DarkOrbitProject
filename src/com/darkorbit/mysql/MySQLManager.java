@@ -27,7 +27,7 @@ public class MySQLManager
 		try {
 			//Create a new MySQL connection, the DSN for a MySQL connection in java is jdbc:mysql://host/databas
 			//We send the connection DSN, the username and the password as parameters
-			connection = DriverManager.getConnection("jdbc:mysql://"+host+"/"+database,username,password);
+			connection = DriverManager.getConnection("jdbc:mysql://"+host+"/"+database + "?autoReconnect=true&autoReconnectForPools=true",username,password);
 			//We set the auto commit to false, not 100% sure why did I putted this shit
 			connection.setAutoCommit(false);
 			Console.out("Connected to MySQL!");

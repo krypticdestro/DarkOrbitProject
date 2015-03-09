@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Ammunition;
+import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Settings;
 import com.darkorbit.objects.Ship;
@@ -106,7 +107,7 @@ public class QueryManager extends MySQLManager {
 
 	/**
 	 * Carga todas las naves guardadas en la base de datos al iniciar el emulador
-	 * @return
+	 * @return Numero de naves cargadas
 	 */
 	public static int loadShips() {
 		query = "SELECT * FROM ships";
@@ -143,7 +144,11 @@ public class QueryManager extends MySQLManager {
 		}
 	}
 
-
+	/**
+	 * Carga la municion del usuario //Falla si se compra y reconecta idk why
+	 * @param playerID
+	 * @return Objecto ammunition con los valores de la municion
+	 */
 	public static Ammunition loadAmmunition(int playerID) {
 		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%ammunition_laser%'";
 		ResultSet result;
@@ -189,4 +194,42 @@ public class QueryManager extends MySQLManager {
 		
 		return new Ammunition(lcb10, mcb25, mcb50, sab50, ucb100);
 	}
+
+	
+	/**
+	 * Carga los drones del player
+	 * @param playerID
+	 * @return Array of Drone
+	 */
+	public static Drone[] loadDrones(int playerID) {
+		query = "SELECT * FROM server_1_player_drones WHERE playerID=" + playerID;
+		ResultSet result;
+		//Vamos a poner 8 drones por ahora
+		Drone[] drones = new Drone[8];
+		for(int i=0; i<8; i++) {
+			//Inicializo el array en nulo por si las moscas...
+			drones[i] = null;
+		}
+		
+		try {
+			result = query(query);
+			
+			int contador = 0;
+			//Porque solo hay 8 drones, por ahora
+			while(result.next()) {
+				Drone drone = new Drone(result.getInt("drone_level"), result.getString("drone_kind"));
+				
+				drones[contador] = drone;
+				contador++;
+			}
+		} catch (SQLException e) {
+			Console.error("Couldn't load drones of player " + playerID);
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+		}
+		
+		return drones;
+	}
+	
 }

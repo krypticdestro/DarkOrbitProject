@@ -16,6 +16,7 @@ public class Player {
 	private Ship playerShip;
 	private MovementHelper movementHelper;
 	private Ammunition ammo;
+	private Drone[] drones;
 	
 	/**
 	 * Player constructor
@@ -34,7 +35,7 @@ public class Player {
 		
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
-		
+		this.drones = QueryManager.loadDrones(playerID);
 	}
 	
 	
@@ -86,6 +87,10 @@ public class Player {
 		
 		public Ammunition getAmmo() {
 			return ammo;
+		}
+		
+		public Drone[] getDrones() {
+			return drones;
 		}
 		
 	/* @end */

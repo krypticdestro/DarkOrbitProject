@@ -140,6 +140,7 @@ public class ConnectionManager extends Global implements Runnable {
 		
 		//Borra al usuario del mapa
 		sendToMap(player.getMapID(), "0|R|" + playerID);
+		Console.out("Player " + player.getPlayerID() + " disconnected or exceeded max idle time");
 		GameManager.onlinePlayers.remove(playerID);
 		cancelTimeOut();
 		closeConnection();

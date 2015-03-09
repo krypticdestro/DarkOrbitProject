@@ -9,6 +9,7 @@ import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.ConnectionManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
+import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
 import com.darkorbit.utils.Console;
 
@@ -90,6 +91,7 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
+		//setDrones();
 		setAmmunition();
 		checkPlayerPosition();
 		loadUsers();
@@ -109,7 +111,7 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|PLAY_MUSIC|"+ player.getSettings().PLAY_MUSIC);
 			sendPacket(userSocket, "0|7|PLAY_SFX|"+ player.getSettings().PLAY_SFX);
 			sendPacket(userSocket, "0|7|BAR_STATUS|"+ player.getSettings().BAR_STATUS);
-			sendPacket(userSocket, "0|7|WINDOW_SETTINGS,1|"+ player.getSettings().WINDOW_SETTINGS);
+			sendPacket(userSocket, "0|7|WINDOW_SETTINGS,3|"+ player.getSettings().WINDOW_SETTINGS);
 			sendPacket(userSocket, "0|7|AUTO_REFINEMENT|"+ player.getSettings().AUTO_REFINEMENT);
 			sendPacket(userSocket, "0|7|QUICKSLOT_STOP_ATTACK|"+ player.getSettings().QUICKSLOT_STOP_ATTACK);
 			sendPacket(userSocket, "0|7|DOUBLECLICK_ATTACK|"+ player.getSettings().DOUBLECLICK_ATTACK);
@@ -125,6 +127,56 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, loginPacket);
 		}
 		
+		
+		@SuppressWarnings("unused")
+		private void setDrones() {
+			Drone[] playerDrones = player.getDrones();
+			String packet = "";
+			
+			//El array tiene 8 posiciones, pero pueden ser null... asi que busco cuantos drones de verdad hay
+			int numDrones = 0;
+			
+			for(int i=0; i<playerDrones.length; i++) {
+				if(!(playerDrones[i] == null)) {
+					numDrones++;
+				}
+			}
+			
+			/*
+			 * 0|n|d|5|3/2-96-96,2/4-26-26-26-26,3/2-86-86 -> 8 drones
+			 * 0|n|d|5|3/1-96,2/4-26-26-26-26,3/1-86 -> 6 drones
+			 * 0|n|d|5|1/4-26-26-26-26 -> 4 drones
+			 */
+			
+			//Para cambiar la posicion del grupo de drones...
+			if(numDrones <= 4) {
+				packet += "1/" + numDrones;
+			}
+			
+			
+			//Recorro el array..
+			for(Drone d : playerDrones) {
+				if(!(d == null)) {
+
+					if(numDrones > 4) {
+						switch(numDrones) {
+							case 5:
+								packet += "";
+								break;
+						}
+					} else {
+						packet += "-" + d.getDronePacket();
+					}
+					
+					
+					
+					numDrones--;
+				}
+			}
+			
+			sendPacket(userSocket, "0|n|d|" + player.getPlayerID() + "|" + packet);
+		}
+			
 		
 		//Carga la munición
 		private void setAmmunition() {
