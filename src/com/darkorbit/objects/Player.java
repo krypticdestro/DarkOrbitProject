@@ -5,6 +5,12 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.utils.MovementHelper;
 import com.darkorbit.utils.Vector;
 
+
+/**
+ * Player class
+ * @author Borja
+ *
+ */
 public class Player {
 	private int playerID, health;
 	private String userName;
@@ -16,6 +22,7 @@ public class Player {
 	private Ship playerShip;
 	private MovementHelper movementHelper;
 	private Ammunition ammo;
+	private Rockets rockets;
 	private Drone[] drones;
 	
 	/**
@@ -35,11 +42,12 @@ public class Player {
 		
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
+		this.rockets = QueryManager.loadRockets(playerID);
 		this.drones = QueryManager.loadDrones(playerID);
 	}
 	
 	
-	/* get methods */
+	/* get methods  Self-explained*/
 	
 		public int getPlayerID() {
 			return playerID;
@@ -91,6 +99,10 @@ public class Player {
 		
 		public Drone[] getDrones() {
 			return drones;
+		}
+		
+		public Rockets getRocket() {
+			return rockets;
 		}
 		
 	/* @end */

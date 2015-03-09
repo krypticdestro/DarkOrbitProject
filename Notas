@@ -39,7 +39,10 @@
 		0|C|objectID(?)|shipId||||x|y -> Spawmea esa nave
 		
 		//Carga la municion -> 0|B|x1|x2|x3|x4|sab|rsb
-        sendPacket(socket, "0|B|" + user.x1Ammo + "|" + user.x2Ammo + "|" + user.x3Ammo + "|" + user.x4Ammo + "|0");
+        0|B|" + user.x1Ammo + "|" + user.x2Ammo + "|" + user.x3Ammo + "|" + user.x4Ammo + "|0
+        
+        //Carga misiles y minas -> 0|3|m1|m2|m3|m4|PLD-8|DRC|Wiz|minas|SMB|ISH|PEM|MinaPem|mina2|mina3
+       	0|3|1000|1000|1000|0|0|0|0|0|100|100|0|0|0|0
 		
 		0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
 		

@@ -91,8 +91,9 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
-		//setDrones();
+		setDrones();
 		setAmmunition();
+		setRocketsAndMines();
 		checkPlayerPosition();
 		loadUsers();
 		sendMyShip();
@@ -125,13 +126,21 @@ public class LoginAssembly extends Global {
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
 			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|21|CLANTAG|0|0|0";
 			sendPacket(userSocket, loginPacket);
+			
+			
+			//selecciona config 1 -> en el paquete mando por defecto datos de la config 1
+	        sendPacket(userSocket, "0|A|CC|1");
 		}
 		
-		
-		@SuppressWarnings("unused")
+		/*
+		 * Envia la informacion para cargar los drones
+		 * TODO: Rehacer de una mejor forma..
+		 */
 		private void setDrones() {
 			Drone[] playerDrones = player.getDrones();
 			String packet = "";
+			
+			//Suponiendo que la nave mira hacia arriba, ire poniendolos true cuando el grupo de drones se haya llenado
 			
 			//El array tiene 8 posiciones, pero pueden ser null... asi que busco cuantos drones de verdad hay
 			int numDrones = 0;
@@ -142,46 +151,150 @@ public class LoginAssembly extends Global {
 				}
 			}
 			
-			/*
-			 * 0|n|d|5|3/2-96-96,2/4-26-26-26-26,3/2-86-86 -> 8 drones
-			 * 0|n|d|5|3/1-96,2/4-26-26-26-26,3/1-86 -> 6 drones
-			 * 0|n|d|5|1/4-26-26-26-26 -> 4 drones
-			 */
-			
-			//Para cambiar la posicion del grupo de drones...
-			if(numDrones <= 4) {
-				packet += "1/" + numDrones;
-			}
-			
-			
-			//Recorro el array..
-			for(Drone d : playerDrones) {
-				if(!(d == null)) {
-
-					if(numDrones > 4) {
+			//Si el usuario tiene activados los drones
+			if(player.getSettings().SHOW_DRONES.equals("1")) {
+				while(numDrones > 0) {
+					
+					/* Si solo se tienen entre 0 y 4 drones (bottom group) */
+					if((numDrones > 0) && (numDrones <= 4)) {
+						//0|n|d|5|1/4-26-26-26-26 -> 4 drones
+						packet += "1/" + numDrones;
+						
+						for(int i=0; i < numDrones; i++) {
+							packet += "-" + playerDrones[i].getDronePacket();
+						}
+						
+						//En esta parte del condicional se ponen del dron 1-4 asi que igualo a 0 para salir del bucle
+						numDrones = 0;
+					} else {
+						/*
+						 * 0|n|d|5|3/2-96-96,2/4-26-26-26-26,3/2-86-86 -> 8 drones
+						 * 0|n|d|5|3/1-96,2/4-26-26-26-26,3/1-86 -> 6 drones
+						 * 0|n|d|5|1/4-26-26-26-26 -> 4 drones
+						 */
+						
 						switch(numDrones) {
+							//Si tiene 5 drones (4 bottom, 1 right)
 							case 5:
-								packet += "";
+								packet += "3/1"; //right
+								
+								//playerDrones[4] -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones[4].getDronePacket() + ",";
+								numDrones--;
+								break;
+							
+							//6 drones (4 bot, 1 right, 1 left)
+							case 6:
+								packet += "3/1"; //right
+								
+								//playerDrones[4] -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones[4].getDronePacket() + ",";
+								
+								//4 bot
+								packet += "2/4";
+								
+								for(int i=0; i < 4; i++) {
+									packet += "-" + playerDrones[i].getDronePacket();
+								}
+								
+								packet += ",";
+								
+								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
+								
+								packet += "3/1";
+								packet += "-" + playerDrones[5].getDronePacket() ;
+								
+								//Para salir del bucle
+								numDrones = 0;
+								break;
+								
+							//7 drones (4 bot, 2 right, 1 left)
+							case 7:
+								packet += "3/2"; //right
+								
+								//playerDrones[4] -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones[4].getDronePacket() + "-" + playerDrones[6].getDronePacket() + ",";
+								
+								//4 bot
+								packet += "2/4";
+								
+								for(int i=0; i < 4; i++) {
+									packet += "-" + playerDrones[i].getDronePacket();
+								}
+								
+								packet += ",";
+								
+								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
+								
+								packet += "3/1";
+								packet += "-" + playerDrones[5].getDronePacket() ;
+								
+								//Para salir del bucle
+								numDrones = 0;
+								break;
+								
+							//8 drones (4 bot, 2 right, 2 left)
+							case 8:
+								packet += "3/2"; //right
+								
+								//playerDrones[4] -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones[4].getDronePacket() + "-" + playerDrones[6].getDronePacket() + ",";
+								
+								//4 bot
+								packet += "2/4";
+								
+								for(int i=0; i < 4; i++) {
+									packet += "-" + playerDrones[i].getDronePacket();
+								}
+								
+								packet += ",";
+								
+								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
+								
+								packet += "3/2";
+								packet += "-" + playerDrones[5].getDronePacket() + "-" + playerDrones[7].getDronePacket();
+								
+								//Para salir del bucle
+								numDrones = 0;
 								break;
 						}
-					} else {
-						packet += "-" + d.getDronePacket();
 					}
-					
-					
-					
-					numDrones--;
 				}
+				
+
+				sendPacket(userSocket, "0|n|d|" + player.getPlayerID() + "|" + packet);
+				sendToMap(player.getMapID(), "0|n|d|" + player.getPlayerID() + "|" + packet);
+				
+			} else {
+				//Si el usuario no quiere ver los drones
+				int numIris = 0;
+				int numFlax = 0;
+
+				for(Drone d : playerDrones) {
+					if(!(d == null)) {
+						if(d.getDoneKind().equals("drone_iris")) {
+							numIris++;
+						} else {
+							numFlax++;
+						}
+					}
+				}
+				
+				sendPacket(userSocket, "0|n|e|" + player.getPlayerID() + "|" + numFlax + "/" + numIris);
+				sendToMap(player.getMapID(), "0|n|e|" + player.getPlayerID() + "|" + numFlax + "/" + numIris);
 			}
-			
-			sendPacket(userSocket, "0|n|d|" + player.getPlayerID() + "|" + packet);
 		}
-			
 		
 		//Carga la munición
 		private void setAmmunition() {
 			// 0|B|x1|x2|x3|x4|sab|rsb
 	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|0");
+		}
+		
+		//Carga los misiles y minas
+		private void setRocketsAndMines() {
+			//0|3|m1|m2|m3|m4|PLD-8|DRC|Wiz|minas|SMB|ISH|PEM|MinaPem|mina2|mina3
+	        sendPacket(userSocket, "0|3|" + player.getRocket().getR310() + "|" + player.getRocket().getPlt2026() + "|" + player.getRocket().getPlt2021() + "|" + player.getRocket().getPlt3030() + "|0|0|0|0|0|0|0|0|0");
 		}
 		
 		//Actualiza la posicion de los usuarios para no verlos en su posicion inicial...

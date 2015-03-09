@@ -8,6 +8,7 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
+import com.darkorbit.objects.Rockets;
 import com.darkorbit.objects.Settings;
 import com.darkorbit.objects.Ship;
 import com.darkorbit.utils.Console;
@@ -195,6 +196,54 @@ public class QueryManager extends MySQLManager {
 		return new Ammunition(lcb10, mcb25, mcb50, sab50, ucb100);
 	}
 
+	
+	/**
+	 * Carga los misiles del usuario //Falla si se compra y reconecta idk why
+	 * @param playerID
+	 * @return Objecto Rockets con los valores de la municion
+	 */
+	public static Rockets loadRockets(int playerID) {
+		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%ammunition_rocket%'";
+		ResultSet result;
+		int r310 = 0, plt2026 = 0, plt3030 = 0, plt2021 = 0;
+		
+		try {
+			result = query(query);
+			
+			while(result.next()) {
+				String[] rocketType = result.getString("lootid").split("_");
+				
+				//r-310 | plt-2026 | plt-3030 | plt-2021
+				switch(rocketType[2]) {
+					case "r-310":
+						r310 = result.getInt("Q");
+						break;
+						
+					case "plt-2026":
+						plt2026 = result.getInt("Q");
+						break;
+						
+					case "plt-3030":
+						plt3030 = result.getInt("Q");
+						break;
+						
+					case "plt-2021":
+						plt2021 = result.getInt("Q");
+						break;
+				}
+			}
+			
+		} catch (SQLException e) {
+			
+			Console.error("Couldn't load the player rockets...");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+		}
+		
+		return new Rockets(r310, plt2026, plt3030, plt2021);
+	}
+	
 	
 	/**
 	 * Carga los drones del player

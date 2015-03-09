@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 
 import com.darkorbit.mysql.MySQLManager;
 import com.darkorbit.net.GameServer;
@@ -23,6 +24,7 @@ public class Launcher {
 	private static BufferedReader configReader = null;
 	public static boolean developmentMode = false;
 	private static final String version = "Development version v0.1.7";
+	private static Scanner in = new Scanner(System.in);
 
 	/**
 	 * Main method. Reads the config file and set-up the server
@@ -38,12 +40,14 @@ public class Launcher {
 		new MySQLManager(mysqlHost, mysqlUserName, mysqlPassword, mysqlDatabase);
 		
 		new GameServer(PORT);
+		
+		waitForCommands();
 	}
 	
 	/**
 	 * Lee el archivo de configuración
 	 */
-	static void readConfigFile() {
+	private static void readConfigFile() {
 		Console.out("Reading config file...");
 		try {
 			configReader = new BufferedReader(new FileReader("config/config.ini"));
@@ -86,6 +90,18 @@ public class Launcher {
 			if(developmentMode) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	/**
+	 * Espera a la entrada de texto (comandos)
+	 */
+	private static void waitForCommands() {
+		//Quiero que siempre este escuchando..
+		while(true) {
+			//String command = in.nextLine();
+			in.nextLine();
+			System.out.println("Wait until the next update to use commands!");
 		}
 	}
 }
