@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Map.Entry;
 
 import com.darkorbit.main.Launcher;
+import com.darkorbit.objects.Player;
 import com.darkorbit.utils.Console;
 
 public class Global {
@@ -39,6 +40,14 @@ public class Global {
 	public static void sendToMap(short mapID, String packet) {
 		for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
 			if(u.getValue().player().getMapID() == mapID) {
+				sendPacket(u.getValue().getSocket(), packet);
+			}
+		}
+	}
+	
+	public static void sendToOthers(Player p, String packet) {
+		for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
+			if((u.getValue().player().getMapID() == p.getMapID()) && (u.getValue().player().getPlayerID() != p.getPlayerID())) {
 				sendPacket(u.getValue().getSocket(), packet);
 			}
 		}

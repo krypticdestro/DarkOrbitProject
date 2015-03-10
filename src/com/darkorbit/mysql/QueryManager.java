@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Ammunition;
+import com.darkorbit.objects.Clan;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Rockets;
@@ -79,7 +80,6 @@ public class QueryManager extends MySQLManager {
 				}
 				
 				if(playerResult.next()) {
-					//TODO: Rellenar con valores de la db xD
 					//Una vez tiene las opciones del jugador y sus datos los retorna
 					player = new Player(playerID, playerSettings, 
 							playerResult.getString("username"),
@@ -87,7 +87,17 @@ public class QueryManager extends MySQLManager {
 							playerResult.getShort("factionId"),
 							playerResult.getShort("mapId"),
 							new Vector(playerResult.getInt("x"), playerResult.getInt("y")),
-							playerResult.getInt("Health")
+							playerResult.getInt("Health"),
+							playerResult.getBoolean("premium"),
+							playerResult.getLong("exp"),
+							playerResult.getLong("credits"),
+							playerResult.getLong("uri"),
+							playerResult.getLong("honor"),
+							playerResult.getInt("level"),
+							playerResult.getDouble("jackpot"),
+							playerResult.getInt("rank"),
+							playerResult.getInt("GG"),
+							playerResult.getInt("clanId")
 							);
 					
 					return player;
@@ -281,4 +291,31 @@ public class QueryManager extends MySQLManager {
 		return drones;
 	}
 	
+
+	/**
+	 * Carga la información del clan del player
+	 * @param clanID ID del clan
+	 * @return Clan object
+	 */
+	public static Clan loadClan(int clanID) {
+		query = "SELECT * FROM server_1_clan WHERE clanID=" + clanID;
+		ResultSet result;
+		Clan clan = null;
+		
+		try {
+			result = query(query);
+			
+			if(result.next()) {
+				clan = new Clan(clanID, result.getString("tagName"));
+			}
+			
+		} catch (SQLException e) {
+			Console.error("Couldn't load player clan...");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+		}
+		
+		return clan;
+	}
 }

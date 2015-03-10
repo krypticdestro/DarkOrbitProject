@@ -10,6 +10,14 @@ public class Drone {
 		
 		String[] arrayKind = droneKind.split("_");
 		
+		/*
+		 * 10 -> flax (hercules)
+		 * 20 -> iris
+		 * 30 -> iris (hercules)
+		 * 40 -> iris (havok)
+		 * 50 -> zeus
+		 * 70 -> apis
+		 */
 		switch(arrayKind[1]) {
 			case "iris":
 				//20 es el codigo del iris

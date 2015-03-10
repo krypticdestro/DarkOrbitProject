@@ -92,13 +92,13 @@ public class LoginAssembly extends Global {
 		//si el login va bien, se mandan los paquetes necesarios..
 		setSettings();
 		setPlayer();
+		sendMyShip();
 		setDrones(player);
 		setAmmunition();
 		setRocketsAndMines();
 		setExtras();
 		checkPlayerPosition();
 		loadUsers();
-		sendMyShip();
 		loadHUD();
 		sendStations();
 	}
@@ -128,13 +128,27 @@ public class LoginAssembly extends Global {
 		
 		//Informacion básica del jugador
 		private void setPlayer() {
+			int premium = 0;
+			if(player.isPremium()) {
+				premium = 1;
+			} else {
+				premium = 0;
+			}
+			
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|0|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|1|2|3|124|412312|3|21|CLANTAG|0|0|0";
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
 			sendPacket(userSocket, loginPacket);
 			
 			
 			//selecciona config 1 -> en el paquete mando por defecto datos de la config 1
 	        sendPacket(userSocket, "0|A|CC|1");
+		}
+		
+		//Envia mis datos a los usuarios del mapa
+		private void sendMyShip() {
+			//0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
+			String packet = "0|C|" + player.getPlayerID() + "|" + player.getShipID() + "|3|" + player.clan().getTagName() + "|" + player.getUserName() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getRank() + "|0|0|" + player.getRings() + "|0|0";
+			sendToOthers(player, packet);
 		}
 		
 		/*
@@ -268,6 +282,7 @@ public class LoginAssembly extends Global {
 				
 
 				sendPacket(userSocket, "0|n|d|" + p.getPlayerID() + "|" + packet);
+				sendToOthers(p, "0|n|d|" + p.getPlayerID() + "|" + packet);
 				
 			} else {
 				//Si el usuario no quiere ver los drones
@@ -285,6 +300,7 @@ public class LoginAssembly extends Global {
 				}
 				//Send F:******* I:******* packet
 				sendPacket(userSocket, "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris);
+				sendToOthers(p, "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris);
 			}
 		}
 		
@@ -317,7 +333,7 @@ public class LoginAssembly extends Global {
 			}
 		}
 				
-		//Los usuarios del mismo mapa
+		//Los usuarios del mismo mapa (que se habian conectado antes que tu)
 		private void loadUsers() {
 			//Carga las naves de los jugadores del mismo mapID (cambiar en un futuro para el rango del minimapa)
 			for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
@@ -326,7 +342,7 @@ public class LoginAssembly extends Global {
 				if((u.getValue().player().getMapID() == player.getMapID()) && (u.getValue().player().getPlayerID() != player.getPlayerID())) {
 					
 					//0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
-					String packet = "0|C|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().getShipID() + "|3|CLANTAG|" + u.getValue().player().getUserName() + "|" + u.getValue().player().getPosition().getX() + "|" + u.getValue().player().getPosition().getY() + "|" + u.getValue().player().getFactionID() + "|0|1|0|0|0|0|0";
+					String packet = "0|C|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().getShipID() + "|3|" + u.getValue().player().clan().getTagName() + "|" + u.getValue().player().getUserName() + "|" + u.getValue().player().getPosition().getX() + "|" + u.getValue().player().getPosition().getY() + "|" + u.getValue().player().getFactionID() + "|" + u.getValue().player().clan().getClanID() + "|" + u.getValue().player().getRank() + "|0|0|" + u.getValue().player().getRings() + "|0|0";
 					sendPacket(userSocket, packet);
 					
 					setDrones(u.getValue().player());
@@ -337,13 +353,6 @@ public class LoginAssembly extends Global {
 					}
 				}
 			}
-		}
-		
-		//Envia mis datos a los usuarios del mapa
-		private void sendMyShip() {
-			//0|C|USERID|SHIPID|EXPANSION|CLANTAG|USERNAME|X|Y|FactionId|CLANID|RANK|WARNICON|CLANDIPLOMACY|GALAXYGATES|NPC|CLOACK
-			String packet = "0|C|" + player.getPlayerID() + "|" + player.getShipID() + "|3|CLANTAG|" + player.getUserName() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getFactionID() + "|0|1|0|0|0|0|0";
-			sendToMap(player.getMapID(), packet);
 		}
 		
 		//Varios paquetes sobre el cliente
