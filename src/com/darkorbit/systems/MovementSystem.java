@@ -1,12 +1,13 @@
-package com.darkorbit.utils;
+package com.darkorbit.systems;
 
 import java.util.Calendar;
 
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Player;
+import com.darkorbit.utils.Vector;
 
-public class MovementHelper extends Global {
+public class MovementSystem extends Global {
 	private final double vtRel = 0.84412; //Relacion velocidad juego original
 	
 	private Vector destination, oldPosition, direction;
@@ -14,7 +15,7 @@ public class MovementHelper extends Global {
 	private long lastMove, timeElapsed;
 	private Player player;
 	
-	public MovementHelper(int playerID) {
+	public MovementSystem(int playerID) {
 		this.player = GameManager.getConnectionManager(playerID).player();
 	}
 	

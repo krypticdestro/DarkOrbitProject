@@ -2,7 +2,7 @@ package com.darkorbit.objects;
 
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameManager;
-import com.darkorbit.utils.MovementHelper;
+import com.darkorbit.systems.MovementSystem;
 import com.darkorbit.utils.Vector;
 
 
@@ -22,7 +22,7 @@ public class Player {
 	
 	private Settings playerSettings;
 	private Ship playerShip;
-	private MovementHelper movementHelper;
+	private MovementSystem movementSystem;
 	private Ammunition ammo;
 	private Rockets rockets;
 	private Drone[] drones;
@@ -90,7 +90,7 @@ public class Player {
 		
 		public boolean isMoving() { return moving; }
 		
-		public MovementHelper movement() { return movementHelper; }
+		public MovementSystem movement() { return movementSystem; }
 		
 		public int getHealth() { return health; }
 		
@@ -128,12 +128,12 @@ public class Player {
 		
 		public void setPosition(Vector p) { position = p; }
 		
-		public void setMovementHelper() {
+		public void setMovementSystem() {
 			/*
 			 * Porque el constructor del movementHelper necesita que el usuario este online en el connectionManager
 			 * asi que hago un metodo para desde el connectionManager iniciarlo cuando quiera...
 			 */
-			movementHelper = new MovementHelper(playerID);
+			movementSystem = new MovementSystem(playerID);
 		}
 		
 		public void setHealth(int h) { health = h; }

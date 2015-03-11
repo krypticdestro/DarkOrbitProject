@@ -258,7 +258,7 @@ public class ConnectionManager extends Global implements Runnable {
 								GameManager.connectPlayer(this);
 								
 								//Inicia el movementHelper del player
-								player.setMovementHelper();
+								player.setMovementSystem();
 								
 								thread.setName("ConnectionManager-User_" + player.getPlayerID());
 								
