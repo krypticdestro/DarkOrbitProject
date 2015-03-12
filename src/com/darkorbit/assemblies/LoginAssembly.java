@@ -11,6 +11,7 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
+import com.darkorbit.objects.Portal;
 import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.utils.Console;
 
@@ -101,6 +102,7 @@ public class LoginAssembly extends Global {
 		loadUsers();
 		loadHUD();
 		sendStations();
+		setPortals();
 	}
 	
 	/* Login functions */
@@ -419,4 +421,14 @@ public class LoginAssembly extends Global {
 				}
 			}
 
+		//Crea los portales
+		private void setPortals() {
+			for(Entry<Integer, Portal> p : GameManager.portals.entrySet()) {
+				if(player.getMapID() == p.getValue().getMapID()) {
+					//0|p|portalId|portalGFX|1|portalX|portalY
+					String packet = "0|p|" + p.getValue().getPortalID() + "|" + p.getValue().portalGFX() + "|1|" + p.getValue().getPosition().getX() + "|" + p.getValue().getPosition().getY();
+					sendPacket(userSocket, packet);
+				}
+			}
+		}
 }

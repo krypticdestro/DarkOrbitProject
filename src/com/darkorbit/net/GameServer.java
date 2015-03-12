@@ -25,8 +25,12 @@ public class GameServer implements Runnable {
 			serverThread.start();
 			Console.out("Server initialized in port " + port);
 			
+			/*
+			 * Carga las naves y portales del juego!
+			 */
 			int nShips = QueryManager.loadShips();
 			Console.out(nShips + " Ships loaded!");
+			QueryManager.loadPortals();
 			
 			Console.out("Waiting connections...");
 		} catch (IOException e) {

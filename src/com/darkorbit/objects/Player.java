@@ -3,6 +3,7 @@ package com.darkorbit.objects;
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.systems.MovementSystem;
+import com.darkorbit.utils.Console;
 import com.darkorbit.utils.Vector;
 
 
@@ -16,7 +17,7 @@ public class Player {
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
-	private boolean moving, isPremium;
+	private boolean moving, isPremium, isJumping;
 	private long experience, credits, uridium, honor;
 	private double jackpot;
 	
@@ -55,6 +56,7 @@ public class Player {
 		this.clanID = clanID;
 		
 		this.moving = false;
+		this.isJumping = false;
 		
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
@@ -120,11 +122,14 @@ public class Player {
 		
 		public Clan clan() { return clan; }
 		
+		public boolean isJumping() { return isJumping; }
 		
 	/* @end */
 		
 	/* set methods */
 		public void isMoving(boolean m) { moving = m; }
+		
+		public void isJumping(boolean j) { isJumping = j; }
 		
 		public void setPosition(Vector p) { position = p; }
 		
@@ -146,6 +151,29 @@ public class Player {
 				return true;
 			} else {
 				return false;
+			}
+		}
+		
+		//Comprueba el rango respecto a un portal
+		public boolean isInRange(Portal p) {
+			//Actualiza la posicion del jugador..
+			movementSystem.position();
+			String packet = "layerX: " + position.getX() + "\nplayerY: " + position.getY() + "\nportalX: " + p.getPosition().getX() + "\nportalY: " + p.getPosition().getY();
+			Console.alert(packet);
+			double finalX = position.getX() - p.getPosition().getX();
+			double finalY = position.getY() - p.getPosition().getY();
+			
+			Console.alert("FINALX: " + finalX);
+			Console.alert("FINALY: " + finalY);
+			
+			double distance = Math.sqrt(finalX * finalX + finalY * finalY);
+			
+			Console.alert("DISTANCE: " + distance);
+			
+			if(distance > p.getRange()) {
+				return false;
+			} else {
+				return true;
 			}
 		}
 }

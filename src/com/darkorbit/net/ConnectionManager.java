@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Calendar;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.objects.Player;
+import com.darkorbit.objects.Portal;
+import com.darkorbit.packets.ClientCommands;
 import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.utils.Console;
 
@@ -25,7 +28,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private Socket userSocket;
 	private Thread thread;
 	private Player player = null;
-	private Timer timeOutTimer;
+	private Timer timeOutTimer, jumpTimer;
 	
 	private LoginAssembly loginAssembly;
 	
@@ -292,6 +295,51 @@ public class ConnectionManager extends Global implements Runnable {
 					player.movement().moveShip(p);
 					break;
 				
+				case ClientCommands.PORTAL_JUMP:
+					//Cuando se pulsa la 'j'
+					for(Entry<Integer, Portal> portal : GameManager.portals.entrySet()) {
+						//Si el jugador esta en el mismo mapa que el portal..
+						if(player.getMapID() == portal.getValue().getMapID()) {
+							
+							//Comprueba que el jugador no este ya saltando..
+							if(!player.isJumping()) {
+								if(player.isInRange(portal.getValue())) {
+									
+									//Si el jugador tiene al menos el nivel requerido del portal
+									if(player.getLevel() >= portal.getValue().requiredLevel()) {
+										
+										//El jugador esta en rango, ejecuto el salto!
+										sendPacket(userSocket, "0|A|STD|Jumping");
+										player.isJumping(true);
+										
+										jumpTimer = new Timer("Player" + player.getPlayerID() + " Jump Timer");
+										jumpTimer.schedule(new TimerTask(){
+											public void run() {
+												try {
+													//Jump time :)
+													Thread.sleep(3250);
+													
+													//TODO: JUMP
+													
+													player.isJumping(false);
+												} catch (InterruptedException e) {
+													e.printStackTrace();
+												}
+											}
+										}, 0);
+									} else {
+										//El jugador no tiene el nivel necesario
+										sendPacket(userSocket, "0|A|STM|");
+									}
+								} else {
+									//No esta en rango, mando paquete que avisa de ello..
+									sendPacket(userSocket, "0|A|STM|jumpgate_failed_no_gate");
+								}
+							}
+						}
+					}
+					
+					break;
 				
 			}
 		}

@@ -9,6 +9,7 @@ import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Clan;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
+import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Rockets;
 import com.darkorbit.objects.Settings;
 import com.darkorbit.objects.Ship;
@@ -317,5 +318,44 @@ public class QueryManager extends MySQLManager {
 		}
 		
 		return clan;
+	}
+
+	
+	/**
+	 * Carga los portales del juego..
+	 */
+	public static void loadPortals() {
+		//TODO: borrar el where!
+		query = "SELECT * FROM portals";
+		ResultSet result;
+		
+		try {
+			result = query(query);
+			
+			while(result.next()) {
+				Portal portal = new Portal(
+						result.getInt("id"),
+						result.getShort("mapId"),
+						new Vector(result.getInt("x"), result.getInt("y")),
+						result.getShort("toMapId"),
+						new Vector(result.getInt("newX"), result.getInt("newY")),
+						result.getInt("reqLvl"),
+						result.getInt("portalGFX")
+						);
+				
+				GameManager.addPortal(portal);
+			}
+			
+		} catch (SQLException e) {
+			Console.error("Couldn't load the game portals..");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();	
+			}
+			/*
+			 * No se puede jugar sin portales..
+			 * Relamente si, pero no quiero xD
+			 */
+			System.exit(0);
+		}
 	}
 }

@@ -3,6 +3,7 @@ package com.darkorbit.net;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Ship;
 
 public class GameManager {
@@ -38,5 +39,16 @@ public class GameManager {
 		
 		public static Ship getShip(short shipID) {
 			return ships.get(shipID);
+		}
+		
+	/* Portals map */
+		public static Map<Integer, Portal> portals = new TreeMap<Integer, Portal>();
+		
+		public static void addPortal(Portal p) {
+			portals.put(p.getPortalID(), p);
+		}
+		
+		public static Portal getPortal(int id) {
+			return portals.get(id);
 		}
 }

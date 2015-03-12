@@ -65,7 +65,10 @@ public class MovementSystem extends Global {
 				
 				timeRemaining = time - timeElapsed;
 				
-				return new Vector(oldPosition.getX() + (direction.getX() * (timeElapsed / time)), oldPosition.getY() + (direction.getY() * (timeElapsed / time)));
+				Vector flyPosition = new Vector(oldPosition.getX() + (direction.getX() * (timeElapsed / time)), oldPosition.getY() + (direction.getY() * (timeElapsed / time)));
+				player.setPosition(flyPosition);
+				
+				return flyPosition;
 			} else {
 				//ya ha llegado...
 				player.isMoving(false);

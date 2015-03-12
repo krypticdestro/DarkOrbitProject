@@ -100,8 +100,17 @@ public class Launcher {
 		//Quiero que siempre este escuchando..
 		while(true) {
 			//String command = in.nextLine();
-			in.nextLine();
-			System.out.println("Wait until the next update to use commands!");
+			String[] ccommand = in.nextLine().split(" ");
+			
+			switch(ccommand[0]) {
+				case "help":
+					Console.out("List of available commands:\n");
+					System.out.println("- help => shows this awesome list");
+					break;
+					
+				default:
+					Console.out("Unknown command :/");
+			}
 		}
 	}
 }
