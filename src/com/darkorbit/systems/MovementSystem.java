@@ -29,7 +29,7 @@ public class MovementSystem extends Global {
 		
 		oldPosition = new Vector(Integer.parseInt(p[3]), Integer.parseInt(p[4]));
 		
-		int vel = player.getShip().getShipSpeed(); //Tener en cuenta que luego la velocidad aumentara con el equipamiento
+		int vel = player.getShip().getShipSpeed() + player.getSpeed();
 				
 		direction = new Vector(destination.getX() - oldPosition.getX(), destination.getY() - oldPosition.getY());
 		

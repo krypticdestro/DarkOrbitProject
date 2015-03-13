@@ -1,5 +1,6 @@
 package com.darkorbit.objects;
 
+import com.darkorbit.utils.Extra;
 import com.darkorbit.utils.Vector;
 
 public class Portal {
@@ -37,4 +38,9 @@ public class Portal {
 		public int getRange() { return range; }
 	
 	/* @end */
+		
+		//Pinta el rango del portal
+		public void drawRange() {
+			Extra.drawRange(mapID, position.getX(), position.getY());
+		}
 }

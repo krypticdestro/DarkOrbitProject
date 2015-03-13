@@ -22,7 +22,7 @@ public class Launcher {
 	private static String mysqlDatabase = null;
 	
 	private static BufferedReader configReader = null;
-	public static boolean developmentMode = false;
+	public static boolean developmentMode = true;
 	private static final String version = "Development version v0.1.7";
 	private static Scanner in = new Scanner(System.in);
 
@@ -34,6 +34,9 @@ public class Launcher {
 	public static void main(String[] args) throws IOException {
 		System.out.println("DarkOrbit Game Server (C) 2015 - " + version);
 		System.out.println("Starting up everything...\n");
+		if(developmentMode) {
+			Console.alert("Disable by default development mode in official releases!");
+		}
 		readConfigFile();
 		
 		Console.out("Connecting to MySQL...");
@@ -59,11 +62,6 @@ public class Launcher {
 
 				String[] values = line.split("=");
 				switch(values[0]) {
-					case "developmentMode":
-						developmentMode = Boolean.parseBoolean(values[1]);
-						if(developmentMode) Console.alert("DevelopmentMode Activated!!");
-						break;
-						
 					case "mysqlHost":
 						mysqlHost = values[1];
 						break;
@@ -106,6 +104,17 @@ public class Launcher {
 				case "help":
 					Console.out("List of available commands:\n");
 					System.out.println("- help => shows this awesome list");
+					System.out.println("- devmode => enable/disable development mode. Which includes information about packets and detailed error messages");
+					break;
+					
+				case "devmode":
+					if(!developmentMode) {
+						developmentMode = true;
+						Console.alert("DevelopmentMode Activated");
+					} else {
+						developmentMode = false;
+						Console.alert("DevelopmentMode Desactivated.");
+					}
 					break;
 					
 				default:

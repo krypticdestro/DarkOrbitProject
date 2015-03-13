@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
+import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.packets.ClientCommands;
@@ -36,6 +37,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private int idle = 0;
 	private final int maxIdle = 24; // 1 = 25 segundos ; 24 = 600 segundos = 10 minutos
 	private long lastPacket = 0;
+	private boolean portalFound = false;
 	public boolean timedOut = false;
 
 	
@@ -138,8 +140,8 @@ public class ConnectionManager extends Global implements Runnable {
 	 */
 	public void disconnectPlayer() throws IOException {
 		
-		//if(player.canDisconnect()) - por si le estan atacando, etc...
-		//saveData();
+		//TODO: if(player.canDisconnect()) - por si le estan atacando, etc...
+		saveData();
 		
 		//Borra al usuario del mapa
 		sendToMap(player.getMapID(), "0|R|" + playerID);
@@ -147,6 +149,23 @@ public class ConnectionManager extends Global implements Runnable {
 		GameManager.onlinePlayers.remove(playerID);
 		cancelTimeOut();
 		closeConnection();
+	}
+	
+	/**
+	 * Guarda toda la información necesaria..
+	 */
+	private void saveData() {
+		/* player data */
+		
+			//Default player update query
+			String query = "UPDATE server_1_players SET ";
+			
+			//Actualizo y guardo la posicion del usuario
+			query += "x=" + player.getPosition().getX() + ", y=" + player.getPosition().getY() + ", mapId=" + player.getMapID();
+			query += " WHERE playerID=" + player.getPlayerID();
+		
+			QueryManager.updateSql(query);
+		/* @end */
 	}
 	
 	/**
@@ -227,6 +246,44 @@ public class ConnectionManager extends Global implements Runnable {
 						}
 					}
 					break;
+					
+				case "/portalsRange":
+					try {
+						if(Boolean.parseBoolean(p[1]) == true) {
+							for(Entry<Integer, Portal> p2 : GameManager.portals.entrySet()) {
+								if(player.getMapID() == p2.getValue().getMapID()) {
+									p2.getValue().drawRange();
+								}
+							}
+						} else {
+							System.out.println(GameManager.rangeShips.size());
+							for(Entry<Integer, Integer> ship : GameManager.rangeShips.entrySet()) {
+								sendToMap(player.getMapID(), "0|K|" + (ship.getValue() - 1)); //No me preguntes muy bien porque xD
+							}
+						}
+						
+					} catch(Exception e) {
+						sendPacket(userSocket, "0|A|STM|wrong_packet_parameter");
+						if(Launcher.developmentMode) {
+							e.printStackTrace();
+						}
+					}
+					break;
+					
+				case "/speed":
+					try {
+						for(Entry<Integer, ConnectionManager> o : GameManager.onlinePlayers.entrySet()) {
+							if(Integer.parseInt(p[1]) == o.getValue().player().getPlayerID()) {
+								o.getValue().player().setSpeed(Integer.parseInt(p[2]));
+							}
+						}
+						
+					} catch(Exception e) {
+						sendPacket(userSocket, "0|A|STM|wrong_packet_parameter");
+						if(Launcher.developmentMode) {
+							e.printStackTrace();
+						}
+					}
 			}
 			
 		} else {
@@ -291,13 +348,16 @@ public class ConnectionManager extends Global implements Runnable {
 					break;
 					
 				case ServerCommands.SHIP_MOVEMENT:
-					//Mueve la nave
+					//1|newX|newY|oldX|oldY => Mueve la nave
 					player.movement().moveShip(p);
 					break;
 				
 				case ClientCommands.PORTAL_JUMP:
 					//Cuando se pulsa la 'j'
+					portalFound = false;
+					
 					for(Entry<Integer, Portal> portal : GameManager.portals.entrySet()) {
+						
 						//Si el jugador esta en el mismo mapa que el portal..
 						if(player.getMapID() == portal.getValue().getMapID()) {
 							
@@ -307,37 +367,72 @@ public class ConnectionManager extends Global implements Runnable {
 									
 									//Si el jugador tiene al menos el nivel requerido del portal
 									if(player.getLevel() >= portal.getValue().requiredLevel()) {
-										
 										//El jugador esta en rango, ejecuto el salto!
+										
+										portalFound = true; /* para bloquear el mensaje de portal no encontrado generado por el bucle for */
+										
 										sendPacket(userSocket, "0|A|STD|Jumping");
 										player.isJumping(true);
+										
+										ConnectionManager connectionManager = this;
 										
 										jumpTimer = new Timer("Player" + player.getPlayerID() + " Jump Timer");
 										jumpTimer.schedule(new TimerTask(){
 											public void run() {
 												try {
 													//Jump time :)
-													Thread.sleep(3250);
+													sendPacket(userSocket, "0|U|99|" + portal.getValue().getPortalID());
+													Thread.sleep(3250); //tiempo de salto..
 													
-													//TODO: JUMP
+													//Borra el grafico del usuario..
+													sendToMap(player.getMapID(), "0|R|" + player.getPlayerID());
+													
+													player.setPosition(portal.getValue().getDestination());
+													player.setMapID(portal.getValue().getToMapID());
+													saveData();
+																									
+													/*
+													 * Cierran los sockets antiguos que tenia abiertos y el timeout
+													 * 
+													 * El propio cliente manda un nuevo paquete de login por "la conexion perdida"
+													 * por lo que se ejecuta como si fuera un usuario nuevo metiendose al juego
+													 */
+													GameManager.getConnectionManager(player.getPlayerID()).cancelTimeOut();
+													GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
+													//Y vuelvo a añadirlo como jugador online
+													GameManager.connectPlayer(connectionManager);
+													
+													Console.out("Player " + player.getPlayerID() + " jumped to mapID=" + portal.getValue().getToMapID());
 													
 													player.isJumping(false);
-												} catch (InterruptedException e) {
+													portalFound = false;
+												} catch (InterruptedException | IOException e) {
 													e.printStackTrace();
 												}
+												
+												jumpTimer.cancel();
+												jumpTimer.purge();
 											}
 										}, 0);
+										
+										break;
+										
 									} else {
 										//El jugador no tiene el nivel necesario
-										sendPacket(userSocket, "0|A|STM|");
+										portalFound = true;
+										sendPacket(userSocket, "0|A|STM|jumplevelfalse|" + portal.getValue().requiredLevel());
+										break;
 									}
-								} else {
-									//No esta en rango, mando paquete que avisa de ello..
-									sendPacket(userSocket, "0|A|STM|jumpgate_failed_no_gate");
 								}
 							}
 						}
-					}
+					} /*@end for*/
+					
+					//Si no se ha encontrado un portal y el usuario no esta saltando--
+					 if(!portalFound && !player.isJumping()) {
+							//No esta en rango, mando paquete que avisa de ello..
+							sendPacket(userSocket, "0|A|STM|jumpgate_failed_no_gate");
+					 }
 					
 					break;
 				

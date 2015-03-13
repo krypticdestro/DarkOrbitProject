@@ -51,4 +51,12 @@ public class GameManager {
 		public static Portal getPortal(int id) {
 			return portals.get(id);
 		}
+		
+	/* Range phoenix (Extra function) */
+		public static Map<Integer, Integer> rangeShips = new TreeMap<Integer, Integer>();
+		
+		public static void addRangeShip(int id) {
+			rangeShips.put(rangeShips.size(), id);
+		}
+
 }

@@ -3,7 +3,6 @@ package com.darkorbit.objects;
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.systems.MovementSystem;
-import com.darkorbit.utils.Console;
 import com.darkorbit.utils.Vector;
 
 
@@ -13,7 +12,7 @@ import com.darkorbit.utils.Vector;
  *
  */
 public class Player {
-	private int playerID, health, level, rank, rings, clanID;
+	private int playerID, health, level, rank, rings, clanID, speed;
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
@@ -54,6 +53,7 @@ public class Player {
 		this.rank = rank;
 		this.rings = rings;
 		this.clanID = clanID;
+		this.speed = 0; //por defecto hasta que programe el equipamiento..
 		
 		this.moving = false;
 		this.isJumping = false;
@@ -124,6 +124,8 @@ public class Player {
 		
 		public boolean isJumping() { return isJumping; }
 		
+		public int getSpeed() { return speed; }
+		
 	/* @end */
 		
 	/* set methods */
@@ -132,6 +134,10 @@ public class Player {
 		public void isJumping(boolean j) { isJumping = j; }
 		
 		public void setPosition(Vector p) { position = p; }
+		
+		public void setMapID(short m) { mapID = m; }
+		
+		public void setSpeed(int s) { speed = s; }
 		
 		public void setMovementSystem() {
 			/*
@@ -158,17 +164,11 @@ public class Player {
 		public boolean isInRange(Portal p) {
 			//Actualiza la posicion del jugador..
 			movementSystem.position();
-			String packet = "layerX: " + position.getX() + "\nplayerY: " + position.getY() + "\nportalX: " + p.getPosition().getX() + "\nportalY: " + p.getPosition().getY();
-			Console.alert(packet);
+			
 			double finalX = position.getX() - p.getPosition().getX();
 			double finalY = position.getY() - p.getPosition().getY();
 			
-			Console.alert("FINALX: " + finalX);
-			Console.alert("FINALY: " + finalY);
-			
 			double distance = Math.sqrt(finalX * finalX + finalY * finalY);
-			
-			Console.alert("DISTANCE: " + distance);
 			
 			if(distance > p.getRange()) {
 				return false;
@@ -176,4 +176,7 @@ public class Player {
 				return true;
 			}
 		}
+
+
+		
 }

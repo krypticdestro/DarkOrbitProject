@@ -57,4 +57,17 @@ public class MySQLManager
 		//And return the result
 		return result;
 	}
+	
+	public static void SQLUpdate(String query) {
+		String query2 = query;
+		try {
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(query2);
+		} catch(SQLException error) {
+			Console.error("Error with SQLUpdate..");
+			if(Launcher.developmentMode) {
+				error.printStackTrace();
+			}
+		}
+	}
 }

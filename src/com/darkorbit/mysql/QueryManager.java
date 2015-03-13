@@ -20,6 +20,11 @@ public class QueryManager extends MySQLManager {
 	
 	public static String query = null;
 	
+	
+	public static void updateSql(String query) {
+		SQLUpdate(query);
+	}
+	
 	/**
 	 * Carga la cuenta del usuario desde la base de datos
 	 * @param playerID
