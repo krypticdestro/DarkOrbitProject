@@ -140,7 +140,7 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|SLOTMENU_ORDER,3|" + player.getSettings().SLOTMENU_ORDER);
 		}
 		
-		//Informacion básica del jugador
+		//Informacion bï¿½sica del jugador
 		private void setPlayer() {
 			int premium = 0;
 			if(player.isPremium()) {
@@ -318,7 +318,7 @@ public class LoginAssembly extends Global {
 			}
 		}
 		
-		//Carga la munición
+		//Carga la municiï¿½n
 		private void setAmmunition() {
 			// 0|B|x1|x2|x3|x4|sab|rsb
 	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|0");
@@ -330,9 +330,9 @@ public class LoginAssembly extends Global {
 	        sendPacket(userSocket, "0|3|" + player.getRocket().getR310() + "|" + player.getRocket().getPlt2026() + "|" + player.getRocket().getPlt2021() + "|" + player.getRocket().getPlt3030() + "|0|0|0|0|0|0|0|0|0");
 		}
 	
-		//Carga los extras -> TODO:
+		//Carga los extras -> TODO: add extras setUp
 		private void setExtras() {
-			//Inicializa los extras vacios. TODO:
+			//Inicializa los extras vacios.
 			sendPacket(userSocket, "0|A|ITM|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0");
 		}
 		

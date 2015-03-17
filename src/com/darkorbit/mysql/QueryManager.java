@@ -8,11 +8,11 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Clan;
 import com.darkorbit.objects.Drone;
+import com.darkorbit.objects.Equipment;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Rockets;
 import com.darkorbit.objects.Settings;
-import com.darkorbit.objects.Equipment;
 import com.darkorbit.objects.Ship;
 import com.darkorbit.utils.Console;
 import com.darkorbit.utils.Vector;
@@ -110,7 +110,7 @@ public class QueryManager extends MySQLManager {
 					
 					return player;
 				} else {
-					//Sino pues ná!
+					//Sino pues nï¿½!
 					return null;
 				}
 			}
@@ -229,10 +229,9 @@ public class QueryManager extends MySQLManager {
 			result = query(query);
 			
 			while(result.next()) {
-				String[] rocketType = result.getString("lootid").split("_");
 				
-				//r-310 | plt-2026 | plt-3030 | plt-2021
-				switch(rocketType[2]) {
+				//r-310 | plt-2026 | plt-3030 | plt-2021 => RocketType
+				switch(result.getString("lootid").split("_")[2]) {
 					case "r-310":
 						r310 = result.getInt("Q");
 						break;
@@ -301,7 +300,7 @@ public class QueryManager extends MySQLManager {
 	
 
 	/**
-	 * Carga la información del clan del player
+	 * Carga la informaciï¿½n del clan del player
 	 * @param clanID ID del clan
 	 * @return Clan object
 	 */
@@ -366,25 +365,67 @@ public class QueryManager extends MySQLManager {
 		}
 	}
 
-	//TODO: THIS SHIEEEET;
-	public static Equipment loadEquipment(int playerID) {
-		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%equipment%'";
+	//TODO: Poner los datos de las query bien :P | Care with config :/
+	public static Equipment loadEquipment(int playerID, int config) {
+		/*
+		 * Aqui deberia seleccionar el equipamiento que tiene el usuario, si no me equivoco vienen dados con la siguiente estructura...
+		 * 
+		 * (string) = "12,41,5,1,2,5,...";
+		 * 
+		 * Y luego cada uno de ellos compararlo en la tabla de '_all_items" para ver que diablos son..
+		 */
+		String[] itemArray = null;
+		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0;
+		
+		query = "SELECT * FROM server_1_general_ship WHERE playerID=" + playerID;
 		ResultSet result;
 		
 		try {
 			result = query(query);
 			while(result.next()) {
+				itemArray = result.getString("generators").split(",");
 				
+				//TODO: Add more equipment objects.. | Tengo que ver como hacer un array que englobe todos los objetos
+			}
+			
+			//Ahora busco cada item.. si el array no esta vacio
+			if(!itemArray.equals(null)) {
+				for(int i=0; i<itemArray.length; i++) {
+					query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + itemArray[i];
+					ResultSet itemResult = query(query);
+					
+					while(itemResult.next()) {
+						//En funcion de que objeto sea.. TODO: Cambiar la posicion del array if needed
+						switch(itemResult.getString("lootid").split("_")[0]) {
+							case "B02":
+								B02++;
+								break;
+							case "B01":
+								B01++;
+								break;
+							case "A03":
+								A03++;
+								break;
+							case "A02":
+								A02++;
+								break;
+							case "A01":
+								A01++;
+								break;
+						}
+					}
+				}
 			}
 			
 			
+			
 		} catch (SQLException e) {
-			Console.error("Couldn't load player " + playerID + " TODOOOOOOOOO FUCK THAT");
+			Console.error("Couldn't load player " + playerID + " equipment");
 			if(Launcher.developmentMode) {
 				e.printStackTrace();
 			}
 		}
 		
-		return new Equipment();
+		return new Equipment(B02, B01, A03, A02, A01);
 	}
 }

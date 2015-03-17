@@ -10,7 +10,7 @@ import com.darkorbit.utils.Console;
 
 /**
  * Crea un hilo con un ServerSocket y manda las conexiones al ConnectionHandler
- * @author Borja Sanchidrián
+ * @author Borja Sanchidriï¿½n
  */
 
 public class GameServer implements Runnable {
@@ -49,7 +49,6 @@ public class GameServer implements Runnable {
 				if(incomingConnection.isConnected()) {
 					//user connected!
 					Console.out("Connection detected!");
-					//TODO: que necesito? los usuarios necesitan un ID como minimo!!
 					new ConnectionManager(incomingConnection);
 				}
 			} catch (IOException e) {

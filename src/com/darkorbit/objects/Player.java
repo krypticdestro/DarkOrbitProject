@@ -27,7 +27,7 @@ public class Player {
 	private Rockets rockets;
 	private Drone[] drones;
 	private Clan clan;
-	private Equipment equipment;
+	private Equipment config1, config2;
 	
 	/**
 	 * Player constructor
@@ -54,7 +54,7 @@ public class Player {
 		this.rank = rank;
 		this.rings = rings;
 		this.clanID = clanID;
-		this.speed = 0; //por defecto hasta que programe el equipamiento..
+		this.speed = 0; //TODO: por defecto hasta que programe el equipamiento..
 		
 		this.moving = false;
 		this.isJumping = false;
@@ -63,6 +63,11 @@ public class Player {
 		this.ammo = QueryManager.loadAmmunition(playerID);
 		this.rockets = QueryManager.loadRockets(playerID);
 		this.drones = QueryManager.loadDrones(playerID);
+		/*
+		 * QueryManager.loadEquipment(playerID, configNum)
+		 */
+		this.config1 = QueryManager.loadEquipment(playerID, 1);
+		this.config2 = QueryManager.loadEquipment(playerID, 2);
 		
 		if(hasClan()) {
 			this.clan = QueryManager.loadClan(clanID);
@@ -126,6 +131,10 @@ public class Player {
 		public boolean isJumping() { return isJumping; }
 		
 		public int getSpeed() { return speed; }
+		
+		public Equipment config1() { return config1; }
+		
+		public Equipment config2() { return config2; }
 		
 	/* @end */
 		
