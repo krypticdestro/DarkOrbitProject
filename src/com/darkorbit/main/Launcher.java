@@ -5,12 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.darkorbit.mysql.MySQLManager;
 import com.darkorbit.net.GameServer;
+import com.darkorbit.net.Global;
 import com.darkorbit.utils.Console;
 
-public class Launcher {
+public class Launcher extends Global {
 
 	private static final int PORT = 8080;
 	public static final String clientVersion = "4.1";
@@ -105,6 +108,7 @@ public class Launcher {
 					Console.out("List of available commands:\n");
 					System.out.println("- help => shows this awesome list");
 					System.out.println("- devmode => enable/disable development mode. Which includes information about packets and detailed error messages");
+					System.out.println("- close <seconds> => shutdown the server in the choosen time");
 					break;
 					
 				case "devmode":
@@ -117,6 +121,35 @@ public class Launcher {
 					}
 					break;
 					
+				case "close":
+					try {
+						int seconds = Integer.parseInt(ccommand[1]);
+						Timer closeTimer = new Timer("closeTimer");
+						closeTimer.schedule(new TimerTask() {
+							public void run() {
+								if(seconds >= 0) {
+									
+									for(int i=seconds; i>0; i--) {
+										sendToAll("0|A|STM|server_close_n_seconds|" + i);
+										Console.alert("Closing server in " + i);
+										try {
+											Thread.sleep(1000);
+										} catch (InterruptedException e) { }
+									}
+									
+									System.exit(0);
+								}
+								
+								closeTimer.cancel();
+								closeTimer.purge();
+							}
+						}, 0);
+					} catch(Exception e) {
+						if(developmentMode) {
+							e.printStackTrace();
+						}
+					}
+					break;
 				default:
 					Console.out("Unknown command :/");
 			}

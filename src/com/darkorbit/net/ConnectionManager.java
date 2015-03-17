@@ -141,6 +141,8 @@ public class ConnectionManager extends Global implements Runnable {
 	public void disconnectPlayer() throws IOException {
 		
 		//TODO: if(player.canDisconnect()) - por si le estan atacando, etc...
+		//Actualiza la posicion del usuario para que al guardarla sea la "ultima conocida"
+		player.movement().position();
 		saveData();
 		
 		//Borra al usuario del mapa
@@ -155,16 +157,37 @@ public class ConnectionManager extends Global implements Runnable {
 	 * Guarda toda la información necesaria..
 	 */
 	private void saveData() {
+		String query = "";
 		/* player data */
 		
 			//Default player update query
-			String query = "UPDATE server_1_players SET ";
+			query = "UPDATE server_1_players SET ";
 			
 			//Actualizo y guardo la posicion del usuario
 			query += "x=" + player.getPosition().getX() + ", y=" + player.getPosition().getY() + ", mapId=" + player.getMapID();
 			query += " WHERE playerID=" + player.getPlayerID();
 		
 			QueryManager.updateSql(query);
+			query = "";
+		/* @end */
+			
+		/* player settings */
+			
+			//Default player update query
+			query = "UPDATE server_1_players_settings SET ";
+			
+			query += "AUTO_REFINEMENT=" + player.getSettings().AUTO_REFINEMENT + ", QUICKSLOT_STOP_ATTACK=" + player.getSettings().QUICKSLOT_STOP_ATTACK + ", ";
+			query += "DOUBLECLICK_ATTACK=" + player.getSettings().DOUBLECLICK_ATTACK + ", AUTO_START=" + player.getSettings().AUTO_START + ", ";
+			query += "DISPLAY_NOTIFICATIONS=" + player.getSettings().DISPLAY_NOTIFICATIONS + ", SHOW_DRONES=" + player.getSettings().SHOW_DRONES + ", ";
+			query += "DISPLAY_WINDOW_BACKGROUND=" + player.getSettings().DISPLAY_WINDOW_BACKGROUND + ", ALWAYS_DRAGGABLE_WINDOWS=" + player.getSettings().ALWAYS_DRAGGABLE_WINDOWS + ", ";
+			query += "PRELOAD_USER_SHIPS=" + player.getSettings().PRELOAD_USER_SHIPS + ", QUICKBAR_SLOT='" + player.getSettings().QUICKBAR_SLOT + "', ";
+			query += "MAINMENU_POSITION='" + player.getSettings().MAINMENU_POSITION + "', SLOTMENU_POSITION='" + player.getSettings().SLOTMENU_POSITION + "', ";
+			query += "SLOTMENU_ORDER=" + player.getSettings().SLOTMENU_ORDER + ", SETTINGS='" + player.getSettings().SET + "', WINDOW_SETTINGS='" + player.getSettings().WINDOW_SETTINGS + "'";
+			
+			query += " WHERE playerID=" + player.getPlayerID();
+			
+			QueryManager.updateSql(query);
+			query = "";
 		/* @end */
 	}
 	
@@ -239,7 +262,7 @@ public class ConnectionManager extends Global implements Runnable {
 				case "/p":
 					//Envia un paquete directamente al usuario
 					try {
-						sendPacket(userSocket, p[1]);
+						sendToMap(player.getMapID(), p[1]);
 					} catch(Exception e) {
 						if(Launcher.developmentMode) {
 							e.printStackTrace();
@@ -256,7 +279,6 @@ public class ConnectionManager extends Global implements Runnable {
 								}
 							}
 						} else {
-							System.out.println(GameManager.rangeShips.size());
 							for(Entry<Integer, Integer> ship : GameManager.rangeShips.entrySet()) {
 								sendToMap(player.getMapID(), "0|K|" + (ship.getValue() - 1)); //No me preguntes muy bien porque xD
 							}
@@ -272,9 +294,15 @@ public class ConnectionManager extends Global implements Runnable {
 					
 				case "/speed":
 					try {
+						int maxSpeed = 700;
+						
 						for(Entry<Integer, ConnectionManager> o : GameManager.onlinePlayers.entrySet()) {
 							if(Integer.parseInt(p[1]) == o.getValue().player().getPlayerID()) {
-								o.getValue().player().setSpeed(Integer.parseInt(p[2]));
+								if(Integer.parseInt(p[2]) > maxSpeed) {
+									o.getValue().player().setSpeed(maxSpeed);
+								} else {
+									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
+								}
 							}
 						}
 						
@@ -355,7 +383,6 @@ public class ConnectionManager extends Global implements Runnable {
 				case ClientCommands.PORTAL_JUMP:
 					//Cuando se pulsa la 'j'
 					portalFound = false;
-					
 					for(Entry<Integer, Portal> portal : GameManager.portals.entrySet()) {
 						
 						//Si el jugador esta en el mismo mapa que el portal..
@@ -435,7 +462,100 @@ public class ConnectionManager extends Global implements Runnable {
 					 }
 					
 					break;
-				
+					
+				case ServerCommands.SELECT:
+					int targetID = Integer.parseInt(p[1]);
+					sendPacket(userSocket, "0|N|" + targetID + "|" + player.getShipID() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0");
+					break;
+
+				/*
+				 * Cuando el jugador cambia alguna opcion del cliente :D
+				 */
+				case ServerCommands.CLIENT_SETTING:
+					try {
+						switch(p[1]) {
+							case "AUTO_REFINEMENT":
+								player.getSettings().AUTO_REFINEMENT = p[2];
+								break;
+								
+							case "QUICKSLOT_STOP_ATTACK":
+								player.getSettings().QUICKSLOT_STOP_ATTACK = p[2];
+								break;
+								
+							case "DOUBLECLICK_ATTACK":
+								player.getSettings().DOUBLECLICK_ATTACK = p[2];
+								break;
+								
+							case "AUTO_START":
+								player.getSettings().AUTO_START = p[2];
+								break;
+								
+							case "DISPLAY_NOTIFICATIONS":
+								player.getSettings().DISPLAY_NOTIFICATIONS = p[2];
+								break;
+								
+							case "SHOW_DRONES":
+								player.getSettings().SHOW_DRONES = p[2];
+								break;
+								
+							case "DISPLAY_WINDOW_BACKGROUND":
+								player.getSettings().DISPLAY_WINDOW_BACKGROUND = p[2];
+								break;
+								
+							case "ALWAYS_DRAGGABLE_WINDOWS":
+								player.getSettings().ALWAYS_DRAGGABLE_WINDOWS = p[2];
+								break;
+								
+							case "PRELOAD_USER_SHIPS":
+								player.getSettings().PRELOAD_USER_SHIPS = p[2];
+								break;
+								
+							case "QUICKBAR_SLOT":
+								player.getSettings().QUICKBAR_SLOT = p[2];
+								break;
+								
+							case "MAINMENU_POSITION,3":
+								player.getSettings().MAINMENU_POSITION = p[2];
+								break;
+								
+							case "SLOTMENU_POSITION,3":
+								player.getSettings().SLOTMENU_POSITION = p[2];
+								break;
+								
+							case "SLOTMENU_ORDER,3":
+								player.getSettings().SLOTMENU_ORDER = p[2];
+								break;
+								
+							case "WINDOW_SETTINGS,3":
+								player.getSettings().WINDOW_SETTINGS = p[2];
+								break;
+							
+						}
+						
+					} catch(Exception e) {
+						if(Launcher.developmentMode) e.printStackTrace();
+					}
+					break;
+					
+				/*
+				 * 
+				 */
+				case ServerCommands.SET_ATTRIBUTE:
+					/*
+					 * Mas opciones del cliente como el switch de arriba..
+					 */
+					if(p[1].equals(ServerCommands.SET_FLASH_SETTINGS)) {
+						/*
+						 * El paquete es 0|A|SET|1|0|0|1|.... => 27 elementos
+						 */
+						String paket = "";
+						for(int i=2; i<27; i++) {
+							paket += "|" + p[i];
+						}
+						
+						player.getSettings().SET = paket;
+					}
+					break;
 			}
 		}
 	}

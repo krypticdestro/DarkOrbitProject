@@ -53,6 +53,12 @@ public class Global {
 		}
 	}
 	
+	public static void sendToAll(String packet) {
+		for(Entry<Integer, ConnectionManager> u : GameManager.onlinePlayers.entrySet()) {
+			sendPacket(u.getValue().getSocket(), packet);
+		}
+	}
+	
 	/**
 	 * Envia el policy necesario de flash - Buscar en google para mas info xD
 	 * @param socket

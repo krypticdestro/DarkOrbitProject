@@ -12,6 +12,7 @@ import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Rockets;
 import com.darkorbit.objects.Settings;
+import com.darkorbit.objects.Equipment;
 import com.darkorbit.objects.Ship;
 import com.darkorbit.utils.Console;
 import com.darkorbit.utils.Vector;
@@ -80,8 +81,9 @@ public class QueryManager extends MySQLManager {
 							settingsResult.getString("QUALITY_EFFECT"),
 							settingsResult.getString("QUALITY_EXPLOSION"),
 							settingsResult.getString("QUICKBAR_SLOT"),
-							settingsResult.getString("SLOTMENU_POSITION"),						
-							settingsResult.getString("SLOTMENU_ORDER")
+							settingsResult.getString("SLOTMENU_POSITION"),
+							settingsResult.getString("SLOTMENU_ORDER"),
+							settingsResult.getString("MAINMENU_POSITION")
 							);
 				}
 				
@@ -362,5 +364,27 @@ public class QueryManager extends MySQLManager {
 			 */
 			System.exit(0);
 		}
+	}
+
+	//TODO: THIS SHIEEEET;
+	public static Equipment loadEquipment(int playerID) {
+		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%equipment%'";
+		ResultSet result;
+		
+		try {
+			result = query(query);
+			while(result.next()) {
+				
+			}
+			
+			
+		} catch (SQLException e) {
+			Console.error("Couldn't load player " + playerID + " TODOOOOOOOOO FUCK THAT");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+		}
+		
+		return new Equipment();
 	}
 }

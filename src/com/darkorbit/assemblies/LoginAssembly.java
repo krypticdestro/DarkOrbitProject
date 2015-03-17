@@ -52,8 +52,17 @@ public class LoginAssembly extends Global {
 				
 				try {
 					//Cierran los sockets antiguos que tenia abiertos y el timeout
-					GameManager.getConnectionManager(player.getPlayerID()).cancelTimeOut();
-					GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
+					GameManager.getConnectionManager(player.getPlayerID()).disconnectPlayer();
+					/*
+					 * Sobreescribo la carga de la cuenta porque la posicion del usuario va a cambiar cuando se ejecute el disconnectPlayer.
+					 * en vez de la posicion del ultimo sitio donde ese usuario ha usado un portal, o desconectado "bien" va a cambiar a la 
+					 * que estaba en el momento en el que ha reiniciado el cliente. 
+					 * 
+					 * Es decir si el usuario esta volando de un lado a otro del mapa 
+					 * y reinicia el cliente la posicion exacta se va a actualizar en la DB con disconnectPlayer() asi que tengo que volver a leer 
+					 * la DB 
+					 */
+					player = QueryManager.loadAccount(playerID);
 					
 					//login normal
 					startLogin();
@@ -111,8 +120,6 @@ public class LoginAssembly extends Global {
 		//Manda las opciones del cliente
 		private void setSettings() {
 			//Envia al cliente las opciones del juego
-			
-			sendPacket(userSocket, "0|A|SET|"+ player.getSettings().SET);
 			sendPacket(userSocket, "0|7|MINIMAP_SCALE,1|"+player.getSettings().MINIMAP_SCALE);
 			sendPacket(userSocket, "0|7|DISPLAY_PLAYER_NAMES|"+ player.getSettings().DISPLAY_PLAYER_NAMES);
 			sendPacket(userSocket, "0|7|DISPLAY_CHAT|"+ player.getSettings().DISPLAY_CHAT);
@@ -126,6 +133,11 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|AUTO_START|"+ player.getSettings().AUTO_START);
 			sendPacket(userSocket, "0|7|DISPLAY_NOTIFICATIONS|"+ player.getSettings().DISPLAY_NOTIFICATIONS);
 			sendPacket(userSocket, "0|7|SHOW_DRONES|"+ player.getSettings().SHOW_DRONES);
+			sendPacket(userSocket, "0|A|SET"+ player.getSettings().SET); //Quito la | aposta porque va por defecto en la DB
+			sendPacket(userSocket, "0|7|QUICKBAR_SLOT|" + player.getSettings().QUICKBAR_SLOT);
+			sendPacket(userSocket, "0|7|MAINMENU_POSITION,3|" + player.getSettings().MAINMENU_POSITION);
+			sendPacket(userSocket, "0|7|SLOTMENU_POSITION,3|" + player.getSettings().SLOTMENU_POSITION);
+			sendPacket(userSocket, "0|7|SLOTMENU_ORDER,3|" + player.getSettings().SLOTMENU_ORDER);
 		}
 		
 		//Informacion básica del jugador

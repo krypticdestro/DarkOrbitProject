@@ -26,7 +26,8 @@ public class Player {
 	private Ammunition ammo;
 	private Rockets rockets;
 	private Drone[] drones;
-	private Clan	clan;
+	private Clan clan;
+	private Equipment equipment;
 	
 	/**
 	 * Player constructor
