@@ -20,7 +20,7 @@ import com.darkorbit.utils.Console;
 
 /**
  * Administra las conexiones entrantes
- * @author Borja Sanchidrián
+ * @author Borja Sanchidriï¿½n
  */
 
 public class ConnectionManager extends Global implements Runnable {
@@ -154,7 +154,7 @@ public class ConnectionManager extends Global implements Runnable {
 	}
 	
 	/**
-	 * Guarda toda la información necesaria..
+	 * Guarda toda la informaciï¿½n necesaria..
 	 */
 	private void saveData() {
 		savePlayerData();
@@ -214,7 +214,7 @@ public class ConnectionManager extends Global implements Runnable {
 				
 				//Comprueba que el caracter no sea ni nulo, espacio en blanco, linea nueva
 				if(packetChar[0] != '\u0000' && packetChar[0] != '\n' && packetChar[0] != '\r') {
-					//Si no añade el caracter a packet
+					//Si no aï¿½ade el caracter a packet
 					packet += packetChar[0];
 					
 				} else if(!packet.isEmpty()) {
@@ -327,7 +327,7 @@ public class ConnectionManager extends Global implements Runnable {
 			
 			switch(p[0]) {
 				case ServerCommands.REQUEST_POLICY:
-					//Envia la informacion necesaria a flash para la conexión
+					//Envia la informacion necesaria a flash para la conexiï¿½n
 					sendPolicy(userSocket);
 					break;
 				
@@ -350,7 +350,7 @@ public class ConnectionManager extends Global implements Runnable {
 								player = loginAssembly.getPlayer();
 								playerID = player.getPlayerID();
 
-								//Añade el connectionManager al de jugadores online
+								//Aï¿½ade el connectionManager al de jugadores online
 								GameManager.connectPlayer(this);
 								
 								//Inicia el movementHelper del player
@@ -434,7 +434,7 @@ public class ConnectionManager extends Global implements Runnable {
 													 */
 													GameManager.getConnectionManager(player.getPlayerID()).cancelTimeOut();
 													GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
-													//Y vuelvo a añadirlo como jugador online
+													//Y vuelvo a aï¿½adirlo como jugador online
 													GameManager.connectPlayer(connectionManager);
 													
 													Console.out("Player " + player.getPlayerID() + " jumped to mapID=" + portal.getValue().getToMapID());

@@ -9,6 +9,7 @@ import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Clan;
 import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Equipment;
+import com.darkorbit.objects.GameMap;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Rockets;
@@ -140,10 +141,18 @@ public class QueryManager extends MySQLManager {
 				Ship ship = new Ship(
 						result.getShort("Id"),
 						result.getInt("HP"),
+						result.getInt("Shield"),
+						result.getInt("shieldAbsorb"),
 						result.getInt("Speed"),
 						result.getInt("Batteries"),
 						result.getInt("Rockets"),
-						result.getInt("Cargo")
+						result.getInt("Cargo"),
+						result.getInt("Damage"),
+						result.getInt("maxDamage"),
+						result.getInt("experience"),
+						result.getInt("honor"),
+						result.getInt("credits"),
+						result.getInt("uridium")
 						);
 				
 				GameManager.addShip(ship);
@@ -428,5 +437,27 @@ public class QueryManager extends MySQLManager {
 		}
 		
 		return new Equipment(B02, B01, A03, A02, A01);
+	}
+	
+	
+	public static void loadMaps() {
+		query = "SELECT * FROM maps WHERE id=1";
+		try {
+			//TODO: add more maps
+			ResultSet result = query(query);
+			
+			while(result.next()) {
+				//'Crea' un GameMap en el Mapa xD
+				GameMap map = new GameMap(result.getShort("id"), result.getString("NPCS"));
+				GameManager.addMap(map);
+			}
+			
+		} catch(Exception e) {
+			Console.error("Couldn't load gameMaps...");
+			if(Launcher.developmentMode) {
+				e.printStackTrace();
+			}
+			System.exit(0);
+		}
 	}
 }

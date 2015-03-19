@@ -9,6 +9,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.darkorbit.mysql.MySQLManager;
+import com.darkorbit.mysql.QueryManager;
+import com.darkorbit.net.GameManager;
 import com.darkorbit.net.GameServer;
 import com.darkorbit.net.Global;
 import com.darkorbit.utils.Console;
@@ -47,11 +49,13 @@ public class Launcher extends Global {
 		
 		new GameServer(PORT);
 		
+		QueryManager.loadMaps();
+		
 		waitForCommands();
 	}
 	
 	/**
-	 * Lee el archivo de configuración
+	 * Lee el archivo de configuraciï¿½n
 	 */
 	private static void readConfigFile() {
 		Console.out("Reading config file...");

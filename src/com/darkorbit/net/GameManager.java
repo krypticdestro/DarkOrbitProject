@@ -3,6 +3,7 @@ package com.darkorbit.net;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.darkorbit.objects.GameMap;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Ship;
 
@@ -58,5 +59,11 @@ public class GameManager {
 		public static void addRangeShip(int id) {
 			rangeShips.put(rangeShips.size(), id);
 		}
-
+		
+	/* GameMaps map*/
+		public static Map<Short, GameMap> gameMaps = new TreeMap<Short, GameMap>();
+		
+		public static void addMap(GameMap m) {
+			gameMaps.put(m.getMapID(), m);
+		}
 }

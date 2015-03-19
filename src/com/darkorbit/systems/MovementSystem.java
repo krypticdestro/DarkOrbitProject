@@ -2,21 +2,46 @@ package com.darkorbit.systems;
 
 import java.util.Calendar;
 
+import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Player;
 import com.darkorbit.utils.Vector;
 
-public class MovementSystem extends Global {
+public class MovementSystem extends Global implements Runnable {
 	private final double vtRel = 0.84412; //Relacion velocidad juego original
 	
 	private Vector destination, oldPosition, direction;
 	private double time, distance, timeRemaining;
-	private long lastMove, timeElapsed;
+	private long lastMove;
 	private Player player;
+	private Thread thread;
 	
 	public MovementSystem(int playerID) {
 		this.player = GameManager.getConnectionManager(playerID).player();
+		
+		this.thread = new Thread(this);
+		thread.setName("MovementSystem Thread player" + player.getPlayerID());
+		thread.start();
+	}
+	
+	
+	public void run() {
+		while(true) {
+			if(player.isMoving()) {
+				try {
+					//TODO: Add some logic xD
+				
+					//Comprueba la posicion del usuario y si se esta moviendo..
+					checkIfPlayerIsMoving();
+					Thread.sleep(350);
+				} catch (InterruptedException e) {
+					if(Launcher.developmentMode) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -51,12 +76,28 @@ public class MovementSystem extends Global {
 		sendToMap(player.getMapID(), movePacket);
 	}
 	
+	public void checkIfPlayerIsMoving() {
+		long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastMove;
+		
+		if(player.isMoving()) {
+			if(timeElapsed < time) {
+				//Usuario se esta moviendo, devuelve position
+				player.isMoving(true);
+			} else {
+				//ya ha llegado...
+				player.isMoving(false);
+			}
+		} else {
+			player.isMoving(false);
+		}
+	}
+	
 	/**
 	 * Devuelve la posicion del usuario
 	 * @return
 	 */
 	public Vector position() {
-		timeElapsed = Calendar.getInstance().getTimeInMillis() - lastMove;
+		long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastMove;
 		
 		if(player.isMoving()) {
 			if(timeElapsed < time) {
