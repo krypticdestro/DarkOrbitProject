@@ -157,6 +157,11 @@ public class ConnectionManager extends Global implements Runnable {
 	 * Guarda toda la información necesaria..
 	 */
 	private void saveData() {
+		savePlayerData();
+		savePlayerSettings();
+	}
+	
+	private void savePlayerData() {
 		String query = "";
 		/* player data */
 		
@@ -170,7 +175,10 @@ public class ConnectionManager extends Global implements Runnable {
 			QueryManager.updateSql(query);
 			query = "";
 		/* @end */
-			
+	}
+	
+	private void savePlayerSettings() {
+		String query = "";
 		/* player settings */
 			
 			//Default player update query
@@ -532,6 +540,7 @@ public class ConnectionManager extends Global implements Runnable {
 							
 						}
 						
+						savePlayerSettings();
 					} catch(Exception e) {
 						if(Launcher.developmentMode) e.printStackTrace();
 					}

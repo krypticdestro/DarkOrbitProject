@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-03-2015 a las 12:21:25
+-- Tiempo de generación: 19-03-2015 a las 17:05:55
 -- Versión del servidor: 5.6.21
--- Versión de PHP: 5.5.19
+-- Versión de PHP: 5.6.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -39,25 +39,6 @@ CREATE TABLE IF NOT EXISTS `cms` (
 INSERT INTO `cms` (`id`, `handler`, `setting`) VALUES
 (1, 'banner', './templates/Default/images/banner.jpg'),
 (2, 'slogan', 'Game for life');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `codes`
---
-
-CREATE TABLE IF NOT EXISTS `codes` (
-`id` int(11) NOT NULL,
-  `code` varchar(255) NOT NULL,
-  `used` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `codes`
---
-
-INSERT INTO `codes` (`id`, `code`, `used`) VALUES
-(1, 'CODIGOGUAY', 0);
 
 -- --------------------------------------------------------
 
@@ -1184,7 +1165,7 @@ CREATE TABLE IF NOT EXISTS `maps` (
 `id` smallint(4) NOT NULL,
   `Name` varchar(20) NOT NULL DEFAULT '',
   `Limits` varchar(20) NOT NULL,
-  `Portals` int(11) NOT NULL,
+  `Portals` text NOT NULL,
   `NPCS` text NOT NULL,
   `isStarterMap` enum('0','1') NOT NULL DEFAULT '0',
   `factionId` tinyint(1) NOT NULL DEFAULT '0'
@@ -1195,39 +1176,39 @@ CREATE TABLE IF NOT EXISTS `maps` (
 --
 
 INSERT INTO `maps` (`id`, `Name`, `Limits`, `Portals`, `NPCS`, `isStarterMap`, `factionId`) VALUES
-(26, '3-6', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 3),
-(27, '3-7', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 3),
-(2, '1-2', '208x130', 3, '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 1),
-(1, '1-1', '208x130', 1, '[{"npcId":84,"Count":50}]', '1', 1),
-(3, '1-3', '128x128', 3, '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 1),
-(4, '1-4', '', 4, '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 1),
-(5, '2-1', '', 0, '[{"npcId":84,"Count":50}]', '1', 2),
-(6, '2-2', '', 0, '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 2),
-(7, '2-3', '', 0, '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 2),
-(8, '2-4', '', 0, '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 2),
-(9, '3-1', '', 0, '[{"npcId":84,"Count":50}]', '1', 3),
-(10, '3-2', '', 0, '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 3),
-(11, '3-3', '', 0, '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 3),
-(12, '3-4', '', 0, '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 3),
-(13, '4-1', '', 0, '[{"npcId":80,"Count":1}]', '0', 1),
-(14, '4-2', '', 0, '[{"npcId":80,"Count":1}]', '0', 2),
-(15, '4-3', '', 0, '[{"npcId":80,"Count":1}]', '0', 3),
-(16, '4-4', '', 0, '[{"npcId":80,"Count":1}]', '0', 0),
-(17, '1-5', '', 0, '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 1),
-(18, '1-6', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 1),
-(19, '1-7', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 1),
-(20, '1-8', '', 0, '[{"npcId":85,"Count":75}]', '0', 1),
-(21, '2-5', '', 0, '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 2),
-(22, '2-6', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 2),
-(23, '2-7', '', 0, '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 2),
-(24, '2-8', '', 0, '[{"npcId":85,"Count":75}]', '0', 2),
-(25, '3-5', '', 0, '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 3),
-(28, '3-8', '', 0, '[{"npcId":85,"Count":75}]', '0', 3),
-(29, '4-5', '', 0, '', '0', 0),
-(42, '???', '', 0, '', '0', 0),
-(91, '5-1', '', 0, '', '0', 0),
-(92, '5-2', '', 0, '', '0', 0),
-(93, '5-3', '', 0, '', '0', 0);
+(26, '3-6', '', '[{"Id":1,"x":"2000","y":"2000","newX":"2000","newY":"11500","Map":25},{"Id":2,"x":"18500","y":"11500","newX":"2000","newY":"11500","Map":28}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 3),
+(27, '3-7', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":25},{"Id":2,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":28}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 3),
+(2, '1-2', '208x130', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":1},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":3},{"Id":3,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":4}]', '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 1),
+(1, '1-1', '208x130', '[{"Id":1,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":2}]', '[{"npcId":84,"Count":50}]', '1', 1),
+(3, '1-3', '128x128', '[{"Id":1,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":2},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":7},{"Id":3,"x":"18500","y":"11500","newX":"18500","newY":"2000","Map":4}]', '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 1),
+(4, '1-4', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":2},{"Id":2,"x":"18500","y":"2000","newX":"18500","newY":"11500","Map":3},{"Id":3,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":12},{"Id":4,"x":"18500","y":"6750","newX":"2000","newY":"6750","Map":13}]', '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 1),
+(5, '2-1', '', '[{"Id":1,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":6}]', '[{"npcId":84,"Count":50}]', '1', 2),
+(6, '2-2', '', '[{"Id":1,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":5},{"Id":2,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":7},{"Id":3,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":8}]', '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 2),
+(7, '2-3', '', '[{"Id":1,"x":"18500","y":"11500","newX":"18500","newY":"2000","Map":8},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":6},{"Id":3,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":3}]', '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 2),
+(8, '2-4', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":6},{"Id":2,"x":"18500","y":"2000","newX":"18500","newY":"11500","Map":7},{"Id":3,"x":"2000","y":"11500","newX":"2000","newY":"2000","Map":11},{"Id":4,"x":"10250","y":"11500","newX":"10250","newY":"2000","Map":14}]', '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 2),
+(9, '3-1', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":10}]', '[{"npcId":84,"Count":50}]', '1', 3),
+(10, '3-2', '', '[{"Id":1,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":9},{"Id":2,"x":"18500","y":"2000","newX":"18500","newY":"11500","Map":11},{"Id":3,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":12}]', '[{"npcId":84,"Count":50},{"npcId":71,"Count":25}]', '1', 3),
+(11, '3-3', '', '[{"Id":1,"x":"18500","y":"11500","newX":"18500","newY":"2000","Map":10},{"Id":2,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":12},{"Id":3,"x":"2000","y":"2000","newX":"2000","newY":"11500","Map":8}]', '[{"npcId":71,"Count":25},{"npcId":72,"Count":10},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 3),
+(12, '3-4', '', '[{"Id":1,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":10},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":11},{"Id":3,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":4},{"Id":4,"x":"10250","y":"2000","newX":"18500","newY":"6750","Map":15}]', '[{"npcId":74,"Count":10},{"npcId":71,"Count":25},{"npcId":75,"Count":25},{"npcId":73,"Count":25}]', '0', 3),
+(13, '4-1', '', '[{"Id":1,"x":"2000","y":"6750","newX":"18500","newY":"6750","Map":4},{"Id":2,"x":"18500","y":"11500","newX":"18500","newY":"11500","Map":15},{"Id":3,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":14},{"Id":4,"x":"10250","y":"6750","newX":"20000","newY":"13000","Map":16}]', '[{"npcId":80,"Count":1}]', '0', 1),
+(14, '4-2', '', '[{"Id":1,"x":"10250","y":"2000","newX":"10250","newY":"11500","Map":8},{"Id":2,"x":"2000","y":"11500","newX":"18500","newY":"11500","Map":13},{"Id":3,"x":"18500","y":"11500","newX":"18500","newY":"2000","Map":15},{"Id":4,"x":"10250","y":"6750","newX":"21500","newY":"12100","Map":16}]\n', '[{"npcId":80,"Count":1}]', '0', 2),
+(15, '4-3', '', '[{"Id":1,"x":"18500","y":"6750","newX":"10250","newY":"2000","Map":12},{"Id":2,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":14},{"Id":3,"x":"2000","y":"11500","newX":"18500","newY":"11500","Map":13},{"Id":4,"x":"10250","y":"6750","newX":"21500","newY":"13900","Map":16}]', '[{"npcId":80,"Count":1}]', '0', 3),
+(16, '4-4', '', '[{"Id":1,"x":"21500","y":"13900","newX":"10250","newY":"6750","Map":15},{"Id":2,"x":"21500","y":"12100","newX":"10250","newY":"6750","Map":14},{"Id":3,"x":"20000","y":"13000","newX":"10250","newY":"6750","Map":13},{"Id":4,"x":"6000","y":"13000","newX":"18500","newY":"6750","Map":17},{"Id":5,"x":"28000","y":"3000","newX":"2000","newY":"11500","Map":21},{"Id":6,"x":"28000","y":"24000","newX":"2000","newY":"2000","Map":25}]', '[{"npcId":80,"Count":1}]', '0', 0),
+(17, '1-5', '', '[{"Id":1,"x":"18500","y":"6750","newX":"6000","newY":"13000","Map":16},{"Id":2,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":18},{"Id":3,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":19}]', '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 1),
+(18, '1-6', '', '[{"Id":1,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":17},{"Id":2,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":20}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 1),
+(19, '1-7', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":20},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":17}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 1),
+(20, '1-8', '', '[{"Id":1,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":18},{"Id":2,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":19}]', '[{"npcId":85,"Count":75}]', '0', 1),
+(21, '2-5', '', '[{"Id":1,"x":"2000","y":"11500","newX":"28000","newY":"3000","Map":16},{"Id":2,"x":"2000","y":"2000","newX":"2000","newY":"11500","Map":22},{"Id":3,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":23}]', '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 2),
+(22, '2-6', '', '[{"Id":1,"x":"2000","y":"11500","newX":"2000","newY":"2000","Map":21},{"Id":2,"x":"18500","y":"2000","newX":"2000","newY":"11500","Map":24}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50},{"npcId":80,"Count":4}]', '0', 2),
+(23, '2-7', '', '[{"Id":1,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":21},{"Id":2,"x":"18500","y":"2000","newX":"18500","newY":"11500","Map":24}]', '[{"npcId":79,"Count":10},{"npcId":78,"Count":50}]', '0', 2),
+(24, '2-8', '', '[{"Id":1,"x":"2000","y":"11500","newX":"18500","newY":"2000","Map":22},{"Id":2,"x":"18500","y":"11500","newX":"18500","newY":"2000","Map":23}]', '[{"npcId":85,"Count":75}]', '0', 2),
+(25, '3-5', '', '[{"Id":1,"x":"2000","y":"2000","newX":"28000","newY":"24000","Map":16},{"Id":2,"x":"2000","y":"11500","newX":"2000","newY":"2000","Map":26},{"Id":3,"x":"18500","y":"11500","newX":"2000","newY":"2000","Map":27}]', '[{"npcId":77,"Count":10},{"npcId":71,"Count":50},{"npcId":76,"Count":25}]', '0', 3),
+(28, '3-8', '', '[{"Id":1,"x":"2000","y":"2000","newX":"18500","newY":"11500","Map":27},{"Id":2,"x":"2000","y":"11500","newX":"2000","newY":"11500","Map":26}]', '[{"npcId":85,"Count":75}]', '0', 3),
+(29, '4-5', '', '', '', '0', 0),
+(42, '???', '', '', '', '0', 0),
+(91, '5-1', '', '', '', '0', 0),
+(92, '5-2', '', '', '', '0', 0),
+(93, '5-3', '', '', '', '0', 0);
 
 -- --------------------------------------------------------
 
@@ -1256,31 +1237,6 @@ CREATE TABLE IF NOT EXISTS `navigation` (
   `adminOnly` int(1) NOT NULL DEFAULT '0',
   `content` longtext NOT NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `news`
---
-
-CREATE TABLE IF NOT EXISTS `news` (
-`nID` int(11) NOT NULL,
-  `newsID` varchar(50) NOT NULL DEFAULT 'default',
-  `image` varchar(50) NOT NULL DEFAULT 'default.gif',
-  `icon` varchar(50) NOT NULL DEFAULT 'default.gif',
-  `headline` varchar(100) NOT NULL DEFAULT 'Default Headline',
-  `text` text NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
---
--- Volcado de datos para la tabla `news`
---
-
-INSERT INTO `news` (`nID`, `newsID`, `image`, `icon`, `headline`, `text`, `active`) VALUES
-(3, 'alphaRelease', 'meteor_on_hora.gif', 'meteor_on_hora.jpg', 'Alpha release', 'Hello pilots, <br><br> I wrote a To-Do List for our server (important to our developers etc and may it''s important for users to. So users can spare some asks!) <br><br> To-Do List: <br> <b class="breakingNewsHighlightBlue">Fixing Equipment<br> Improve shop (looking for bugs)<br> Attack system<br> Aliens and movement<br> Ranking system<br> Working Chat</b><br><br>  If you want to know more go to the official <b class="breakingNewsHighlightBlue"><a href="http://dark-revolution.nu/forum/viewtopic.php?f=11&t=18" target="_blank">post</a></b>', 1),
-(2, 'darkRevolution', 'default.gif', 'default.gif', 'Dark-Revolution', 'Welcome to <b class="breakingNewsHighlightBlue">Dark-Revolution</b>,<br> <br> The server is still in a early alpha, so expect some bugs and systems not working at the moment. We''re working hard to get the server ready for you.<br> <br> Your Dark-Revolution team.', 1),
-(1, 'newsSystem', 'aprilFirst2011.gif', 'aprilFirst2011.gif', 'News System', 'Now we have a new <b class="breakingNewsHighlightBlue">News system!</b>', 0);
 
 -- --------------------------------------------------------
 
@@ -1491,7 +1447,7 @@ INSERT INTO `server_1_auction_hour` (`autoID`, `ItemName`, `amount`, `sType`, `H
 (38, 'equipment_weapon_rocketlauncher_hst-2', 1, 'Weaponry', 0, 0, 15000, 0, 'The rapid reloader!\nThis upgraded version of the Hellstorm launcher 1 makes it possible to win the battle before it''s even begun. One little rocket makes a world of difference on the battlefield - firing up to 5 rockets, this rocket launcher unleashes a broadside of destruction, giving a whole new meaning to the word firepower. This highly sophisticated piece of weaponry can only be equipped with specially designed rockets.'),
 (39, 'resource_ore_xenomit', 10, 'Special', 0, 0, 100, 0, 'Required to create Promerium on your ship and in the Skylab (10 units)'),
 (40, 'resource_logfile', 3, 'Special', 0, 0, 900, 0, 'Log-disks can be exchanged for pilot points. (3 units)'),
-(41, 'drone_iris', 1, 'Special', 5, 10000, 0, 0, 'Power drone with two slots'),
+(41, 'drone_iris', 1, 'Special', 0, 0, 0, 0, 'Power drone with two slots'),
 (42, 'ship_vengeance', 1, 'Ships', 0, 0, 30000, 1, 'The best Star Hunter: You''ll have (almost) nothing to fear in this ship!'),
 (43, 'ship_goliath', 1, 'Ships', 0, 0, 80000, 1, 'The ultimate Battlecruiser: The only true ship for hotshot space pilots!'),
 (44, 'ship_leonov', 1, 'Ships', 0, 0, 15000, 1, 'The Starjet''s top model: Small and agile, but very deadly!'),
@@ -1530,7 +1486,7 @@ CREATE TABLE IF NOT EXISTS `server_1_clan` (
   `clandescription` longtext NOT NULL,
   `Tax` int(2) NOT NULL,
   `Teamspeak` varchar(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1577,18 +1533,14 @@ CREATE TABLE IF NOT EXISTS `server_1_hangar` (
   `name` varchar(255) NOT NULL,
   `userID` int(11) NOT NULL,
   `playerID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `server_1_hangar`
 --
 
 INSERT INTO `server_1_hangar` (`hangarID`, `hangar_is_active`, `hangar_is_selected`, `name`, `userID`, `playerID`) VALUES
-(1, 1, 1, 'Hangar 1', 1, 1),
-(2, 1, 1, 'Hangar 1', 2, 2),
-(3, 1, 1, 'Hangar 1', 3, 3),
-(4, 1, 1, 'Hangar 1', 4, 4),
-(5, 1, 1, 'Hangar 1', 5, 5);
+(1, 1, 1, 'Hangar 1', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1606,25 +1558,7 @@ CREATE TABLE IF NOT EXISTS `server_1_hangar_config_drones` (
   `design` longtext NOT NULL,
   `design2` longtext NOT NULL,
 `autoID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_hangar_config_drones`
---
-
-INSERT INTO `server_1_hangar_config_drones` (`playerID`, `userID`, `hangarID`, `EQ2`, `item_id`, `EQ`, `design`, `design2`, `autoID`) VALUES
-(4, 4, 4, '', 9, '', '', '', 1),
-(1, 1, 1, '', 26, '', '', '', 2),
-(1, 1, 1, '', 27, '', '', '', 3),
-(1, 1, 1, '', 28, '', '', '', 4),
-(5, 5, 5, '', 30, '', '', '', 5),
-(5, 5, 5, '', 31, '', '', '', 6),
-(5, 5, 5, '', 32, '', '', '', 7),
-(5, 5, 5, '', 33, '', '', '', 8),
-(5, 5, 5, '', 34, '', '', '', 9),
-(5, 5, 5, '', 35, '', '', '', 10),
-(5, 5, 5, '', 36, '', '', '', 11),
-(5, 5, 5, '', 37, '', '', '', 12);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1643,15 +1577,7 @@ CREATE TABLE IF NOT EXISTS `server_1_hangar_config_pet10` (
   `gears` longtext NOT NULL,
   `protocols` longtext NOT NULL,
 `autoID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_hangar_config_pet10`
---
-
-INSERT INTO `server_1_hangar_config_pet10` (`hangarID`, `petID`, `playerID`, `userID`, `configNum`, `lasers`, `generators`, `gears`, `protocols`, `autoID`) VALUES
-(1, 1, 1, 1, 1, '', '', '', '', 1),
-(1, 1, 1, 1, 2, '', '', '', '', 2);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1669,23 +1595,15 @@ CREATE TABLE IF NOT EXISTS `server_1_hangar_config_ship` (
   `generators` longtext NOT NULL,
   `heavy_guns` longtext NOT NULL,
   `extras` longtext NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `server_1_hangar_config_ship`
 --
 
 INSERT INTO `server_1_hangar_config_ship` (`hangarID`, `autoID`, `playerID`, `userID`, `configNum`, `lasers`, `generators`, `heavy_guns`, `extras`) VALUES
-(1, 1, 1, 1, 1, '', '', '', '21'),
-(1, 2, 1, 1, 2, '', '', '', ''),
-(2, 3, 2, 2, 1, '', '', '', ''),
-(2, 4, 2, 2, 2, '', '', '', ''),
-(3, 5, 3, 3, 1, '', '', '', ''),
-(3, 6, 3, 3, 2, '', '', '', ''),
-(4, 7, 4, 4, 1, '', '', '', ''),
-(4, 8, 4, 4, 2, '', '', '', ''),
-(5, 9, 5, 5, 1, '', '', '', ''),
-(5, 10, 5, 5, 2, '', '', '', '');
+(1, 1, 1, 1, 1, '', '', '', ''),
+(1, 2, 1, 1, 2, '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -1698,18 +1616,7 @@ CREATE TABLE IF NOT EXISTS `server_1_log` (
   `playerID` bigint(20) NOT NULL,
   `descrip` longtext NOT NULL,
   `addDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_log`
---
-
-INSERT INTO `server_1_log` (`autoID`, `playerID`, `descrip`, `addDate`) VALUES
-(1, 0, 'You where overbidded, you receive 0 credits.', '2015-03-07 11:41:16'),
-(2, 0, 'You where overbidded, you receive 0 credits.', '2015-03-07 11:43:38'),
-(3, 1, 'You won 1 Unit(s) of Slot CPU 4 on the auction', '2015-03-07 11:44:03'),
-(4, 1, 'You won 1 Unit(s) of Leonov on the auction', '2015-03-07 11:44:03'),
-(5, 0, 'You where overbidded, you receive 0 credits.', '2015-03-09 21:00:14');
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1735,18 +1642,16 @@ CREATE TABLE IF NOT EXISTS `server_1_players` (
   `rankPosition` bigint(20) NOT NULL DEFAULT '0',
   `overallRank` bigint(20) NOT NULL DEFAULT '0',
   `rankName` varchar(255) NOT NULL DEFAULT 'Basic Space Pilot',
-  `premium` int(1) NOT NULL DEFAULT '0' COMMENT '0: No, Premium | 1: Yes, Premium',
+  `premium` int(1) NOT NULL DEFAULT '1' COMMENT '0: No, Premium | 1: Yes, Premium',
   `level` int(11) NOT NULL DEFAULT '1',
   `playerkills` bigint(20) NOT NULL DEFAULT '0',
-  `uav` varchar(255) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `Ptitle` varchar(255) NOT NULL,
+  `uav` varchar(255) NOT NULL DEFAULT '3/3-25-25-25,3/4-25-25-25-25,3/3-25-25-25',
   `clanId` int(11) NOT NULL DEFAULT '0',
-  `uri` bigint(255) NOT NULL DEFAULT '5000000',
+  `uri` bigint(255) NOT NULL DEFAULT '500000',
   `exp` bigint(255) NOT NULL DEFAULT '0',
   `credits` bigint(255) NOT NULL DEFAULT '2500000',
   `jackpot` double(50,2) NOT NULL DEFAULT '0.00',
-  `Health` bigint(255) NOT NULL DEFAULT '4000',
+  `Health` int(255) NOT NULL DEFAULT '4000',
   `maxHealth` bigint(255) NOT NULL DEFAULT '4000',
   `shield` bigint(255) NOT NULL DEFAULT '0',
   `maxShield` bigint(255) NOT NULL DEFAULT '0',
@@ -1755,20 +1660,15 @@ CREATE TABLE IF NOT EXISTS `server_1_players` (
   `speed` int(11) NOT NULL DEFAULT '320',
   `honor` bigint(255) NOT NULL DEFAULT '0',
   `GGspins` varchar(255) NOT NULL DEFAULT '5',
-  `GG` int(1) NOT NULL DEFAULT '0',
-  `dbonus` varchar(50) NOT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+  `GG` int(1) NOT NULL DEFAULT '0'
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 --
 -- Volcado de datos para la tabla `server_1_players`
 --
 
-INSERT INTO `server_1_players` (`playerID`, `userID`, `tokenId`, `username`, `shipId`, `factionId`, `mapId`, `x`, `xz`, `y`, `yz`, `settings`, `rank`, `rankpoints`, `rankPosition`, `overallRank`, `rankName`, `premium`, `level`, `playerkills`, `uav`, `title`, `Ptitle`, `clanId`, `uri`, `exp`, `credits`, `jackpot`, `Health`, `maxHealth`, `shield`, `maxShield`, `Nanohull`, `MaxNanohull`, `speed`, `honor`, `GGspins`, `GG`, `dbonus`) VALUES
-(1, 1, 6735055205, 'Borja', 108, 3, 1, 1000, 10, 1000, 10, '', 21, 10101, 0, 2, 'General', 0, 1, 0, '', '', '', 0, 410155000, 0, 2389000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0, ''),
-(2, 2, 2218156847, 'TestUser', 1, 1, 1, 1000, 10, 1000, 10, '', 1, 1106, 0, 3, 'Coronel mayor', 1, 1, 0, '', '', '', 0, 5000000, 0, 2500000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0, ''),
-(3, 3, 5861936170, 'TestUser2', 1, 1, 1, 1000, 10, 1000, 10, '', 1, 1106, 0, 4, 'General básico', 1, 1, 0, '', '', '', 0, 5000000, 0, 2500000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0, ''),
-(4, 4, 6048031865, 'TerrorOfGalaxy', 10, 3, 13, 19197, 10, 13402, 10, '', 1, 10107, 0, 1, 'General', 1, 1, 0, '', '', '', 0, 4655000, 0, 2500000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0, ''),
-(5, 5, 5642307418, 'Borja2', 109, 2, 1, 1000, 10, 1000, 10, '', 21, 0, 0, 5, 'Basic Space Pilot', 0, 1, 0, '', '', '', 0, 499533000, 0, 2390000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0, '');
+INSERT INTO `server_1_players` (`playerID`, `userID`, `tokenId`, `username`, `shipId`, `factionId`, `mapId`, `x`, `xz`, `y`, `yz`, `settings`, `rank`, `rankpoints`, `rankPosition`, `overallRank`, `rankName`, `premium`, `level`, `playerkills`, `uav`, `clanId`, `uri`, `exp`, `credits`, `jackpot`, `Health`, `maxHealth`, `shield`, `maxShield`, `Nanohull`, `MaxNanohull`, `speed`, `honor`, `GGspins`, `GG`) VALUES
+(1, 1, 5486409290, 'Borja', 1, 2, 1, 367, 10, 671, 10, '', 1, 0, 0, 1, 'Basic Space Pilot', 1, 1, 0, '3/3-25-25-25,3/4-25-25-25-25,3/3-25-25-25', 0, 500000, 0, 2500000, 0.00, 4000, 4000, 0, 0, 0, 0, 320, 0, '5', 0);
 
 -- --------------------------------------------------------
 
@@ -1787,31 +1687,7 @@ CREATE TABLE IF NOT EXISTS `server_1_players_galaxygate` (
   `state` varchar(255) NOT NULL DEFAULT 'in_progress',
   `galaxygate_current_wave` varchar(255) NOT NULL DEFAULT '0',
   `galaxygate_multipliers` int(2) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_players_galaxygate`
---
-
-INSERT INTO `server_1_players_galaxygate` (`playerID`, `fixID`, `userID`, `galaxygate_id`, `galaxygate_current_parts`, `galaxygate_prepared`, `livesLeft`, `state`, `galaxygate_current_wave`, `galaxygate_multipliers`) VALUES
-(1, 1, 1, '1', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 2, 1, '2', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 3, 1, '3', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 4, 1, '4', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 5, 1, '5', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 6, 1, '6', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 7, 1, '7', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 8, 1, '8', 0, 0, '-1', 'in_progress', '0', 0),
-(1, 9, 1, '13', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 10, 5, '1', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 11, 5, '2', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 12, 5, '3', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 13, 5, '4', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 14, 5, '5', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 15, 5, '6', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 16, 5, '7', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 17, 5, '8', 0, 0, '-1', 'in_progress', '0', 0),
-(5, 18, 5, '13', 0, 0, '-1', 'in_progress', '0', 0);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1845,14 +1721,14 @@ CREATE TABLE IF NOT EXISTS `server_1_players_items` (
 
 CREATE TABLE IF NOT EXISTS `server_1_players_settings` (
 `playerID` bigint(11) NOT NULL,
-  `SETTINGS` varchar(255) NOT NULL DEFAULT '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1',
+  `SETTINGS` varchar(255) NOT NULL DEFAULT '|1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1',
   `MINIMAP_SCALE` varchar(255) NOT NULL DEFAULT '11',
   `DISPLAY_PLAYER_NAMES` varchar(255) NOT NULL DEFAULT '1',
   `DISPLAY_CHAT` varchar(255) NOT NULL DEFAULT '1',
   `PLAY_MUSIC` varchar(255) NOT NULL DEFAULT '0',
   `PLAY_SFX` varchar(255) NOT NULL DEFAULT '1',
   `BAR_STATUS` varchar(255) NOT NULL DEFAULT '1',
-  `WINDOW_SETTINGS` varchar(255) NOT NULL DEFAULT '0,9,4,1,1,232,3,1,3,780,388,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,22,347,188,0,23,458,1,1,24,284,25,0',
+  `WINDOW_SETTINGS` varchar(255) NOT NULL DEFAULT '0,584,2,1,1,854,2,1,3,970,492,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,23,458,1,1,24,284,25,0',
   `AUTO_REFINEMENT` varchar(255) NOT NULL DEFAULT '0',
   `QUICKSLOT_STOP_ATTACK` varchar(255) NOT NULL DEFAULT '1',
   `DOUBLECLICK_ATTACK` varchar(255) NOT NULL DEFAULT '1',
@@ -1872,22 +1748,18 @@ CREATE TABLE IF NOT EXISTS `server_1_players_settings` (
   `QUALITY_ATTACK` varchar(255) NOT NULL DEFAULT '3',
   `QUALITY_EFFECT` varchar(255) NOT NULL DEFAULT '3',
   `QUALITY_EXPLOSION` varchar(255) NOT NULL DEFAULT '3',
-  `QUICKBAR_SLOT` varchar(255) NOT NULL DEFAULT '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1',
-  `SLOTMENU_POSITION` varchar(255) NOT NULL DEFAULT '313,451',
+  `QUICKBAR_SLOT` varchar(255) NOT NULL DEFAULT '3,4,5,6,7,39,-1,-1,-1,-1',
+  `SLOTMENU_POSITION` varchar(255) NOT NULL DEFAULT '565,561',
   `SLOTMENU_ORDER` varchar(255) NOT NULL DEFAULT '0',
-  `MAINMENU_POSITION` varchar(255) NOT NULL DEFAULT '499,772'
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+  `MAINMENU_POSITION` varchar(255) NOT NULL DEFAULT '532,590'
+) ENGINE=MyISAM AUTO_INCREMENT=1028 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `server_1_players_settings`
 --
 
 INSERT INTO `server_1_players_settings` (`playerID`, `SETTINGS`, `MINIMAP_SCALE`, `DISPLAY_PLAYER_NAMES`, `DISPLAY_CHAT`, `PLAY_MUSIC`, `PLAY_SFX`, `BAR_STATUS`, `WINDOW_SETTINGS`, `AUTO_REFINEMENT`, `QUICKSLOT_STOP_ATTACK`, `DOUBLECLICK_ATTACK`, `AUTO_START`, `DISPLAY_NOTIFICATIONS`, `SHOW_DRONES`, `DISPLAY_WINDOW_BACKGROUND`, `ALWAYS_DRAGGABLE_WINDOWS`, `PRELOAD_USER_SHIPS`, `QUALITY_PRESETTING`, `QUALITY_CUSTOMIZED`, `QUALITY_BACKGROUND`, `QUALITY_POIZONE`, `QUALITY_SHIP`, `QUALITY_ENGINE`, `QUALITY_COLLECTABLE`, `QUALITY_ATTACK`, `QUALITY_EFFECT`, `QUALITY_EXPLOSION`, `QUICKBAR_SLOT`, `SLOTMENU_POSITION`, `SLOTMENU_ORDER`, `MAINMENU_POSITION`) VALUES
-(1, '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '0', '1', '0,647,5,1,1,884,9,1,3,969,493,1,5,10,10,0,10,4,330,1,13,315,122,0,20,7,544,0,22,22,492,1,23,1060,131,0,24,412,97,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1', '313,451', '0', '499,772'),
-(3, '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '1', '1', '0,9,4,1,1,232,3,1,3,780,388,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,22,347,188,0,23,458,1,1,24,284,25,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1', '313,451', '0', '499,772'),
-(2, '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '1', '1', '0,9,4,1,1,232,3,1,3,780,388,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,22,347,188,0,23,458,1,1,24,284,25,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1', '313,451', '0', '499,772'),
-(4, '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '1', '1', '0,9,4,1,1,232,3,1,3,780,388,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,22,347,188,0,23,458,1,1,24,284,25,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1', '313,451', '0', '499,772'),
-(5, '1|1|1|1|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '0', '1', '0,647,5,1,1,884,9,1,3,969,493,1,5,10,10,0,10,4,330,1,13,315,122,0,20,7,544,0,22,22,492,1,23,1060,131,0,24,412,97,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '-1,-1,-1,-1,-1,-1,-1,-1,-1,-1', '313,451', '0', '499,772');
+(1, '|1|1|1|1|1|1|1|1|1|1|1|0|0|1|1|0|0|1|1|0|0|1|1|1|1', '11', '1', '1', '0', '0', '1', '0,584,2,1,1,854,2,1,3,970,492,1,5,5,5,0,10,5,288,0,13,187,50,0,20,5,402,1,23,458,1,1,24,284,25,0', '0', '1', '1', '0', '1', '1', '1', '1', '0', '3', '0', '3', '3', '3', '3', '3', '3', '3', '3', '3,4,5,6,7,39,-1,-1,-1,-1', '565,561', '0', '532,590');
 
 -- --------------------------------------------------------
 
@@ -1904,56 +1776,14 @@ CREATE TABLE IF NOT EXISTS `server_1_player_all_items` (
   `interactive` int(11) NOT NULL,
   `playerID` int(11) NOT NULL,
   `userID` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `server_1_player_all_items`
 --
 
 INSERT INTO `server_1_player_all_items` (`id`, `lootid`, `Q`, `LV`, `properties`, `interactive`, `playerID`, `userID`) VALUES
-(1, 'ship_phoenix', 1, 0, '', 1, 1, 1),
-(2, 'ammunition_laser_mcb-25', 50709868, 0, '', 0, 1, 1),
-(3, 'ammunition_laser_sab-50', 6678533, 0, '', 0, 1, 1),
-(4, 'ship_phoenix', 1, 0, '', 1, 2, 2),
-(5, 'ship_phoenix', 1, 0, '', 1, 3, 3),
-(6, 'ship_phoenix', 1, 0, '', 1, 4, 4),
-(7, 'ship_aegis', 1, 0, '', 1, 4, 4),
-(8, 'ship_goliath', 1, 0, '', 1, 4, 4),
-(9, 'drone_iris', 1, 0, '', 1, 4, 4),
-(10, 'ammunition_laser_ucb-100', 3334139, 0, '', 0, 1, 1),
-(11, 'ammunition_rocket_plt-2021', 218970, 0, '', 0, 1, 1),
-(12, 'ammunition_mine_acm-01', 612, 0, '', 0, 1, 1),
-(13, 'ammunition_laser_mcb-50', 3339378, 0, '', 0, 1, 1),
-(14, 'ammunition_laser_lcb-10', 100, 0, '', 0, 1, 1),
-(15, 'ship_vengeance', 1, 0, '', 1, 1, 1),
-(16, 'ship_vengeance_design_lightning', 1, 0, '', 1, 1, 1),
-(17, 'ship_goliath', 1, 0, '', 1, 1, 1),
-(18, 'ship_goliath_design_saturn', 1, 0, '', 1, 1, 1),
-(19, 'ship_goliath_design_diminisher', 1, 0, '', 1, 1, 1),
-(20, 'ship_goliath_design_venom', 1, 0, '', 1, 1, 1),
-(21, 'equipment_extra_cpu_sle-04', 1, 0, '', 0, 1, 1),
-(22, 'ship_leonov', 1, 0, '', 1, 1, 1),
-(23, 'pet_pet10', 1, 0, '', 1, 1, 1),
-(24, 'ship_goliath_design_spectrum', 1, 0, '', 1, 1, 1),
-(25, 'ship_goliath_design_sentinel', 1, 0, '', 1, 1, 1),
-(26, 'drone_iris', 1, 0, '', 1, 1, 1),
-(27, 'drone_iris', 1, 0, '', 1, 1, 1),
-(28, 'drone_iris', 1, 0, '', 1, 1, 1),
-(29, 'ship_phoenix', 1, 0, '', 1, 5, 5),
-(30, 'drone_iris', 1, 0, '', 1, 5, 5),
-(31, 'drone_iris', 1, 0, '', 1, 5, 5),
-(33, 'drone_iris', 1, 0, '', 1, 5, 5),
-(34, 'drone_iris', 1, 0, '', 1, 5, 5),
-(35, 'drone_iris', 1, 0, '', 1, 5, 5),
-(36, 'drone_iris', 1, 0, '', 1, 5, 5),
-(37, 'drone_iris', 1, 0, '', 1, 5, 5),
-(38, 'ammunition_laser_mcb-25', 25412, 0, '', 0, 5, 5),
-(39, 'ammunition_laser_ucb-100', 1621, 0, '', 0, 5, 5),
-(40, 'ammunition_mine_acm-01', 46, 0, '', 0, 5, 5),
-(41, 'ammunition_rocket_plt-2021', 113, 0, '', 0, 5, 5),
-(42, 'ammunition_laser_mcb-50', 943, 0, '', 0, 5, 5),
-(43, 'ammunition_laser_sab-50', 1754, 0, '', 0, 5, 5),
-(44, 'drone_designs_havoc', 1, 0, '', 1, 5, 5);
+(1, 'ship_phoenix', 1, 0, '', 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1964,7 +1794,7 @@ INSERT INTO `server_1_player_all_items` (`id`, `lootid`, `Q`, `LV`, `properties`
 CREATE TABLE IF NOT EXISTS `server_1_player_drones` (
 `drone_id` int(255) NOT NULL,
   `item_sale_id` int(255) NOT NULL,
-  `drone_level` int(2) NOT NULL DEFAULT '1',
+  `drone_level` int(2) NOT NULL DEFAULT '0',
   `drone_hp` varchar(255) NOT NULL DEFAULT '0',
   `drone_effect` varchar(255) NOT NULL DEFAULT '0%/0%',
   `drone_sp` int(255) NOT NULL DEFAULT '0',
@@ -1976,25 +1806,7 @@ CREATE TABLE IF NOT EXISTS `server_1_player_drones` (
   `playerID` int(255) NOT NULL,
   `drone_design` varchar(255) NOT NULL,
   `drone_kind` varchar(255) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_player_drones`
---
-
-INSERT INTO `server_1_player_drones` (`drone_id`, `item_sale_id`, `drone_level`, `drone_hp`, `drone_effect`, `drone_sp`, `drone_dl`, `drone_sl`, `drone_repair`, `drone_currency`, `userID`, `playerID`, `drone_design`, `drone_kind`) VALUES
-(1, 9, 1, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 4, 4, '', 'drone_iris'),
-(2, 26, 1, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 1, 1, '', 'drone_iris'),
-(3, 27, 1, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 1, 1, '', 'drone_iris'),
-(4, 28, 1, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 1, 1, '', 'drone_iris'),
-(5, 30, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(6, 31, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(7, 32, 6, '0', '0%/0%', 0, 0, 0, 500, 'credits', 5, 5, '', 'drone_iris'),
-(8, 33, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(9, 34, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(10, 35, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(11, 36, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris'),
-(12, 37, 6, '0', '0%/0%', 0, 0, 0, 500, 'uridium', 5, 5, '', 'drone_iris');
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -2010,18 +1822,14 @@ CREATE TABLE IF NOT EXISTS `server_1_player_hangar_general_ship` (
   `ship_selected_model` text NOT NULL,
   `ship_all_model` longtext NOT NULL,
 `autoID` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `server_1_player_hangar_general_ship`
 --
 
 INSERT INTO `server_1_player_hangar_general_ship` (`hangarID`, `playerID`, `ship_id`, `ship_hp`, `ship_selected_model`, `ship_all_model`, `autoID`) VALUES
-(1, 1, 1, 4000, 'ship_goliath_design_saturn', '', 1),
-(2, 2, 1, 4000, 'ship_phoenix', '', 2),
-(3, 3, 1, 4000, 'ship_phoenix', '', 3),
-(4, 4, 4, 4000, 'ship_goliath', '', 4),
-(5, 5, 1, 4000, 'ship_phoenix', '', 5);
+(1, 1, 1, 4000, 'ship_phoenix', '', 1);
 
 -- --------------------------------------------------------
 
@@ -2043,14 +1851,7 @@ CREATE TABLE IF NOT EXISTS `server_1_player_pet10` (
   `item_id` bigint(20) NOT NULL,
   `userID` int(255) NOT NULL,
   `playerID` int(255) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `server_1_player_pet10`
---
-
-INSERT INTO `server_1_player_pet10` (`pet_id`, `pet_hp`, `pet_level`, `pet_name`, `pet_location`, `lockedSlots`, `lasers`, `gemerators`, `gears`, `protocols`, `item_id`, `userID`, `playerID`) VALUES
-(1, 50000, 0, 'werq', 1, '4|8|3|4', 0, 0, 0, 0, 23, 1, 1);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -2453,7 +2254,7 @@ CREATE TABLE IF NOT EXISTS `server_shop_items` (
   `scd` varchar(1) NOT NULL DEFAULT 'c',
   `sell` varchar(255) NOT NULL,
 `autoId` bigint(20) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=168 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `server_shop_items`
@@ -2592,14 +2393,14 @@ INSERT INTO `server_shop_items` (`name`, `levels`, `properties`, `C`, `type`, `l
 ('CBR', 'W3sic2VsbGluZyI6eyJjcmVkaXRzIjoxMDB9LCJjZG4iOnsiMzB4MzAiOiJiMTBlMWZhZWFkNjg5MzBlZThmNmE0ZjNjMjBkMTcwMCIsIjYzeDYzIjoiNGQyZjU5Y2M2MWY5YWY1YjVlNjBiZDQ4NmY2MjAyMDAiLCIxMDB4MTAwIjoiN2M2M2UxM2Q5OTYyNDg1MWViNzNjZGI4NjY0ODI0MDAifX1d', '0', 'battery', 14, 'ammunition_rocketlauncher_cbr', 'c', '', 'c', '', 129),
 ('CBO-100', 'W3sic2VsbGluZyI6eyJjcmVkaXRzIjoxMn0sImNkbiI6eyIzMHgzMCI6ImRiOTNkMzQ1M2JjMTIxZWQ4Y2U4MzQ3YWFkOTYyZDAwIiwiNjN4NjMiOiI4MzJkYzk1N2JhMTYzY2VmNzU2Mzg2ZDc0YzdhZDMwMCIsIjEwMHgxMDAiOiJlYmZiN2E0M2EwYjhhZTFhMjhjYTNhMjA1ODhiODYwMCJ9fV0=', '0', 'battery', 14, 'ammunition_laser_cbo-100', 'c', '', 'c', '', 130),
 ('Venom', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiI4ZjE5NDdhMzYyMzcwMzBhMDQyZDQ5ZmMyZGIzOGIwMCIsIjYzeDYzIjoiM2M0NTQ3YjZkN2EyMWZhYmRjMjhjMTkzMDUyMWMxMDAiLCIxMDB4MTAwIjoiMmQ4OWI2OTYzNjZkZjlhMTU1OWRjOGQ3MDJkMDhmMDAiLCJ0b3AiOiIxM2UzYTkwNGFkYmYzMDE3ZTQ1NjFiOThhMmUxNGEwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_venom', 'u', '250000', 'c', '', 131),
-('Solace', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiJjOGFjMzU4YjRmOGVhMTYyYjQyZjU2YmEwNTQyMWQwMCIsIjYzeDYzIjoiN2U1Nzk1OTdlZTViNmZkNTQwMTEyYjU3MzM2MzQ0MDAiLCIxMDB4MTAwIjoiMWYyZTUwYmVlZGU1NDg1ZDU4NTJhMmZiNjRkM2RmMDAiLCJ0b3AiOiJkNmU4YjUyN2IxYTkwZGZjYzA3YmQwNzQ4Y2QwYWIwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_solace', 'u', '250000', 'c', '', 132),
-('Spectrum', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiJmY2I2YmM3NWIyMzA0MmE1YmJmZTU4OWI0OTY1ZjAwMCIsIjYzeDYzIjoiMGRkNDUxMTBjZDE0ZDY1N2NlZTBiYTI0YjI3ZWFlMDAiLCIxMDB4MTAwIjoiMzVmNGJiMzMxMWM2YjRhYTQ3YTE2ZmQxODAwMDg5MDAiLCJ0b3AiOiI1ZGVjMWMxOGFkZjE4OTBkZDRhNzNhZTYwNDAzZTMwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_spectrum', 'u', '250000', 'c', '', 133),
+('Solace', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiJjOGFjMzU4YjRmOGVhMTYyYjQyZjU2YmEwNTQyMWQwMCIsIjYzeDYzIjoiN2U1Nzk1OTdlZTViNmZkNTQwMTEyYjU3MzM2MzQ0MDAiLCIxMDB4MTAwIjoiMWYyZTUwYmVlZGU1NDg1ZDU4NTJhMmZiNjRkM2RmMDAiLCJ0b3AiOiJkNmU4YjUyN2IxYTkwZGZjYzA3YmQwNzQ4Y2QwYWIwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_solace', 'c', '', 'c', '', 132),
+('Spectrum', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiJmY2I2YmM3NWIyMzA0MmE1YmJmZTU4OWI0OTY1ZjAwMCIsIjYzeDYzIjoiMGRkNDUxMTBjZDE0ZDY1N2NlZTBiYTI0YjI3ZWFlMDAiLCIxMDB4MTAwIjoiMzVmNGJiMzMxMWM2YjRhYTQ3YTE2ZmQxODAwMDg5MDAiLCJ0b3AiOiI1ZGVjMWMxOGFkZjE4OTBkZDRhNzNhZTYwNDAzZTMwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_spectrum', 'c', '', 'c', '', 133),
 ('Kick', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiNjN4NjMiOiI3YmRhNWQzYzI0OGVkYmYyMzE5YWI1Nzc2YzZjZWQwMCIsIjEwMHgxMDAiOiI4ZDEzNmRkNzY3ZjNmMjYwYTAwOTdhYjkyZjNlY2EwMCIsInRvcCI6ImUxMThhNzA3MmU4Yzg5MDdlNWU0OTNkN2Y1ZjBiMjAwIn19XQ==', '0', 'ship', 21, 'ship_goliath_design_kick', 'c', '', 'c', '', 134),
 ('Referee', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiNjN4NjMiOiI5NjQ0YTBkNDUyYTI1YWEwZGM2MzEwZTZlMGIzZTcwMCIsIjEwMHgxMDAiOiJiMjc2MmVhYTRiOGJmNGRkOTZlOTMxOGU3OGZmYmMwMCIsInRvcCI6IjVmNjBhMWFkNWVjYWY4MjQ2YzA4NzNhZTEwODM4ZDAwIn19XQ==', '0', 'ship', 21, 'ship_goliath_design_referee', 'c', '', 'c', '', 135),
 ('Goal', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiNjN4NjMiOiIwMTdmOTkzNWM0OTlhYjRlOTA5ZjdjYTEwYTJkMWUwMCIsIjEwMHgxMDAiOiIwODdmZDAyMTQ4NzRlZGEzNjA2MzkzNTc5YTUxNjgwMCIsInRvcCI6Ijk1Y2MyZTRkNzAyOGY1ZWRkOWQ0MjY0MjAzMTVlYTAwIn19XQ==', '0', 'ship', 21, 'ship_goliath_design_goal', 'c', '', 'c', '', 136),
 ('Diminisher', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiIxM2JkMzA0NTkzOGZmN2UxMzg3ZTM4MTBmNGVmOWUwMCIsIjYzeDYzIjoiOTU0NTBhODBmYTFmZjI2YzhiNjFmMzAzNDc0Y2Y1MDAiLCIxMDB4MTAwIjoiZjk4MWU4NDU3NTI5MmIzNGUxOGYwYTAzZGYyMzUwMDAiLCJ0b3AiOiI3ZDAwYWEzOWNkMmIxOTQ0NjQ5MTAwYzQwODg4NzQwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_diminisher', 'u', '250000', 'c', '100000', 137),
 ('Jade', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiI1NWMxMzIxZWFlOTA4NmIxZTdhZjZkYmJmZjI3ZjMwMCIsIjYzeDYzIjoiYWQ2Njg0NDBhZjY0ZTkyMTI5YzJhMDg2YTdiOThhMDAiLCIxMDB4MTAwIjoiODE4ZTEyM2QxMmE2MTkzOGJmZWViZWJkNjViYzM2MDAiLCJ0b3AiOiI4MTJhOWI4ZWFjNWJhOWM2YTdlNTIyYzViNmZmNWEwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_jade', 'u', '40000', 'c', '', 138),
-('Sovereign', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiI4ZjIxNTEwMjc4YWNjNjM0YzkwMTRkZTUwMTVhMTgwMCIsIjYzeDYzIjoiNjU0YzE1NjcxMWI3ZDJkNDhiNzNiMGQ0OGNiZmMyMDAiLCIxMDB4MTAwIjoiOGY2NzhhNzQzMTRkMWM3MjNiYjcyZDY5NTUzZDZiMDAiLCJ0b3AiOiJkYmQwNDQzYmE0ODViOThmYzk4N2E0YjIxNWM2YmQwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_sovereign', 'x', '', 'c', '', 139),
+('Sovereign', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiI4ZjIxNTEwMjc4YWNjNjM0YzkwMTRkZTUwMTVhMTgwMCIsIjYzeDYzIjoiNjU0YzE1NjcxMWI3ZDJkNDhiNzNiMGQ0OGNiZmMyMDAiLCIxMDB4MTAwIjoiOGY2NzhhNzQzMTRkMWM3MjNiYjcyZDY5NTUzZDZiMDAiLCJ0b3AiOiJkYmQwNDQzYmE0ODViOThmYzk4N2E0YjIxNWM2YmQwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_sovereign', 'c', '', 'c', '', 139),
 ('Razer-Goliath', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJjZG4iOnsiMzB4MzAiOiI0OGY4Y2ZkNThlNTBiNGFjOGNkYTMyZDU1NTdjZjcwMCIsIjYzeDYzIjoiNTExMGZkMDg2YzkxNjgxNGQ1ZjI5NTYzNzBiM2I5MDAiLCIxMDB4MTAwIjoiMmY4ZTIzZGMyMDBkY2MxYzUwODYwOTM2ZTU1YjBmMDAiLCJ0b3AiOiJkMTBiMzRjZTUxZWY3ZmM4N2U2Y2EyZDc0YWQ4N2UwMCJ9fV0=', '0', 'ship', 21, 'ship_goliath_design_goliath-razer', 'x', '', 'c', '', 140),
 ('Apis Drone', 'W3sic2xvdHNldHMiOnsiZGVmYXVsdCI6eyJUIjpbMCw0LDExLDksNyw4LDEwXSwiUSI6Mn0sImRlc2lnbiI6eyJUIjpbMTZdLCJRIjoxfX0sInNlbGxpbmciOnsiY3JlZGl0cyI6MTAwMDAwfSwiY2RuIjp7IjMweDMwIjoiMzZmZjE0ZWE2Zjk5MjliYmUyNTFjOTdjN2FhOWMxMDAiLCI2M3g2MyI6IjRjYzJlNWY2NzgwZDBhNzEwZDBjNTM3ZDI5NTUxNTAwIiwiMTAweDEwMCI6ImI4YTAwMzdhNjFlZDk2YmQzMDQ5YTQ5Njk4NTEwNzAwIiwidG9wIjoiZjNiZmNlMmFkMzg5ZDNmMjQzOWIwNjE5Zjk4ODQ4MDAifX0seyJzbG90c2V0cyI6eyJkZWZhdWx0Ijp7IlQiOlswLDQsMTEsOSw3LDgsMTBdLCJRIjoyfSwiZGVzaWduIjp7IlQiOlsxNl0sIlEiOjF9fSwic2VsbGluZyI6eyJjcmVkaXRzIjoxNTAwMDB9LCJjZG4iOnsiMzB4MzAiOiI5NzA4OWZlNjAyMjdiMTNkMDk3NjA4ZDJjMGRhZDMwMCIsIjYzeDYzIjoiOTMyODA5OGNmNmY2MWY5YTE1YzE4NmNkYTkzYmI0MDAiLCIxMDB4MTAwIjoiNTQ3MDljNTZkYjJlMWYyZjkwMmQ0Nzc5YjI0M2RlMDAiLCJ0b3AiOiJlYmMxOGZkNzZmZDU3MzNkMzcwYThjZDVjYmZiMDIwMCJ9fSx7InNsb3RzZXRzIjp7ImRlZmF1bHQiOnsiVCI6WzAsNCwxMSw5LDcsOCwxMF0sIlEiOjJ9LCJkZXNpZ24iOnsiVCI6WzE2XSwiUSI6MX19LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjIxMDAwMH0sImNkbiI6eyIzMHgzMCI6ImRiYzBkNDc4NjkxZGUwNTI3NDVjZjYxMjU5M2UwMTAwIiwiNjN4NjMiOiI2ZTU1NDUzOTNhZTk5NmIzZDg4MTc2ZTA4Mjg4MWYwMCIsIjEwMHgxMDAiOiI3YjhmYjU4MTVlNzBjMjdlZGViMGIzNDc2ZDg3NzYwMCIsInRvcCI6Ijg0MDlkNjM1M2FhYTE0M2NlYzczYTU2MThmZDJmZDAwIn19LHsic2xvdHNldHMiOnsiZGVmYXVsdCI6eyJUIjpbMCw0LDExLDksNyw4LDEwXSwiUSI6Mn0sImRlc2lnbiI6eyJUIjpbMTZdLCJRIjoxfX0sInNlbGxpbmciOnsiY3JlZGl0cyI6MjQwMDAwfSwiY2RuIjp7IjMweDMwIjoiMWU0NmUyY2VmNGQ1YzVkMzgwMDA5OGYwNDM4NzdlMDAiLCI2M3g2MyI6IjIzNTdkNWM0NDUxNmE5MGM2NWY3ZTZmODQ5YzA5YjAwIiwiMTAweDEwMCI6IjMxODUxNzhmYzQ1YTkyMDcwZGRkOGFmZWFkOTFmODAwIiwidG9wIjoiYWQ0ZmY1Y2M5ZDZkYjVhZTZmYTM4ODRjNTdiMzJiMDAifX0seyJzbG90c2V0cyI6eyJkZWZhdWx0Ijp7IlQiOlswLDQsMTEsOSw3LDgsMTBdLCJRIjoyfSwiZGVzaWduIjp7IlQiOlsxNl0sIlEiOjF9fSwic2VsbGluZyI6eyJjcmVkaXRzIjozMTUwMDB9LCJjZG4iOnsiMzB4MzAiOiIxOTM2NjBiMjY4ZTY4OTZlOTYxNDhkMjE1MzFkMWYwMCIsIjYzeDYzIjoiYmE2YjQ2ZDRjYWMxZDBkODE5OTE1YzFhODAzN2U5MDAiLCIxMDB4MTAwIjoiNDlhMzEyNmE0OTAzZjQ4YTdmOTZjZjY0YzdiNmJmMDAiLCJ0b3AiOiIyYzM0M2QxNDExNTQ1ZDcxZjJhYzVkNDczYmU4MGYwMCJ9fSx7InNsb3RzZXRzIjp7ImRlZmF1bHQiOnsiVCI6WzAsNCwxMSw5LDcsOCwxMF0sIlEiOjJ9LCJkZXNpZ24iOnsiVCI6WzE2XSwiUSI6MX19LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjUwMDAwMH0sImNkbiI6eyIzMHgzMCI6IjZlMTZkYTVmMTQ2ZGIzZDY2YWEyYmI3ODg0OWViYTAwIiwiNjN4NjMiOiI2OTExMjJiMTg4MmFlMWY2ZWVlZjlkZGJjMTY2YzIwMCIsIjEwMHgxMDAiOiIzYjJiNGQwOWIxMjA3YTNjMDA3ZjJlYjY5MGEwOTAwMCIsInRvcCI6IjBlZWZlMDI1Y2QwYWY0ZDFkODJmMGIzMjRkNzg3MjAwIn19XQ==', '0', 'drone', 24, 'drone_apis', 'u', '', 'c', '', 141),
 ('Zeus Drone', 'W3sic2xvdHNldHMiOnsiZGVmYXVsdCI6eyJUIjpbMCw0LDExLDksNyw4LDEwXSwiUSI6Mn0sImRlc2lnbiI6eyJUIjpbMTZdLCJRIjoxfX0sInNlbGxpbmciOnsiY3JlZGl0cyI6MTAwMDAwfSwiY2RuIjp7IjMweDMwIjoiOTI5OTRmMDZlMDBlNTFhNjM3NjlmNWRlM2MyNDAwMDAiLCI2M3g2MyI6Ijk1YjBiM2UwNTc3MTg4ZDU4MmJmMmZkZDg1Y2IyZDAwIiwiMTAweDEwMCI6IjgxMWZkOGZjNzFjMGU2YWE3NGIxMjlkN2ZhNmQyMjAwIiwidG9wIjoiZDZkNjVhZmJjNmFmNzQxMmI4Y2Q3MThlNTUxNjQ0MDAifX0seyJzbG90c2V0cyI6eyJkZWZhdWx0Ijp7IlQiOlswLDQsMTEsOSw3LDgsMTBdLCJRIjoyfSwiZGVzaWduIjp7IlQiOlsxNl0sIlEiOjF9fSwic2VsbGluZyI6eyJjcmVkaXRzIjoxNTAwMDB9LCJjZG4iOnsiMzB4MzAiOiIyMmY3ZjhmZWQ2OTRjOGQwN2FkYjk0MzZjOGQyYzEwMCIsIjYzeDYzIjoiMzY1MTI0ZGQ3NDEzMzNjODg2ZWU0OGJkZWQyMjM4MDAiLCIxMDB4MTAwIjoiYzU1Yjg2NzdhMDk2MTI1Y2ZhMTQ4ODhkN2IxMjAxMDAiLCJ0b3AiOiJhMGM3NjNjNjJkYWJmNzMyNDY4ODE1MjQzYjA2Y2EwMCJ9fSx7InNsb3RzZXRzIjp7ImRlZmF1bHQiOnsiVCI6WzAsNCwxMSw5LDcsOCwxMF0sIlEiOjJ9LCJkZXNpZ24iOnsiVCI6WzE2XSwiUSI6MX19LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjIxMDAwMH0sImNkbiI6eyIzMHgzMCI6IjA5MWU2ZmI0YTc4NDUxZDU5ZjZjY2I1ODdiMzUxNTAwIiwiNjN4NjMiOiJmN2ZlMzhjMTI4YzNjMTNkOTA5N2JmY2U4NTg5MWMwMCIsIjEwMHgxMDAiOiIxZWZjMjIzNmMwYTlhMDExMGI2MjJlZTVjMGEwMjIwMCIsInRvcCI6Ijg3YmIzY2RlZTNmN2E0MTc1YWE3YmU4MGRiN2Q1ODAwIn19LHsic2xvdHNldHMiOnsiZGVmYXVsdCI6eyJUIjpbMCw0LDExLDksNyw4LDEwXSwiUSI6Mn0sImRlc2lnbiI6eyJUIjpbMTZdLCJRIjoxfX0sInNlbGxpbmciOnsiY3JlZGl0cyI6MjQwMDAwfSwiY2RuIjp7IjMweDMwIjoiNDg2NDBhY2JhNDEwYjM3YzI4NzQwM2UyNzBkYTBjMDAiLCI2M3g2MyI6IjBjZDBkZTg2OTM1OGUyZjlhZTM2YjcyNTJjNTk1YjAwIiwiMTAweDEwMCI6Ijg1ZDgyMTI1ZmI5NjVjZjc5YTVlMGFmYTcxMGZlNDAwIiwidG9wIjoiMDFlODRlMWU0ZmQ4M2FiYWU3ZGQ1YTc1Mzk1YTYwMDAifX0seyJzbG90c2V0cyI6eyJkZWZhdWx0Ijp7IlQiOlswLDQsMTEsOSw3LDgsMTBdLCJRIjoyfSwiZGVzaWduIjp7IlQiOlsxNl0sIlEiOjF9fSwic2VsbGluZyI6eyJjcmVkaXRzIjozMTUwMDB9LCJjZG4iOnsiMzB4MzAiOiIzZjI1ZThkZDE2YjY2OTc0ZTk5NGEwMDI2MDJkYjUwMCIsIjYzeDYzIjoiMmM2NWZkMjQxNDBmOTgxYjUwYTQ3N2VmMjhjMGNiMDAiLCIxMDB4MTAwIjoiZjE0ZGVhOWQ1ZDU0MjQ1NGY4MTRiMDRhNGMwMjcwMDAiLCJ0b3AiOiI0MGQzNmUzYjU3NTE0YTkwMjA3Mjg4NWI1N2IxYWUwMCJ9fSx7InNsb3RzZXRzIjp7ImRlZmF1bHQiOnsiVCI6WzAsNCwxMSw5LDcsOCwxMF0sIlEiOjJ9LCJkZXNpZ24iOnsiVCI6WzE2XSwiUSI6MX19LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjUwMDAwMH0sImNkbiI6eyIzMHgzMCI6IjRlZTg3OTFlYmI2Mzk1MTFhZGVmNTBhYWY5YzViNjAwIiwiNjN4NjMiOiI5ODdkNjJhOWEyYzYwMjkwNjM5Zjc3MTQ5MDllNjYwMCIsIjEwMHgxMDAiOiI5OGU4ZDJjZGNlYjY0MTJlNWI5YzY5ZWJiNzQ0NGEwMCIsInRvcCI6ImViYjEzNDNlOTk4NjVlNzMwOWE4ZGQ0NDM5OTZiZDAwIn19XQ==', '0', 'drone', 24, 'drone_zeus', 'u', '100000', 'c', '100000', 142),
@@ -2627,9 +2428,7 @@ INSERT INTO `server_shop_items` (`name`, `levels`, `properties`, `C`, `type`, `l
 ('Leonov', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6NX0sImdlbmVyYXRvcnMiOnsiVCI6WzMsNF0sIlEiOjV9LCJoZWF2eV9ndW5zIjp7IlQiOlsxXSwiUSI6MX0sImV4dHJhcyI6eyJUIjpbMTEsOSw3LDgsMTAsNl0sIlEiOjF9fSwic2VsbGluZyI6eyJjcmVkaXRzIjowfSwiY2RuIjp7IjYzeDYzIjoiMjgzNTJmZDZmNzZmN2Y2OWZkZTYwYmU2NTFkMjhiMDAiLCIxMDB4MTAwIjoiNTE0ZTEyYjFjYTVjMjdhMjJiNmVmNjQ2ZmI5YjhhMDAiLCJ0b3AiOiIwMDQxNWQ3NzY2NTQ2MmY2ZTE2MTA0ODU2MTlhNDAwMCJ9fV0=', '0', 'ship', 22, 'ship_leonov', 'u', '15000', 'c', '0', 164),
 ('Piranha', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTV9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjIwMDAwMH0sImNkbiI6eyI2M3g2MyI6ImM2YzhhMDlhNDc0OWFmNjkxYjZhOTk0N2NmMmM2OTAwIiwiMTAweDEwMCI6IjVmY2RiODNlNjliNDAxZDkyY2MxYWU2YWJiMTcyMzAwIiwidG9wIjoiYTYwNGNkNDY2OWI4MGEwZGRkODlmYTU0ZmM5NDYzMDAifX1d', '0', 'ship', 22, 'ship_piranha', 'c', '125000', 'c', '0', 165),
 ('Armory Upgrade 1', 'W3sic2VsbGluZyI6eyJjcmVkaXRzIjoyNTAwMH0sImNkbiI6eyIzMHgzMCI6IjViNTA4OGQyYzk4MWUwY2Q3M2RmMDA1YWNhNmVkNzAwIiwiNjN4NjMiOiI2MzUyNzliNmQ2NjNiMzY1MmU3MDc0MzM2NTQzZGIwMCIsIjEwMHgxMDAiOiJmMWY1Nzg2YjdkYWQ3OTZiOTI3ZGViZWZjYWQyNDgwMCJ9fV0=', '0', 'special', 10, 'equipment_extra_cpu_g3x-amry-s', 'u', '5000', 'c', '25000', 166),
-('Logfile', 'W3siY2RuIjp7IjMweDMwIjoiYjEyMzI2YjczY2MwYTBlYTk3NzZkZWIzZTllZTcwMDAiLCI2M3g2MyI6Ijc1M2FjMWVkZGI2MjcxNjZiMzcxY2U2YWRkMmE0ODAwIiwiMTAweDEwMCI6IjY5YTYxM2QwZTRjZDcyZTkwYWZkNmNkYzY4ZmNmYjAwIn19XQ==', '0', 'special', 25, 'resource_logfile', 'u', '300', 'c', '', 167),
-('Lightning', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTB9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxMH0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6Mn19LCJjZG4iOnsiMzB4MzAiOiJmZDBjYmRlOGU0N2NkOTQwZGU5OWVhNjI2YTNmYjEwMCIsIjYzeDYzIjoiMjVhMTE5ZDFhNzU3NzY3MTAzOTY4NmU1YjIxMzdjMDAiLCIxMDB4MTAwIjoiNzBlMDg3ZTAyMjY0Mjk2YWU4YTE4YjEzYzk0MjExMDAiLCJ0b3AiOiJkYjRjNDY4NTc1MzY0YzAyOWM5NDExMDNiNTU5YjgwMCJ9fV0=', '0', 'ship', 21, 'ship_vengeance_design_lightning', 'u', '250000', 'c', '', 168),
-('Big Boy', 'W3sic2xvdHNldHMiOnsibGFzZXJzIjp7IlQiOlswXSwiUSI6MTB9LCJnZW5lcmF0b3JzIjp7IlQiOlszLDRdLCJRIjoxNX0sImhlYXZ5X2d1bnMiOnsiVCI6WzFdLCJRIjoxfSwiZXh0cmFzIjp7IlQiOlsxMSw5LDcsOCwxMCw2XSwiUSI6M319LCJzZWxsaW5nIjp7ImNyZWRpdHMiOjYyNTAwMH0sImNkbiI6eyI2M3g2MyI6ImJiNzM3OGRkNzQwNzQ4MGRmMGU4ZTMxZmI1MDU2MjAwIiwiMTAweDEwMCI6IjBiMzEyMTgzZjNhYzk3YjBlMGNhYWRhMjVlZjdjODAwIiwidG9wIjoiNzNhNDU5NmY3ODE1NWI0NTdmYzlhYzE1MGUxYzM3MDAifX1d', '0', 'ship', 21, 'ship_bigboy', 'c', '200000', 'c', '', 169);
+('Logfile', 'W3siY2RuIjp7IjMweDMwIjoiYjEyMzI2YjczY2MwYTBlYTk3NzZkZWIzZTllZTcwMDAiLCI2M3g2MyI6Ijc1M2FjMWVkZGI2MjcxNjZiMzcxY2U2YWRkMmE0ODAwIiwiMTAweDEwMCI6IjY5YTYxM2QwZTRjZDcyZTkwYWZkNmNkYzY4ZmNmYjAwIn19XQ==', '0', 'special', 25, 'resource_logfile', 'u', '300', 'c', '', 167);
 
 -- --------------------------------------------------------
 
@@ -2648,15 +2447,15 @@ CREATE TABLE IF NOT EXISTS `ships` (
   `shieldAbsorb` smallint(11) NOT NULL DEFAULT '20',
   `Damage` int(255) NOT NULL DEFAULT '20',
   `maxDamage` int(11) NOT NULL,
-  `Speed` int(11) NOT NULL DEFAULT '150',
+  `Speed` smallint(11) NOT NULL DEFAULT '150',
   `isNeutral` enum('0','1') NOT NULL DEFAULT '1',
   `LaserId` tinyint(1) NOT NULL DEFAULT '0',
   `Lasers` bigint(255) NOT NULL,
   `Generators` bigint(255) NOT NULL,
-  `Batteries` int(255) NOT NULL,
-  `Rockets` int(255) NOT NULL,
+  `Batteries` bigint(255) NOT NULL,
+  `Rockets` bigint(255) NOT NULL,
   `Extra` int(11) NOT NULL,
-  `Cargo` int(255) NOT NULL,
+  `Cargo` bigint(255) NOT NULL,
   `experience` int(11) NOT NULL DEFAULT '0',
   `honor` int(11) NOT NULL DEFAULT '0',
   `credits` int(11) NOT NULL DEFAULT '0',
@@ -2731,7 +2530,7 @@ INSERT INTO `ships` (`Id`, `Name`, `type`, `Costs`, `HP`, `MaxNanohull`, `Shield
 (35, '..::{Boss Kristallon}::..', '', -1, 1600000, 0, 1200000, 60, 15000, 20000, 250, '1', 0, 0, 0, 0, 0, 0, 0, 204800, 1024, 1634400, 512, 16, 0),
 (34, '..::{Boss StreuneR}::..', '', -1, 80000, 0, 40000, 60, 1500, 2000, 280, '1', 0, 0, 0, 0, 0, 0, 0, 12800, 64, 51200, 32, 4, 0),
 (33, '-=[Super Ice Metroid]=-', '', -1, 3200000, 0, 2400000, 60, 0, 0, 200, '1', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(32, '-=[Santabot]=-', '', -1, 1000000, 0, 0, 20, 20, 0, 150, '1', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(32, '-=[Santabot]=-', '', -1, 1000, 0, 0, 20, 20, 0, 150, '1', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (31, '..::{Boss Mordon}::..', '', -1, 80000, 0, 40000, 60, 1300, 1500, 125, '0', 0, 0, 0, 0, 0, 0, 0, 12800, 64, 51200, 32, 4, 0),
 (30, 'leonov', '', 0, 160000, 160000, 0, 0, 0, 0, 380, '1', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (29, '..::{Boss Kristallin}::..', '', -1, 200000, 0, 160000, 60, 3600, 4700, 320, '0', 0, 0, 0, 0, 0, 0, 0, 25600, 128, 51200, 64, 6, 0),
@@ -2846,18 +2645,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `Servers` text NOT NULL,
   `sessionId` bigint(20) NOT NULL DEFAULT '0',
   `regDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `users`
 --
 
 INSERT INTO `users` (`ID`, `Email`, `Name`, `pwHash`, `Servers`, `sessionId`, `regDate`) VALUES
-(1, 'a@a.com', 'Borja', 'eabff95ceee4885e265b2cad2f18ae66', '[{1:1}]', 966596006682452120, '2015-02-24 11:50:06'),
-(2, 'a@a.com', 'TestUser', 'eabff95ceee4885e265b2cad2f18ae66', '[{1:2}]', 799655818326478788, '2015-02-24 23:57:44'),
-(3, 'a@a.com', 'TestUser2', 'eabff95ceee4885e265b2cad2f18ae66', '[{1:3}]', 294705231345854115, '2015-02-24 23:59:23'),
-(4, 'kuchavanika-1996@hotmail.com', 'TerrorOfGalaxy', '7ee265f4edd7b6df5eba48dd6ba8912f', '[{1:4}]', 250435490411836069, '2015-03-01 18:56:17'),
-(5, 'a@a.com', 'Borja2', 'eabff95ceee4885e265b2cad2f18ae66', '[{1:5}]', 956896624350714459, '2015-03-07 13:12:38');
+(1, 'a@a.com', 'Borja', 'eabff95ceee4885e265b2cad2f18ae66', '[{1:1}]', 82196565630805255, '2015-03-19 15:42:37');
 
 --
 -- Índices para tablas volcadas
@@ -2868,12 +2663,6 @@ INSERT INTO `users` (`ID`, `Email`, `Name`, `pwHash`, `Servers`, `sessionId`, `r
 --
 ALTER TABLE `cms`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `handler` (`handler`);
-
---
--- Indices de la tabla `codes`
---
-ALTER TABLE `codes`
- ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `filecollection_file`
@@ -2916,12 +2705,6 @@ ALTER TABLE `messages`
 --
 ALTER TABLE `navigation`
  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `news`
---
-ALTER TABLE `news`
- ADD PRIMARY KEY (`newsID`), ADD UNIQUE KEY `nID` (`nID`);
 
 --
 -- Indices de la tabla `portals`
@@ -3089,11 +2872,6 @@ ALTER TABLE `users`
 ALTER TABLE `cms`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
--- AUTO_INCREMENT de la tabla `codes`
---
-ALTER TABLE `codes`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
---
 -- AUTO_INCREMENT de la tabla `mailsystem`
 --
 ALTER TABLE `mailsystem`
@@ -3114,11 +2892,6 @@ MODIFY `id` int(5) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 ALTER TABLE `navigation`
 MODIFY `id` int(5) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
 --
--- AUTO_INCREMENT de la tabla `news`
---
-ALTER TABLE `news`
-MODIFY `nID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
---
 -- AUTO_INCREMENT de la tabla `portals`
 --
 ALTER TABLE `portals`
@@ -3137,7 +2910,7 @@ MODIFY `autoID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
 -- AUTO_INCREMENT de la tabla `server_1_clan`
 --
 ALTER TABLE `server_1_clan`
-MODIFY `clanID` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `clanID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=26;
 --
 -- AUTO_INCREMENT de la tabla `server_1_clan_diplomacy`
 --
@@ -3152,37 +2925,37 @@ MODIFY `autoID` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT de la tabla `server_1_hangar`
 --
 ALTER TABLE `server_1_hangar`
-MODIFY `hangarID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `hangarID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `server_1_hangar_config_drones`
 --
 ALTER TABLE `server_1_hangar_config_drones`
-MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
+MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_1_hangar_config_pet10`
 --
 ALTER TABLE `server_1_hangar_config_pet10`
-MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_1_hangar_config_ship`
 --
 ALTER TABLE `server_1_hangar_config_ship`
-MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
+MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT de la tabla `server_1_log`
 --
 ALTER TABLE `server_1_log`
-MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_1_players`
 --
 ALTER TABLE `server_1_players`
-MODIFY `playerID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `playerID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `server_1_players_galaxygate`
 --
 ALTER TABLE `server_1_players_galaxygate`
-MODIFY `fixID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=19;
+MODIFY `fixID` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_1_players_items`
 --
@@ -3192,27 +2965,27 @@ MODIFY `item_id` int(255) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT de la tabla `server_1_players_settings`
 --
 ALTER TABLE `server_1_players_settings`
-MODIFY `playerID` bigint(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `playerID` bigint(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1028;
 --
 -- AUTO_INCREMENT de la tabla `server_1_player_all_items`
 --
 ALTER TABLE `server_1_player_all_items`
-MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'item id',AUTO_INCREMENT=45;
+MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'item id',AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `server_1_player_drones`
 --
 ALTER TABLE `server_1_player_drones`
-MODIFY `drone_id` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
+MODIFY `drone_id` int(255) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_1_player_hangar_general_ship`
 --
 ALTER TABLE `server_1_player_hangar_general_ship`
-MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `autoID` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `server_1_player_pet10`
 --
 ALTER TABLE `server_1_player_pet10`
-MODIFY `pet_id` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `pet_id` int(255) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `server_item_types`
 --
@@ -3227,7 +3000,7 @@ MODIFY `id` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=268;
 -- AUTO_INCREMENT de la tabla `server_shop_items`
 --
 ALTER TABLE `server_shop_items`
-MODIFY `autoId` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=170;
+MODIFY `autoId` bigint(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=168;
 --
 -- AUTO_INCREMENT de la tabla `ships`
 --
@@ -3242,7 +3015,7 @@ MODIFY `Id` smallint(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=111;
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-MODIFY `ID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
+MODIFY `ID` int(255) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -169,11 +169,12 @@ public class QueryManager extends MySQLManager {
 	 * @return Objecto ammunition con los valores de la municion
 	 */
 	public static Ammunition loadAmmunition(int playerID) {
-		query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%ammunition_laser%'";
-		ResultSet result;
 		int lcb10 = 0, mcb25 = 0, mcb50 = 0, sab50 = 0, ucb100 = 0;
 		
 		try {
+			query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND lootid LIKE '%ammunition_laser%'";
+			ResultSet result;
+			
 			result = query(query);
 			
 			while(result.next()) {

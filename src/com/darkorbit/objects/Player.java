@@ -66,8 +66,8 @@ public class Player {
 		/*
 		 * QueryManager.loadEquipment(playerID, configNum)
 		 */
-		this.config1 = QueryManager.loadEquipment(playerID, 1);
-		this.config2 = QueryManager.loadEquipment(playerID, 2);
+		/*this.config1 = QueryManager.loadEquipment(playerID, 1);
+		this.config2 = QueryManager.loadEquipment(playerID, 2);*/
 		
 		if(hasClan()) {
 			this.clan = QueryManager.loadClan(clanID);
