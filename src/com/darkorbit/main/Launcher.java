@@ -10,7 +10,6 @@ import java.util.TimerTask;
 
 import com.darkorbit.mysql.MySQLManager;
 import com.darkorbit.mysql.QueryManager;
-import com.darkorbit.net.GameManager;
 import com.darkorbit.net.GameServer;
 import com.darkorbit.net.Global;
 import com.darkorbit.utils.Console;
@@ -65,7 +64,7 @@ public class Launcher extends Global {
 			while((line=configReader.readLine()) != null) {
 				//Si la linea comienza con #, [, lo que sea pasa a la siguiente
 				
-				if (line.startsWith("[") || line.startsWith("#") || !line.contains("=")) continue;
+				if(line.startsWith("[") || line.startsWith("#") || !line.contains("=")) continue;
 
 				String[] values = line.split("=");
 				switch(values[0]) {

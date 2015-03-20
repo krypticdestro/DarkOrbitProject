@@ -2,7 +2,6 @@ package com.darkorbit.systems;
 
 import java.util.Calendar;
 
-import com.darkorbit.main.Launcher;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.net.Global;
 import com.darkorbit.objects.Player;
@@ -20,27 +19,53 @@ public class MovementSystem extends Global implements Runnable {
 	public MovementSystem(int playerID) {
 		this.player = GameManager.getConnectionManager(playerID).player();
 		
-		this.thread = new Thread(this);
-		thread.setName("MovementSystem Thread player" + player.getPlayerID());
+		this.thread = new Thread(this, "MovementSystem Thread player" + player.getPlayerID());
 		thread.start();
 	}
 	
+	/*
+	 * Comprueba si el jugador se esta moviendo para 'despertar' al hilo
+	 */
+	private synchronized void playerMoving() {
+		long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastMove;
+		
+		if(player.isMoving()) {
+			if(timeElapsed < time) {
+				//Usuario se esta moviendo
+				player.isMoving(true);
+			} else {
+				//ya ha llegado...
+				player.isMoving(false);
+			}
+		} else {
+			player.isMoving(false);
+		}
+		
+        if(player.isMoving())
+            notify();
+    }
 	
 	public void run() {
-		while(true) {
-			if(player.isMoving()) {
-				try {
-					//TODO: Add some logic xD
+		/*
+		 * Usado para poder hacer thread.stop(); de forma segura
+		 */
+		Thread currentThread = Thread.currentThread();
+		
+		while(currentThread == thread) {
+	        try {
+				Thread.sleep(350);
 				
-					//Comprueba la posicion del usuario y si se esta moviendo..
-					checkIfPlayerIsMoving();
-					Thread.sleep(350);
-				} catch (InterruptedException e) {
-					if(Launcher.developmentMode) {
-						e.printStackTrace();
-					}
-				}
-			}
+				//'suspendo' el hilo mientras el jugador no se mueva
+	            synchronized(this) {
+	                while (!player.isMoving())
+	                    wait();
+	            }
+	        } catch (InterruptedException e){
+	        }
+	        
+	        //igual que si fuera while(true)
+	        System.out.println("MOVING");
+	        playerMoving();
 		}
 	}
 	
@@ -74,22 +99,7 @@ public class MovementSystem extends Global implements Runnable {
 		
 		String movePacket = "0|1|" + player.getPlayerID() + "|" + destination.getX() + "|" + destination.getY() + "|" + time;
 		sendToMap(player.getMapID(), movePacket);
-	}
-	
-	public void checkIfPlayerIsMoving() {
-		long timeElapsed = Calendar.getInstance().getTimeInMillis() - lastMove;
-		
-		if(player.isMoving()) {
-			if(timeElapsed < time) {
-				//Usuario se esta moviendo, devuelve position
-				player.isMoving(true);
-			} else {
-				//ya ha llegado...
-				player.isMoving(false);
-			}
-		} else {
-			player.isMoving(false);
-		}
+		playerMoving();
 	}
 	
 	/**

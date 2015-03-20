@@ -3,7 +3,8 @@ package com.darkorbit.objects;
 import com.darkorbit.net.GameManager;
 
 public class Npc {
-    private String name;
+    @SuppressWarnings("unused")
+	private String name;
     private Ship npcShip;
     
     public Npc(short id) {
@@ -12,4 +13,8 @@ public class Npc {
     
     /* get methods */
     	public Ship getShip() { return npcShip; }
+    	
+    	public String toString() {
+    		return "test";
+    	}
 }

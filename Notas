@@ -27,7 +27,7 @@
 	
 	Analizando paquetes:
 	
-		0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|equipment(?)|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked"
+		0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|usery|mapId|factionId|clanId|shipAmmo|shipRockets|equipment(?)|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked"
 		
 		1|6560|1200|3920|1200
 		0|1|userID|nexX|newY|oldX|oldY
@@ -76,6 +76,9 @@
 		
 		0|U|99|1 -> activa portalId=1
 		
+		0|Y|" + user.userID + "|" + target.userID + "|L|" + target.user.hp + "|" + target.user.shd + "|" + dmg + "|100|1
+
+		L = LASER, R= ROCKET, H= HEALTH
 		
 		0|LAB|UPD|INFO|LASER|14|5563|ROCKET|13|0 -> actualiza con materias primas 14 = seprom 13= promerium , supongo que seguira el patron
 					   SHIELD
@@ -215,27 +218,69 @@ private void drawRange(Socket socket, short mapId, double positionX, double posi
 			Random r = new Random();
 			int i = r.nextInt(Integer.MAX_VALUE);
 			String packet = "0|I|" + (i++) + "|X: " + (positionX + x) + " Y: " + (positionY + x) + "|1||||||0||" + (positionX + x) + "|" + (positionY + x)  + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX + range) + " Y: " + (positionY) + "|1||||||0||" + (positionX + range) + "|" + (positionY) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX) + " Y: " + (positionY + range) + "|1||||||0||" + (positionX) + "|" + (positionY + range) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX - x) + " Y: " + (positionY - x) + "|1||||||0||" + (positionX - x) + "|" + (positionY - x) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX - x) + " Y: " + (positionY + x) + "|1||||||0||" + (positionX - x) + "|" + (positionY + x) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX + x) + " Y: " + (positionY - x) + "|1||||||0||" + (positionX + x) + "|" + (positionY - x) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX - range) + " Y: " + (positionY) + "|1||||||0||" + (positionX - range) + "|" + (positionY) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 			
 			packet = "0|I|" + (i++) + "|X: " + (positionX) + " Y: " + (positionY - range) + "|1||||||0||" + (positionX) + "|" + (positionY - range) + "|" + mapId;
-			sendPacket(socket, packet);
+			packet);
 		}
 		
+
+
+		//Send log message packet
+		"0|LM|ST|EP|" + exp + "|" + user.user.experience + "|" + user.user.level);
+		"0|LM|ST|HON|" + hon + "|" + user.user.honor);
+		"0|LM|ST|CRE|" + cred + "|" + user.user.credits);
+		"0|LM|ST|URI|" + uri + "|" + user.user.uridium);
+		sendPacet(socket, "0|A|LUP|" + user.user.level + "|" + Tools.getNextLevelExp(user.user.level + 1) );
+
+
+		//hero has got solace, send solace skill button
+		"0|SD|S|1");
+	
+		
+	
+		//hero has got diminsher, send diminisher skill button
+		"0|SD|S|2");
+	
+	
+	
+		//hero has got sentinel, send sentinel skill button
+		"0|SD|S|3");
+	
+		
+	
+		//hero has got spectrum, send spectrum skill button
+		"0|SD|S|4");
+	
+		
+	
+		//hero has got venom, send venom skill button
+		"0|SD|S|5");
+	
+		
+	
+		//hero has got lightning, send lightning skill button
+		"0|SD|S|6");
+	
+		0|PET|S|1000|10|0|8000|50000|50000|1000|1000|50000|50000|20|testPet
+
+		0|PET|I|0|0|1
+	}

@@ -447,9 +447,8 @@ public class QueryManager extends MySQLManager {
 			ResultSet result = query(query);
 			
 			while(result.next()) {
-				//'Crea' un GameMap en el Mapa xD
-				GameMap map = new GameMap(result.getShort("id"), result.getString("NPCS"));
-				GameManager.addMap(map);
+				//Crea un Mapa en el Mapa xD
+				GameManager.addMap(new GameMap(result.getShort("id"), result.getString("NPCS")));
 			}
 			
 		} catch(Exception e) {

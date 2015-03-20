@@ -33,7 +33,7 @@ public class LoginAssembly extends Global {
 	 */
 	public boolean requestLogin(String[] p) {
 		try {
-			
+			//TODO: usar sessionID
 			this.playerID = Integer.parseInt(p[1]);
 			//this.sessionID = Long.parseLong(p[2]); no usado
 			player = QueryManager.loadAccount(playerID);

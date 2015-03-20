@@ -307,7 +307,7 @@ public class ConnectionManager extends Global implements Runnable {
 						for(Entry<Integer, ConnectionManager> o : GameManager.onlinePlayers.entrySet()) {
 							if(Integer.parseInt(p[1]) == o.getValue().player().getPlayerID()) {
 								if(Integer.parseInt(p[2]) > maxSpeed) {
-									o.getValue().player().setSpeed(maxSpeed);
+									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
 								} else {
 									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
 								}
