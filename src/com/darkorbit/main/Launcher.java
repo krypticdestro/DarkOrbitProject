@@ -9,7 +9,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.darkorbit.mysql.MySQLManager;
-import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameServer;
 import com.darkorbit.net.Global;
 import com.darkorbit.utils.Console;
@@ -48,8 +47,6 @@ public class Launcher extends Global {
 		
 		new GameServer(PORT);
 		
-		QueryManager.loadMaps();
-		
 		waitForCommands();
 	}
 	
@@ -86,7 +83,7 @@ public class Launcher extends Global {
 				}
 			}
 		} catch(FileNotFoundException e) {
-			//TODO: Archivo no encontrado :/
+			// Archivo no encontrado :/
 			
 		} catch (IOException e) {
 			Console.error("Couldn't read config file... Should be located in 'config/config.ini");

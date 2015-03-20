@@ -47,14 +47,6 @@ public class ConnectionManager extends Global implements Runnable {
 		thread = new Thread(this);
 		thread.start();
 	}
-	
-	public void closeConnection() throws IOException {
-		userSocket.close();
-		in.close();
-		
-		//Borramos el connection de este usuario
-		GameManager.onlinePlayers.remove(playerID);
-	}
 
 	/**
 	 * Inicia los streams del socket para poder leer/escribir datos
@@ -109,14 +101,10 @@ public class ConnectionManager extends Global implements Runnable {
 							timedOut = true;
 							
 							Console.alert("Player " + playerID + " time-out");
-							cancelTimeOut();
-						} catch (InterruptedException e) {
+						} catch (InterruptedException | IOException e) {
 							if(Launcher.developmentMode) {
 								e.printStackTrace();
 							}
-						} catch (IOException e) {
-							// Por el disconnectPlayer
-							e.printStackTrace();
 						}
 					}
 				}
@@ -124,18 +112,21 @@ public class ConnectionManager extends Global implements Runnable {
 		}, 0, 30000);
 		
 	}
-
 	
 	/**
-	 * Cancela el timer del timeout
+	 * Cancela los timeOut y cierra sockets y streams
+	 * @throws IOException
 	 */
-	public void cancelTimeOut() {
+	public void closeConnection() throws IOException {
 		timeOutTimer.cancel();
 		timeOutTimer.purge();
-	}
-
+		player.movement().close();
+		userSocket.close();
+		in.close();
+	}		
+	
 	/**
-	 * Desconecta al usuario y closeConnection()
+	 * Desconecta al usuario y closeConnection() | usado en loginAssembly too
 	 * @throws IOException
 	 */
 	public void disconnectPlayer() throws IOException {
@@ -149,8 +140,25 @@ public class ConnectionManager extends Global implements Runnable {
 		sendToMap(player.getMapID(), "0|R|" + playerID);
 		Console.out("Player " + player.getPlayerID() + " disconnected or exceeded max idle time");
 		GameManager.onlinePlayers.remove(playerID);
-		cancelTimeOut();
 		closeConnection();
+	}
+	
+	/**
+	 * Funcion aparte para la desconexion por salto en portal
+	 * no tiene que cerrar sockets ni nada, solo cancelar los timers..
+	 * @throws IOException
+	 */
+	public void jumpDisconnetion() throws IOException {
+		//TODO: if(player.canDisconnect()) - por si le estan atacando, etc... (PVP) dat stuff
+		saveData();
+		
+		//Borra al usuario del mapa
+		sendToMap(player.getMapID(), "0|R|" + playerID);
+		GameManager.onlinePlayers.remove(playerID);
+		timeOutTimer.cancel();
+		timeOutTimer.purge();
+		//TODO BIATCH
+		player.movement().close();
 	}
 	
 	/**
@@ -210,7 +218,7 @@ public class ConnectionManager extends Global implements Runnable {
 			String packet = "";
 			char[] packetChar = new char[1];
 			
-			while(in.read(packetChar, 0, 1) != -1 ) {
+			while(in.read(packetChar, 0, 1) != -1) {
 				
 				//Comprueba que el caracter no sea ni nulo, espacio en blanco, linea nueva
 				if(packetChar[0] != '\u0000' && packetChar[0] != '\n' && packetChar[0] != '\r') {
@@ -288,6 +296,7 @@ public class ConnectionManager extends Global implements Runnable {
 							}
 						} else {
 							for(Entry<Integer, Integer> ship : GameManager.rangeShips.entrySet()) {
+								sendToMap(player.getMapID(), "0|n|EMP|" + (ship.getValue() - 1));
 								sendToMap(player.getMapID(), "0|K|" + (ship.getValue() - 1)); //No me preguntes muy bien porque xD
 							}
 						}
@@ -409,8 +418,6 @@ public class ConnectionManager extends Global implements Runnable {
 										sendPacket(userSocket, "0|A|STD|Jumping");
 										player.isJumping(true);
 										
-										ConnectionManager connectionManager = this;
-										
 										jumpTimer = new Timer("Player" + player.getPlayerID() + " Jump Timer");
 										jumpTimer.schedule(new TimerTask(){
 											public void run() {
@@ -420,22 +427,21 @@ public class ConnectionManager extends Global implements Runnable {
 													Thread.sleep(3250); //tiempo de salto..
 													
 													//Borra el grafico del usuario..
-													sendToMap(player.getMapID(), "0|R|" + player.getPlayerID());
+													//sendToMap(player.getMapID(), "0|R|" + player.getPlayerID());
 													
 													player.setPosition(portal.getValue().getDestination());
 													player.setMapID(portal.getValue().getToMapID());
 													saveData();
 																									
 													/*
-													 * Cierran los sockets antiguos que tenia abiertos y el timeout
-													 * 
-													 * El propio cliente manda un nuevo paquete de login por "la conexion perdida"
-													 * por lo que se ejecuta como si fuera un usuario nuevo metiendose al juego
+													 * TODO: Pos eso Tete, cancela los timer y deberia el thread del movimiento, pero no lo consigo.
+													 * No supone una gran carga porque esta suspendido, pero no es "bonito"
 													 */
-													GameManager.getConnectionManager(player.getPlayerID()).cancelTimeOut();
-													GameManager.getConnectionManager(player.getPlayerID()).closeConnection();
-													//Y vuelvo a a�adirlo como jugador online
-													GameManager.connectPlayer(connectionManager);
+													GameManager.getConnectionManager(player.getPlayerID()).jumpDisconnetion();
+													
+													//Creo un nuevo paquete de conexion y magic :D
+													String loginPacket = "LOGIN|" + player.getPlayerID() + "|sessionID|" + Launcher.clientVersion;
+													checkPacket(loginPacket);
 													
 													Console.out("Player " + player.getPlayerID() + " jumped to mapID=" + portal.getValue().getToMapID());
 													

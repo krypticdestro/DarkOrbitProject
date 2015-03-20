@@ -64,9 +64,16 @@ public class MovementSystem extends Global implements Runnable {
 	        }
 	        
 	        //igual que si fuera while(true)
-	        System.out.println("MOVING");
+	        //TODO
+	        System.out.println("MOVING IN DA FUCKING SKY");
 	        playerMoving();
 		}
+	}
+	
+	public synchronized void close() {
+		notifyAll();
+		thread = null;
+		
 	}
 	
 	/**
