@@ -16,6 +16,7 @@ import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.packets.ClientCommands;
 import com.darkorbit.packets.ServerCommands;
+import com.darkorbit.packets.WebCommands;
 import com.darkorbit.utils.Console;
 
 /**
@@ -219,7 +220,6 @@ public class ConnectionManager extends Global implements Runnable {
 			char[] packetChar = new char[1];
 			
 			while(in.read(packetChar, 0, 1) != -1) {
-				
 				//Comprueba que el caracter no sea ni nulo, espacio en blanco, linea nueva
 				if(packetChar[0] != '\u0000' && packetChar[0] != '\n' && packetChar[0] != '\r') {
 					//Si no a�ade el caracter a packet
@@ -308,40 +308,35 @@ public class ConnectionManager extends Global implements Runnable {
 						}
 					}
 					break;
-					
-				case "/speed":
-					try {
-						int maxSpeed = 700;
-						
-						for(Entry<Integer, ConnectionManager> o : GameManager.onlinePlayers.entrySet()) {
-							if(Integer.parseInt(p[1]) == o.getValue().player().getPlayerID()) {
-								if(Integer.parseInt(p[2]) > maxSpeed) {
-									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
-								} else {
-									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
-								}
-							}
-						}
-						
-					} catch(Exception e) {
-						sendPacket(userSocket, "0|A|STM|wrong_packet_parameter");
-						if(Launcher.developmentMode) {
-							e.printStackTrace();
-						}
-					}
 			}
 			
 		} else {
 			String[] p = packet.split("\\|");
 			
 			switch(p[0]) {
+			/* #############################WEB PACKETS############################# */
+				case WebCommands.WEB_PACKET:
+					switch(p[1]) {
+						case WebCommands.EQUIPMENT_UPDATE:
+							QueryManager.checkObject(packet);
+							break;
+					}
+					break;
+			
+			/* ############################GAME PACKETS############################# */
 				case ServerCommands.REQUEST_POLICY:
-					//Envia la informacion necesaria a flash para la conexi�n
+					//Envia la informacion necesaria a flash para la conexion
 					sendPolicy(userSocket);
 					break;
-				
+
 				case ServerCommands.REQUEST_LOGIN:
 					//LOGIN|playerID|sessionID|clientVersion
+					/*
+					 * TODO: Solucionar el problema de que se pueda enviar un paquete de login desde un socket falso
+					 * La solucion que se me ocurre es usar el sessionID y si se rechaza la conexion bloquear cualquier otro tipo de paquete.
+					 * es decir, que no se puedan mandar paquetes de movimiento, etc... sin "autorizacion"
+					 */
+					
 					try {
 						
 						//Comprueba que el paquete este completo y la version del cliente sea correcta
@@ -369,7 +364,7 @@ public class ConnectionManager extends Global implements Runnable {
 								
 								//Inicia el timeout
 								startTimeOut();
-								
+
 							} else {
 								//sino se cierra su socket
 								closeConnection();
@@ -440,7 +435,7 @@ public class ConnectionManager extends Global implements Runnable {
 													GameManager.getConnectionManager(player.getPlayerID()).jumpDisconnetion();
 													
 													//Creo un nuevo paquete de conexion y magic :D
-													String loginPacket = "LOGIN|" + player.getPlayerID() + "|sessionID|" + Launcher.clientVersion;
+													String loginPacket = "LOGIN|" + player.getPlayerID() + "|142312|" + Launcher.clientVersion;
 													checkPacket(loginPacket);
 													
 													Console.out("Player " + player.getPlayerID() + " jumped to mapID=" + portal.getValue().getToMapID());

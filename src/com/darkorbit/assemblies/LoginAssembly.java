@@ -150,7 +150,7 @@ public class LoginAssembly extends Global {
 			}
 			
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + (player.getShip().getShipSpeed() + player.activeConfig().getSpeed()) + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
 			sendPacket(userSocket, loginPacket);
 			
 			
@@ -371,6 +371,12 @@ public class LoginAssembly extends Global {
 		
 		//Varios paquetes sobre el cliente
 		private void loadHUD() {
+			/*
+			 * If you quit this line i won't give you support about the project
+			 * Anyways, you should give credits to the developer, i'm sure that you don't want to see your job as 'owned' by others..
+			 */
+			sendPacket(userSocket, "0|A|STM|log_boot_message_dev");
+			
 			//quita icono de ayuda
 			sendPacket(userSocket, "0|UI|W|HW|11");
 			

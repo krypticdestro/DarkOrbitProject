@@ -3,6 +3,7 @@ package com.darkorbit.net;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.darkorbit.objects.Equipment;
 import com.darkorbit.objects.GameMap;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Ship;
@@ -65,5 +66,16 @@ public class GameManager {
 		
 		public static void addMap(GameMap m) {
 			gameMaps.put(m.getMapID(), m);
+		}
+		
+	/* Equipment map */
+		public static Map<String, Equipment> equipment = new TreeMap<String, Equipment>();
+		
+		public static void addEquipment(Equipment e) {
+			equipment.put(e.getIdentifier(), e);
+		}
+		
+		public static Equipment getEquipment(String identifier) {
+			return equipment.get(identifier);
 		}
 }

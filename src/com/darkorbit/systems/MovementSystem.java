@@ -65,7 +65,6 @@ public class MovementSystem extends Global implements Runnable {
 	        
 	        //igual que si fuera while(true)
 	        //TODO
-	        System.out.println("MOVING IN DA FUCKING SKY");
 	        playerMoving();
 		}
 	}
@@ -86,7 +85,7 @@ public class MovementSystem extends Global implements Runnable {
 		
 		oldPosition = new Vector(Integer.parseInt(p[3]), Integer.parseInt(p[4]));
 		
-		int vel = player.getShip().getShipSpeed() + player.getSpeed();
+		int vel = player.getShip().getShipSpeed() + player.activeConfig().getSpeed();
 				
 		direction = new Vector(destination.getX() - oldPosition.getX(), destination.getY() - oldPosition.getY());
 		
