@@ -36,6 +36,7 @@ public class LoginAssembly extends Global {
 			//TODO: usar sessionID
 			this.playerID = Integer.parseInt(p[1]);
 			//this.sessionID = Long.parseLong(p[2]); no usado
+			//Solo se usa para comprobar que la cuenta esta registrada en la DB o en caso de 1º login
 			player = QueryManager.loadAccount(playerID);
 			
 		} catch(Exception e) {
@@ -49,20 +50,11 @@ public class LoginAssembly extends Global {
 
 			//Pierde la conexion y se reconecta antes del timeOut 
 			if(GameManager.isOnline(player.getPlayerID())) {
-				
 				try {
 					//Cierran los sockets antiguos que tenia abiertos y el timeout
 					GameManager.getConnectionManager(player.getPlayerID()).disconnectPlayer();
-					/*
-					 * Sobreescribo la carga de la cuenta porque la posicion del usuario va a cambiar cuando se ejecute el disconnectPlayer.
-					 * en vez de la posicion del ultimo sitio donde ese usuario ha usado un portal, o desconectado "bien" va a cambiar a la 
-					 * que estaba en el momento en el que ha reiniciado el cliente. 
-					 * 
-					 * Es decir si el usuario esta volando de un lado a otro del mapa 
-					 * y reinicia el cliente la posicion exacta se va a actualizar en la DB con disconnectPlayer() asi que tengo que volver a leer 
-					 * la DB 
-					 */
-					player = QueryManager.loadAccount(playerID);
+					
+					player = GameManager.getPlayer(playerID);
 					
 					//login normal
 					startLogin();
@@ -78,9 +70,21 @@ public class LoginAssembly extends Global {
 					
 					return false;
 				}
+				//Ha estado conectado hace rato
+			} else if(GameManager.playersMap.containsKey(playerID)){
+				player = GameManager.getPlayer(playerID);
+				
+				//login normal
+				startLogin();
+				Console.out("Player " + player.getPlayerID() + " connected!");
+				
+				return true;
+				
 			} else {
 				//El timeOut cierra los sockets solito... | Login normal
 				startLogin();
+				GameManager.addPlayer(player);
+				
 				Console.out("Player " + player.getPlayerID() + " connected!");
 				return true;
 			}
@@ -103,7 +107,13 @@ public class LoginAssembly extends Global {
 		setSettings();
 		setPlayer();
 		sendMyShip();
-		setDrones(player);
+		/*
+		 * Lo hago de esta forma porque necesitaba que la funcion fuera estatica
+		 * para poder mandar los drones que son comprados desde el conection manager
+		 */
+		sendPacket(userSocket, setDrones(player));
+		sendToOthers(player, setDrones(player));
+		
 		setAmmunition();
 		setRocketsAndMines();
 		setExtras();
@@ -140,7 +150,7 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|SLOTMENU_ORDER,3|" + player.getSettings().SLOTMENU_ORDER);
 		}
 		
-		//Informacion bï¿½sica del jugador
+		//Informacion basica del jugador
 		private void setPlayer() {
 			int premium = 0;
 			if(player.isPremium()) {
@@ -149,13 +159,15 @@ public class LoginAssembly extends Global {
 				premium = 0;
 			}
 			
+			//Carga la ultima configuracion que habia usado
+			player.activeConfig(player.configNum());
+			sendPacket(userSocket, "0|A|CC|" + player.configNum());
+			
 			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + player.getShip().getShipSpeed() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
+			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + (player.getShip().getShipSpeed() + player.activeConfig().getSpeed()) + "|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield() + "|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
 			sendPacket(userSocket, loginPacket);
 			
-			
-			//selecciona config 1 -> en el paquete mando por defecto datos de la config 1
-	        sendPacket(userSocket, "0|A|CC|1");
+			sendPacket(userSocket, "0|A|CC|" + player.configNum());
 		}
 		
 		//Envia mis datos a los usuarios del mapa
@@ -169,7 +181,7 @@ public class LoginAssembly extends Global {
 		 * Envia la informacion para cargar los drones
 		 * TODO: Rehacer de una mejor forma..
 		 */
-		private void setDrones(Player p) {
+		public static String setDrones(Player p) {
 			Drone[] playerDrones = p.getDrones();
 			String packet = "";
 			
@@ -294,10 +306,7 @@ public class LoginAssembly extends Global {
 					}
 				}
 				
-
-				sendPacket(userSocket, "0|n|d|" + p.getPlayerID() + "|" + packet);
-				sendToOthers(p, "0|n|d|" + p.getPlayerID() + "|" + packet);
-				
+				packet = "0|n|d|" + p.getPlayerID() + "|" + packet;
 			} else {
 				//Si el usuario no quiere ver los drones
 				int numIris = 0;
@@ -313,9 +322,10 @@ public class LoginAssembly extends Global {
 					}
 				}
 				//Send F:******* I:******* packet
-				sendPacket(userSocket, "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris);
-				sendToOthers(p, "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris);
+				packet = "0|n|e|" + p.getPlayerID() + "|" + numFlax + "/" + numIris;
 			}
+			
+			return packet;
 		}
 		
 		//Carga la municiï¿½n
@@ -359,7 +369,7 @@ public class LoginAssembly extends Global {
 					String packet = "0|C|" + u.getValue().player().getPlayerID() + "|" + u.getValue().player().getShipID() + "|3|" + u.getValue().player().clan().getTagName() + "|" + u.getValue().player().getUserName() + "|" + u.getValue().player().getPosition().getX() + "|" + u.getValue().player().getPosition().getY() + "|" + u.getValue().player().getFactionID() + "|" + u.getValue().player().clan().getClanID() + "|" + u.getValue().player().getRank() + "|0|0|" + u.getValue().player().getRings() + "|0|0";
 					sendPacket(userSocket, packet);
 					
-					setDrones(u.getValue().player());
+					sendPacket(userSocket, setDrones(u.getValue().player()));
 					
 					if(u.getValue().player().isMoving()) {
 						//Si el player estaba moviendose falseo ese movimiento
@@ -371,6 +381,12 @@ public class LoginAssembly extends Global {
 		
 		//Varios paquetes sobre el cliente
 		private void loadHUD() {
+			/*
+			 * If you quit this line i won't give you support about the project
+			 * Anyways, you should give credits to the developer, i'm sure that you don't want to see your job as 'owned' by others..
+			 */
+			sendPacket(userSocket, "0|A|STM|log_boot_message_dev");
+			
 			//quita icono de ayuda
 			sendPacket(userSocket, "0|UI|W|HW|11");
 			

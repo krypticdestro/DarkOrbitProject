@@ -383,83 +383,132 @@ public class QueryManager extends MySQLManager {
 	 * @return Equipment object
 	 */
 	public static Equipment loadEquipment(int playerID, int config) {
-
-		List<String[]> itemArray = new ArrayList<String[]>();
-		//Shields
-		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0;
+		List<String> itemArray = new ArrayList<String>();
+		int currentShield = 0;
+		//Generators
+		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0, G3N79 = 0, G3N69 = 0, G3N33 = 0, G3N32 = 0, G3N20 = 0, G3N10 = 0;
 		//Lasers
 		int LF3 = 0, LF2 = 0, MP1 = 0, LF1 = 0;
 		
-		query = "SELECT * FROM server_1_general_ship WHERE playerID=" + playerID + " AND configNum=" + config;
+		query = "SELECT * FROM server_1_hangar_config_ship WHERE playerID=" + playerID + " AND configNum=" + config;
 		ResultSet result;
 		
 		try {
+			/* player current shield */
+			ResultSet playerResult = query("SELECT shield" + config + " FROM server_1_players WHERE playerID=" + playerID);
+			while(playerResult.next()) {
+				currentShield = playerResult.getInt("shield" + config);
+			}
+			
+			/* get ship equipment */
 			result = query(query);
+			//Podría ser if porque solo deberia haber 1 resultado..
 			while(result.next()) {
-				itemArray.add(result.getString("generators").split("\\|"));
-				itemArray.add(result.getString("lasers").split("\\|"));
+				
+				if(!result.getString("generators").isEmpty()) {
+					itemArray.add(result.getString("generators"));
+				}
+				
+				if(!result.getString("lasers").isEmpty()) {
+					itemArray.add(result.getString("lasers"));
+				}
 				//TODO: Add more equipment objects..
+			}
+			
+			/* get drones equipment */
+			query = "SELECT * FROM server_1_hangar_config_drones WHERE playerID=" + playerID;
+			
+			ResultSet dronesResult = query(query);
+			//Podría ser if porque solo deberia haber 1 resultado..
+			while(dronesResult.next()) {
+				if(!dronesResult.getString("EQ").isEmpty() && config == 1) {
+					itemArray.add(dronesResult.getString("EQ"));
+				}
+				
+				if(!dronesResult.getString("EQ2").isEmpty() && config == 2) {
+					itemArray.add(dronesResult.getString("EQ2"));
+				}
 			}
 			
 			//Ahora busco cada item.. si el array no esta vacio
 			if(itemArray.size() > 0) {
 				for(int i=0; i<itemArray.size(); i++) {
-					query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + itemArray.get(i)[i];
-					ResultSet itemResult = query(query);
-					
-					while(itemResult.next()) {
-						/*
-						 * equipment_generator_shield_sg3n-b02
-						 * [1] {
-						 * 	generator
-						 * 	weapon
-						 * 	-.-.-
-						 * }
-						 */
-						String[] item = itemResult.getString("lootid").split("_");
-						switch(item[1]) {
-							case "generator":
-								/*
-								 * Shields and engines.
-								 */
-								switch(item[3]) {
-									case "sg3n-b02":
-										B02++;
-										break;
-									case "sg3n-b01":
-										B01++;
-										break;
-									case "sg3n-a03":
-										A03++;
-										break;
-									case "sg3n-a02":
-										A02++;
-										break;
-									case "sg3n-a01":
-										A01++;
-										break;
-								}
-								break;
-								
-							case "weapon":
-								/*
-								 * Lasers and RocketLauncher?
-								 */
-								switch(item[3]) {
-									case "lf-3":
-										LF3++;
-										break;
-									case "lf-2":
-										LF2++;
-										break;
-									case "mp-1":
-										MP1++;
-										break;
-									case "lf-1":
-										LF1++;
-										break;
-								}
-								break;
+					for(int j=0; j<itemArray.get(i).split("\\|").length; j++) {
+						query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + itemArray.get(i).split("\\|")[j];
+						ResultSet itemResult = query(query);
+						
+						while(itemResult.next()) {
+							/*
+							 * equipment_generator_shield_sg3n-b02
+							 * [1] {
+							 * 	generator
+							 * 	weapon
+							 * 	-.-.-
+							 * }
+							 */
+							String[] item = itemResult.getString("lootid").split("_");
+							switch(item[1]) {
+								case "generator":
+									/*
+									 * Shields and engines.
+									 */
+									switch(item[3]) {
+										case "sg3n-b02":
+											B02++;
+											break;
+										case "sg3n-b01":
+											B01++;
+											break;
+										case "sg3n-a03":
+											A03++;
+											break;
+										case "sg3n-a02":
+											A02++;
+											break;
+										case "sg3n-a01":
+											A01++;
+											break;
+										case "g3n-7900":
+											G3N79++;
+											break;
+										case "g3n-6900":
+											G3N69++;
+											break;
+										case "g3n-3310":
+											G3N33++;
+											break;
+										case "g3n-3210":
+											G3N32++;
+											break;
+										case "g3n-2010":
+											G3N20++;
+											break;
+										case "g3n-1010":
+											G3N10++;
+											break;
+									}
+									break;
+									
+								case "weapon":
+									/*
+									 * Lasers and RocketLauncher?
+									 */
+									switch(item[3]) {
+										case "lf-3":
+											LF3++;
+											break;
+										case "lf-2":
+											LF2++;
+											break;
+										case "mp-1":
+											MP1++;
+											break;
+										case "lf-1":
+											LF1++;
+											break;
+									}
+									break;
+							}
 						}
 					}
 				}
@@ -471,11 +520,149 @@ public class QueryManager extends MySQLManager {
 				e.printStackTrace();
 			}
 		}
-		
-		return new Equipment(B02, B01, A03, A02, A01, LF3, LF2, MP1, LF1);
+		return new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1);
 	}
 	
+	/**
+	 * Comprueba los objetos equipados en la web
+	 * @param packet
+	 * @return
+	 */
+	public static void checkObject(String packet) {
+		//Generators
+		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0, G3N79 = 0, G3N69 = 0, G3N33 = 0, G3N32 = 0, G3N20 = 0, G3N10 = 0;
+		//Lasers
+		int LF3 = 0, LF2 = 0, MP1 = 0, LF1 = 0;
+		
+		/*
+		 * webPacket|equipment|lasers|1|1|27|16|18
+		 *	item 0: webPacket
+		 *	item 1: equipment
+		 *	item 2: lasers | generators | EQ | EQ2
+		 *	item 3: playerID
+		 *	item 4: config | droneID
+		 *	item 5: 27
+		 *	item 6: 16
+		 *	item 7: 18
+		 */
+		
+		String[] p = packet.split("\\|");
+		int playerID = Integer.parseInt(p[3]), config = Integer.parseInt(p[4]);
+		
+		//Empieza en 5 por el resumen de arriba, para empezar directamente a leer objectos
+		for(int i=5; i<p.length; i++) {
+			query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + p[i];
+			ResultSet itemResult;
+			try {
+				itemResult = query(query);
+				
+				while(itemResult.next()) {
+					String[] item = itemResult.getString("lootid").split("_");
+					/*
+					 * TODO: Un poco cutre porque hay que copiar todo el switch de la funcion de arriba
+					 */
+					switch(item[1]) {
+						case "generator":
+							/*
+							 * Shields and engines.
+							 */
+							switch(item[3]) {
+								case "sg3n-b02":
+									B02++;
+									break;
+								case "sg3n-b01":
+									B01++;
+									break;
+								case "sg3n-a03":
+									A03++;
+									break;
+								case "sg3n-a02":
+									A02++;
+									break;
+								case "sg3n-a01":
+									A01++;
+									break;
+								case "g3n-7900":
+									G3N79++;
+									break;
+								case "g3n-6900":
+									G3N69++;
+									break;
+								case "g3n-3310":
+									G3N33++;
+									break;
+								case "g3n-3210":
+									G3N32++;
+									break;
+								case "g3n-2010":
+									G3N20++;
+									break;
+								case "g3n-1010":
+									G3N10++;
+									break;
+							}
+							break;
+							
+						case "weapon":
+							/*
+							 * Lasers and RocketLauncher?
+							 */
+							switch(item[3]) {
+								case "lf-3":
+									LF3++;
+									break;
+								case "lf-2":
+									LF2++;
+									break;
+								case "mp-1":
+									MP1++;
+									break;
+								case "lf-1":
+									LF1++;
+									break;
+							}
+							break;
+					}
+				}
+			} catch (SQLException e) {
+				if(Launcher.developmentMode) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		if(GameManager.playersMap.containsKey(playerID)) {
+			/*
+			 * Si el jugador se ha llegado a conectar se coge su cuenta del map y se actualiza su equipamiento para que si sigue online le cambie
+			 * y/o si se conecta de nuevo tenga el actualizado.
+			 * 
+			 * CurrentShield lo que hace es comprobar cuando escudo tenia en la configuracion que se va a sustituir para mantenerlo y 'dejar vacio'
+			 * el resto hasta completar el total.
+			 */
+			Player player = GameManager.getPlayer(playerID);
+			int currentShield = 0;
+			if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config1().getCurrentShield();}
+			
+			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
+			GameManager.updatePlayer(player);
+		} else {
+			/*
+			 * si es su primer login o ni siquiera se ha logueado aun y esta cambiando el equipamiento desde la web.
+			 * 
+			 * Lo mismo que arriba con la diferencia de que en vez de actualizar una cuenta, se añade una nueva al map
+			 */
+			Player player = loadAccount(playerID);
+			int currentShield = 0;
+			if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config1().getCurrentShield();}
+			
+			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
+			GameManager.addPlayer(player);
+		}
+	}
 	
+	/**
+	 * Carga los mapas del juego. A medias!
+	 */
 	public static void loadMaps() {
 		query = "SELECT * FROM maps WHERE id=1";
 		try {

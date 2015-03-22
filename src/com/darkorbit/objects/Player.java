@@ -12,7 +12,7 @@ import com.darkorbit.utils.Vector;
  *
  */
 public class Player {
-	private int playerID, health, level, rank, rings, clanID, speed;
+	private int playerID, health, level, rank, rings, clanID, configNum;
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
@@ -27,7 +27,7 @@ public class Player {
 	private Rockets rockets;
 	private Drone[] drones;
 	private Clan clan;
-	private Equipment config1, config2;
+	private Equipment config1, config2, activeConfig;
 	
 	/**
 	 * Player constructor
@@ -54,7 +54,6 @@ public class Player {
 		this.rank = rank;
 		this.rings = rings;
 		this.clanID = clanID;
-		this.speed = 0; //TODO: por defecto hasta que programe el equipamiento..
 		
 		this.moving = false;
 		this.isJumping = false;
@@ -62,12 +61,17 @@ public class Player {
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
 		this.rockets = QueryManager.loadRockets(playerID);
-		this.drones = QueryManager.loadDrones(playerID);
-		/*
-		 * QueryManager.loadEquipment(playerID, configNum)
-		 */
-		/*this.config1 = QueryManager.loadEquipment(playerID, 1);
-		this.config2 = QueryManager.loadEquipment(playerID, 2);*/
+		
+		if(GameManager.dronesBought.containsKey(playerID)) {
+			this.drones = GameManager.getDrones(playerID);
+			
+		} else {
+			this.drones = QueryManager.loadDrones(playerID);
+		}
+		
+		this.config1 = QueryManager.loadEquipment(playerID, 1);
+		this.config2 = QueryManager.loadEquipment(playerID, 2);
+		this.configNum = 1;
 		
 		if(hasClan()) {
 			this.clan = QueryManager.loadClan(clanID);
@@ -130,11 +134,13 @@ public class Player {
 		
 		public boolean isJumping() { return isJumping; }
 		
-		public int getSpeed() { return speed; }
-		
 		public Equipment config1() { return config1; }
 		
 		public Equipment config2() { return config2; }
+		
+		public Equipment activeConfig() { return activeConfig; }
+		
+		public int configNum() { return configNum; }
 		
 	/* @end */
 		
@@ -147,7 +153,38 @@ public class Player {
 		
 		public void setMapID(short m) { mapID = m; }
 		
-		public void setSpeed(int s) { speed = s; }
+		public void addDrone(int position, Drone newDrone) {
+			drones[position] = newDrone;
+		}
+		
+		/*
+		 * Para que cuando se compra uno el cambio en el cliente sea instantaneo
+		 */
+		public void updateDrones() {
+			if(GameManager.dronesBought.containsKey(playerID)) {
+				this.drones = GameManager.getDrones(playerID);
+				
+			} else {
+				this.drones = QueryManager.loadDrones(playerID);
+			}
+		}
+		
+		public void setConfig(int configNum, Equipment config) {
+			if(configNum == 1) {
+				config1 = config;
+			} else if(configNum == 2) {
+				config2 = config;
+			}
+		}
+		
+		public void activeConfig(int i) {
+			configNum = i;
+			if(i == 1) {
+				activeConfig = config1;
+			} else {
+				activeConfig = config2;
+			}
+		}
 		
 		public void setMovementSystem() {
 			/*

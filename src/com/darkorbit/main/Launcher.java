@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.darkorbit.mysql.MySQLManager;
+import com.darkorbit.net.ConnectionManager;
+import com.darkorbit.net.GameManager;
 import com.darkorbit.net.GameServer;
 import com.darkorbit.net.Global;
 import com.darkorbit.utils.Console;
@@ -128,15 +131,20 @@ public class Launcher extends Global {
 						closeTimer.schedule(new TimerTask() {
 							public void run() {
 								if(seconds >= 0) {
-									
 									for(int i=seconds; i>0; i--) {
 										sendToAll("0|A|STM|server_close_n_seconds|" + i);
 										Console.alert("Closing server in " + i);
 										try {
 											Thread.sleep(1000);
-										} catch (InterruptedException e) { }
+										} catch (InterruptedException ignore) { }
 									}
 									
+									for(Entry<Integer, ConnectionManager> c : GameManager.onlinePlayers.entrySet()) {
+										try {
+											c.getValue().disconnectPlayer();
+										} catch (IOException ignore) { }
+									}
+									Console.out("Server shutdown");
 									System.exit(0);
 								}
 								
@@ -145,6 +153,7 @@ public class Launcher extends Global {
 							}
 						}, 0);
 					} catch(Exception e) {
+						Console.alert("You should introduce the ammount of time (in seconds)");
 						if(developmentMode) {
 							e.printStackTrace();
 						}

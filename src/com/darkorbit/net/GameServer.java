@@ -48,7 +48,6 @@ public class GameServer implements Runnable {
 				Socket incomingConnection = server.accept();
 				if(incomingConnection.isConnected()) {
 					//user connected!
-					Console.out("Connection detected!");
 					new ConnectionManager(incomingConnection);
 				}
 			} catch (IOException e) {

@@ -12,10 +12,12 @@ import java.util.TimerTask;
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.mysql.QueryManager;
+import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.packets.ClientCommands;
 import com.darkorbit.packets.ServerCommands;
+import com.darkorbit.packets.WebCommands;
 import com.darkorbit.utils.Console;
 
 /**
@@ -29,7 +31,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private Socket userSocket;
 	private Thread thread;
 	private Player player = null;
-	private Timer timeOutTimer, jumpTimer;
+	private Timer timeOutTimer, jumpTimer, configTimer;
 	
 	private LoginAssembly loginAssembly;
 	
@@ -38,6 +40,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private final int maxIdle = 24; // 1 = 25 segundos ; 24 = 600 segundos = 10 minutos
 	private long lastPacket = 0;
 	private boolean portalFound = false;
+	private boolean configChanged = false;
 	public boolean timedOut = false;
 
 	
@@ -135,11 +138,13 @@ public class ConnectionManager extends Global implements Runnable {
 		//Actualiza la posicion del usuario para que al guardarla sea la "ultima conocida"
 		player.movement().position();
 		saveData();
+		GameManager.updatePlayer(player);
 		
 		//Borra al usuario del mapa
 		sendToMap(player.getMapID(), "0|R|" + playerID);
 		Console.out("Player " + player.getPlayerID() + " disconnected or exceeded max idle time");
 		GameManager.onlinePlayers.remove(playerID);
+		sendPacket(userSocket, "ERR|" + ServerCommands.NOT_LOGGED_IN);
 		closeConnection();
 	}
 	
@@ -152,8 +157,6 @@ public class ConnectionManager extends Global implements Runnable {
 		//TODO: if(player.canDisconnect()) - por si le estan atacando, etc... (PVP) dat stuff
 		saveData();
 		
-		//Borra al usuario del mapa
-		sendToMap(player.getMapID(), "0|R|" + playerID);
 		GameManager.onlinePlayers.remove(playerID);
 		timeOutTimer.cancel();
 		timeOutTimer.purge();
@@ -162,7 +165,7 @@ public class ConnectionManager extends Global implements Runnable {
 	}
 	
 	/**
-	 * Guarda toda la informaciï¿½n necesaria..
+	 * Guarda toda la informacion necesaria..
 	 */
 	private void saveData() {
 		savePlayerData();
@@ -177,7 +180,8 @@ public class ConnectionManager extends Global implements Runnable {
 			query = "UPDATE server_1_players SET ";
 			
 			//Actualizo y guardo la posicion del usuario
-			query += "x=" + player.getPosition().getX() + ", y=" + player.getPosition().getY() + ", mapId=" + player.getMapID();
+			query += "x=" + player.getPosition().getX() + ", y=" + player.getPosition().getY() + ", mapId=" + player.getMapID() + ", ";
+			query += "shield1=" + player.config1().getCurrentShield() + ", shield2=" + player.config2().getCurrentShield();
 			query += " WHERE playerID=" + player.getPlayerID();
 		
 			QueryManager.updateSql(query);
@@ -219,7 +223,6 @@ public class ConnectionManager extends Global implements Runnable {
 			char[] packetChar = new char[1];
 			
 			while(in.read(packetChar, 0, 1) != -1) {
-				
 				//Comprueba que el caracter no sea ni nulo, espacio en blanco, linea nueva
 				if(packetChar[0] != '\u0000' && packetChar[0] != '\n' && packetChar[0] != '\r') {
 					//Si no aï¿½ade el caracter a packet
@@ -285,7 +288,8 @@ public class ConnectionManager extends Global implements Runnable {
 						}
 					}
 					break;
-					
+				
+				// /portalsRange <true/false> - Shows the portal range (development tool)
 				case "/portalsRange":
 					try {
 						if(Boolean.parseBoolean(p[1]) == true) {
@@ -308,40 +312,126 @@ public class ConnectionManager extends Global implements Runnable {
 						}
 					}
 					break;
-					
-				case "/speed":
+				
+				// /close <seconds> - Shutdown the server
+				case "/close":
 					try {
-						int maxSpeed = 700;
-						
-						for(Entry<Integer, ConnectionManager> o : GameManager.onlinePlayers.entrySet()) {
-							if(Integer.parseInt(p[1]) == o.getValue().player().getPlayerID()) {
-								if(Integer.parseInt(p[2]) > maxSpeed) {
-									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
-								} else {
-									o.getValue().player().setSpeed(Integer.parseInt(p[2]));
+						int seconds = Integer.parseInt(p[1]);
+						Timer closeTimer = new Timer("closeTimer");
+						closeTimer.schedule(new TimerTask() {
+							public void run() {
+								if(seconds >= 0) {
+									for(int i=seconds; i>0; i--) {
+										sendToAll("0|A|STM|server_close_n_seconds|" + i);
+										Console.alert("Closing server in " + i);
+										try {
+											Thread.sleep(1000);
+										} catch (InterruptedException ignore) { }
+									}
+									
+									for(Entry<Integer, ConnectionManager> c : GameManager.onlinePlayers.entrySet()) {
+										try {
+											c.getValue().disconnectPlayer();
+										} catch (IOException ignore) { }
+									}
+									Console.out("Server shutdown");
+									System.exit(0);
 								}
+								
+								closeTimer.cancel();
+								closeTimer.purge();
 							}
-						}
-						
+						}, 0);
 					} catch(Exception e) {
-						sendPacket(userSocket, "0|A|STM|wrong_packet_parameter");
-						if(Launcher.developmentMode) {
-							e.printStackTrace();
-						}
+						sendPacket(userSocket, "0|A|STD|You should introduce the ammount of time (in seconds)");
 					}
+					break;
+					
+				// /msg <message> - sends a global message
+				case "/msg":
+					try {
+						String msg = "";
+						for(int i=1; i<p.length; i++) {
+							msg += p[i] + " ";
+						}
+						sendToAll("0|A|STD|" + msg + "\nGlobal message from: " + player.getUserName());
+					} catch(Exception e) {
+						sendPacket(userSocket, "0|A|STD|Introducce the message!");
+					}
+					break;
 			}
 			
 		} else {
 			String[] p = packet.split("\\|");
 			
 			switch(p[0]) {
+			/* #############################WEB PACKETS############################# */
+				case WebCommands.WEB_PACKET:
+					switch(p[1]) {
+						case WebCommands.EQUIPMENT_UPDATE:
+							//webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
+							QueryManager.checkObject(packet);
+							
+							if(GameManager.isOnline(Integer.parseInt(p[3]))) {
+								player = GameManager.getConnectionManager(Integer.parseInt(p[3])).player();
+								//player.updateConfigs();
+							}
+							break;
+							
+						case WebCommands.BUY_DRONE:
+							//Obtengo la cuenta del jugador que compra el vant
+							//webPacket|buydrone|".$playerID."|".$kind."|".$item_id
+							player = QueryManager.loadAccount(Integer.parseInt(p[2]));
+							int dronPosition = 0;
+							/*
+							 * El array de drones tiene 8 posiciones, pero pueden ser nulas, por lo que veo el numero real ocupadas..
+							 */
+							for(int i=0; i<player.getDrones().length; i++) {
+								if(!(player.getDrones()[i] == null)) {
+									dronPosition++;
+								}
+							}
+							//numDrones puede ir de 0 a 7 => 8 drones
+							
+							//Y añado el dron al array
+							if(dronPosition < 8) {
+								player.addDrone(dronPosition, new Drone(1, p[3]));
+							}
+							
+							if(GameManager.dronesBought.containsKey(player.getPlayerID())) {
+								//Borro el antiguo y cargo el nuevo en memoria
+								GameManager.dronesBought.remove(player.getPlayerID());
+								GameManager.dronesBought.put(player.getPlayerID(), player.getDrones());
+							} else {
+								GameManager.dronesBought.put(player.getPlayerID(), player.getDrones());
+							}
+							
+							if(GameManager.isOnline(player.getPlayerID())) {
+								ConnectionManager playerCM = GameManager.getConnectionManager(player.getPlayerID());
+								//Acutliza los drones del usuario
+								playerCM.player().updateDrones();
+								sendPacket(playerCM.getSocket(), LoginAssembly.setDrones(playerCM.player()));
+								
+								sendToOthers(playerCM.player(), LoginAssembly.setDrones(playerCM.player()));
+							}
+							break;
+					}
+					break;
+					
+			/* ############################GAME PACKETS############################# */
 				case ServerCommands.REQUEST_POLICY:
-					//Envia la informacion necesaria a flash para la conexiï¿½n
+					//Envia la informacion necesaria a flash para la conexion
 					sendPolicy(userSocket);
 					break;
-				
+
 				case ServerCommands.REQUEST_LOGIN:
 					//LOGIN|playerID|sessionID|clientVersion
+					/*
+					 * TODO: Solucionar el problema de que se pueda enviar un paquete de login desde un socket falso
+					 * La solucion que se me ocurre es usar el sessionID y si se rechaza la conexion bloquear cualquier otro tipo de paquete.
+					 * es decir, que no se puedan mandar paquetes de movimiento, etc... sin "autorizacion"
+					 */
+					
 					try {
 						
 						//Comprueba que el paquete este completo y la version del cliente sea correcta
@@ -369,7 +459,7 @@ public class ConnectionManager extends Global implements Runnable {
 								
 								//Inicia el timeout
 								startTimeOut();
-								
+
 							} else {
 								//sino se cierra su socket
 								closeConnection();
@@ -427,7 +517,7 @@ public class ConnectionManager extends Global implements Runnable {
 													Thread.sleep(3250); //tiempo de salto..
 													
 													//Borra el grafico del usuario..
-													//sendToMap(player.getMapID(), "0|R|" + player.getPlayerID());
+													sendToMap(player.getMapID(), "0|R|" + player.getPlayerID());
 													
 													player.setPosition(portal.getValue().getDestination());
 													player.setMapID(portal.getValue().getToMapID());
@@ -440,7 +530,7 @@ public class ConnectionManager extends Global implements Runnable {
 													GameManager.getConnectionManager(player.getPlayerID()).jumpDisconnetion();
 													
 													//Creo un nuevo paquete de conexion y magic :D
-													String loginPacket = "LOGIN|" + player.getPlayerID() + "|sessionID|" + Launcher.clientVersion;
+													String loginPacket = "LOGIN|" + player.getPlayerID() + "|142312|" + Launcher.clientVersion;
 													checkPacket(loginPacket);
 													
 													Console.out("Player " + player.getPlayerID() + " jumped to mapID=" + portal.getValue().getToMapID());
@@ -479,7 +569,10 @@ public class ConnectionManager extends Global implements Runnable {
 					
 				case ServerCommands.SELECT:
 					int targetID = Integer.parseInt(p[1]);
-					sendPacket(userSocket, "0|N|" + targetID + "|" + player.getShipID() + "|5|10|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0");
+					//0|N|PlayerID|shipID|shd|getMaxShield()|hp|maxHp|isCloacked
+					Player target = GameManager.getConnectionManager(targetID).player();
+					sendPacket(userSocket, "0|N|" + targetID + "|" + target.getShipID() + "|" + target.activeConfig().getCurrentShield() + "|" + target.activeConfig().getShield() + "|" + target.getHealth() + "|" + target.getShip().getShipHealth() + "|0");
+					//FIXME si alguien 'me tiene' seleccionado actualizar mi escudo al cambiar config
 					break;
 
 				/*
@@ -569,6 +662,56 @@ public class ConnectionManager extends Global implements Runnable {
 						}
 						
 						player.getSettings().SET = paket;
+					}
+					break;
+					
+				case ClientCommands.SELECT:
+					switch(p[1]) {
+						case ClientCommands.CONFIGURATION:
+							if(!configChanged) {
+								configChanged = true; /* para bloquear que se cambie de config antes de 5 seg */
+								
+								configTimer = new Timer("Player" + player.getPlayerID() + " Jump Timer");
+								configTimer.schedule(new TimerTask(){
+									public void run() {
+										try {
+											//Cambio de config
+											if(Integer.parseInt(p[2]) == 1) {
+												sendPacket(userSocket, "0|S|CFG|1");
+												player.activeConfig(1);
+											} else {
+												sendPacket(userSocket, "0|S|CFG|2");
+												player.activeConfig(2);
+											}
+											
+											//Si el escudo actual es mayo que el total, se igualan
+											if(player.activeConfig().getCurrentShield() > player.activeConfig().getShield()) {
+												player.activeConfig().setCurrentShield(player.activeConfig().getShield());
+											}
+											
+											sendPacket(userSocket, "0|A|SHD|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield());
+											/*
+											 * La velocidad se actualiza sola porque se coge directamente en el movementSystem.
+											 * Al igual que el daño
+											 */
+											Thread.sleep(5000);
+											
+											configChanged = false;
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+										
+										configTimer.cancel();
+										configTimer.purge();
+									}
+								}, 0);
+							} else {
+								sendPacket(userSocket, "0|A|STM|config_change_failed_time");
+							}
+							
+							
+							
+							break;
 					}
 					break;
 			}

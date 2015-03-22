@@ -13,6 +13,7 @@ public class MovementSystem extends Global implements Runnable {
 	private Vector destination, oldPosition, direction;
 	private double time, distance, timeRemaining;
 	private long lastMove;
+	private int vel;
 	private Player player;
 	private Thread thread;
 	
@@ -65,7 +66,7 @@ public class MovementSystem extends Global implements Runnable {
 	        
 	        //igual que si fuera while(true)
 	        //TODO
-	        System.out.println("MOVING IN DA FUCKING SKY");
+	        //sendToMap(player.getMapID(), "0|A|STD|Speed: " + vel);
 	        playerMoving();
 		}
 	}
@@ -86,7 +87,7 @@ public class MovementSystem extends Global implements Runnable {
 		
 		oldPosition = new Vector(Integer.parseInt(p[3]), Integer.parseInt(p[4]));
 		
-		int vel = player.getShip().getShipSpeed() + player.getSpeed();
+		vel = player.getShip().getShipSpeed() + player.activeConfig().getSpeed();
 				
 		direction = new Vector(destination.getX() - oldPosition.getX(), destination.getY() - oldPosition.getY());
 		
@@ -135,6 +136,7 @@ public class MovementSystem extends Global implements Runnable {
 				return player.getPosition();
 			}
 		} else {
+			//player.setPosition(new Vector(destination.getX(), destination.getY()));
 			return player.getPosition();
 		}
 	}

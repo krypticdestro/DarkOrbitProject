@@ -3,7 +3,7 @@ package com.darkorbit.objects;
 public class Drone {
 	private int droneLevel, dronePacket;
 	private String droneKind;
-	
+
 	public Drone(int droneLevel, String droneKind) {
 		this.droneLevel = droneLevel;
 		this.droneKind = droneKind;
@@ -33,6 +33,7 @@ public class Drone {
 	}
 	
 	/* get methods */
+		
 		public int getDroneLevel() {
 			return droneLevel;
 		}
@@ -44,5 +45,7 @@ public class Drone {
 		public int getDronePacket() {
 			return dronePacket;
 		}
+	/* @end */
 		
+	/* set methods */
 }

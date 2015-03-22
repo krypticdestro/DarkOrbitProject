@@ -3,7 +3,9 @@ package com.darkorbit.net;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.GameMap;
+import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Ship;
 
@@ -65,5 +67,32 @@ public class GameManager {
 		
 		public static void addMap(GameMap m) {
 			gameMaps.put(m.getMapID(), m);
+		}
+		
+	/* Players map */
+		public static Map<Integer, Player> playersMap = new TreeMap<Integer, Player>();
+		
+		public static Player getPlayer(int playerID) {
+			return playersMap.get(playerID);
+		}
+		
+		public static void addPlayer(Player player) {
+			playersMap.put(player.getPlayerID(), player);
+		}
+		
+		public static void updatePlayer(Player player) {
+			if(playersMap.containsKey(player.getPlayerID())) {
+				playersMap.remove(player.getPlayerID());
+				addPlayer(player);
+			} else {
+				addPlayer(player);
+			}
+		}
+		
+	/* Drones bought */
+		public static Map<Integer, Drone[]> dronesBought = new TreeMap<Integer, Drone[]>();
+		
+		public static Drone[] getDrones(int playerID) {
+			return dronesBought.get(playerID);
 		}
 }
