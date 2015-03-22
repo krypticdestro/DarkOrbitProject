@@ -12,7 +12,7 @@ import com.darkorbit.utils.Vector;
  *
  */
 public class Player {
-	private int playerID, health, level, rank, rings, clanID;
+	private int playerID, health, level, rank, rings, clanID, speed;
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
@@ -27,7 +27,7 @@ public class Player {
 	private Rockets rockets;
 	private Drone[] drones;
 	private Clan clan;
-	private Equipment config1, config2, activeConfig;
+	private Equipment config1, config2;
 	
 	/**
 	 * Player constructor
@@ -54,6 +54,7 @@ public class Player {
 		this.rank = rank;
 		this.rings = rings;
 		this.clanID = clanID;
+		this.speed = 0; //TODO: por defecto hasta que programe el equipamiento..
 		
 		this.moving = false;
 		this.isJumping = false;
@@ -63,21 +64,10 @@ public class Player {
 		this.rockets = QueryManager.loadRockets(playerID);
 		this.drones = QueryManager.loadDrones(playerID);
 		/*
-		 * Si hay un equipamiento guardado de ese usuario.
-		 * es decir que haya modificado su equipamiento en algun momento antes de un reinicio del server
+		 * QueryManager.loadEquipment(playerID, configNum)
 		 */
-		if(GameManager.equipment.containsKey(playerID + "|1")) {
-			this.config1 = GameManager.getEquipment(playerID + "|1");
-			
-		} else if(GameManager.equipment.containsKey(playerID + "|2")) {
-			this.config2 = GameManager.getEquipment(playerID + "|2");
-		} else {
-			this.config1 = QueryManager.loadEquipment(playerID, 1);
-			this.config2 = QueryManager.loadEquipment(playerID, 2);
-		}
-		
-		//Por defecto se inicia el juego con la config 1
-		this.activeConfig = this.config1;
+		/*this.config1 = QueryManager.loadEquipment(playerID, 1);
+		this.config2 = QueryManager.loadEquipment(playerID, 2);*/
 		
 		if(hasClan()) {
 			this.clan = QueryManager.loadClan(clanID);
@@ -140,11 +130,11 @@ public class Player {
 		
 		public boolean isJumping() { return isJumping; }
 		
+		public int getSpeed() { return speed; }
+		
 		public Equipment config1() { return config1; }
 		
 		public Equipment config2() { return config2; }
-		
-		public Equipment activeConfig() { return activeConfig; }
 		
 	/* @end */
 		
@@ -157,13 +147,7 @@ public class Player {
 		
 		public void setMapID(short m) { mapID = m; }
 		
-		public void activeConfig(int i) {
-			if(i == 1) {
-				activeConfig = this.config1;
-			} else {
-				activeConfig = this.config2;
-			}
-		}
+		public void setSpeed(int s) { speed = s; }
 		
 		public void setMovementSystem() {
 			/*
