@@ -12,11 +12,11 @@ import com.darkorbit.utils.Vector;
  *
  */
 public class Player {
-	private int playerID, health, level, rank, rings, clanID, configNum;
+	private int playerID, health, level, rank, rings, clanID, configNum, targetID;
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
-	private boolean moving, isPremium, isJumping;
+	private boolean moving, isPremium, isJumping, isPlayer;
 	private long experience, credits, uridium, honor;
 	private double jackpot;
 	
@@ -57,6 +57,7 @@ public class Player {
 		
 		this.moving = false;
 		this.isJumping = false;
+		this.isPlayer = false;
 		
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
@@ -69,8 +70,8 @@ public class Player {
 			this.drones = QueryManager.loadDrones(playerID);
 		}
 		
-		this.config1 = QueryManager.loadEquipment(playerID, 1);
-		this.config2 = QueryManager.loadEquipment(playerID, 2);
+		this.config1 = QueryManager.loadEquipment(this, 1);
+		this.config2 = QueryManager.loadEquipment(this, 2);
 		this.configNum = 1;
 		
 		if(hasClan()) {
@@ -142,12 +143,24 @@ public class Player {
 		
 		public int configNum() { return configNum; }
 		
+		public boolean isPlayer() { return isPlayer; }
+		
+		public int getTargetID() { return targetID; }
+		
 	/* @end */
 		
 	/* set methods */
 		public void isMoving(boolean m) { moving = m; }
 		
 		public void isJumping(boolean j) { isJumping = j; }
+		
+		public void isPlayer(boolean p) { 
+			isPlayer = p;
+		}
+		
+		public void setTarget(int targetID) {
+			this.targetID = targetID;
+		}
 		
 		public void setPosition(Vector p) { position = p; }
 		

@@ -1,10 +1,12 @@
 package com.darkorbit.objects;
 
 public class Drone {
-	private int droneLevel, dronePacket;
+	private int droneID, droneLevel, dronePacket;
 	private String droneKind;
+	private Equipment EQ, EQ2;
 
-	public Drone(int droneLevel, String droneKind) {
+	public Drone(int droneID, int droneLevel, String droneKind) {
+		this.droneID = droneID;
 		this.droneLevel = droneLevel;
 		this.droneKind = droneKind;
 		
@@ -30,10 +32,15 @@ public class Drone {
 				break;
 				
 		}
+		
+		this.EQ = null;
+		this.EQ2 = null;
 	}
 	
 	/* get methods */
 		
+		public int getDroneID() { return droneID; }
+	
 		public int getDroneLevel() {
 			return droneLevel;
 		}
@@ -48,4 +55,14 @@ public class Drone {
 	/* @end */
 		
 	/* set methods */
+		
+		public void setEQ(int configNum, int currentShield, int B02, int B01, int A03, int A02, int A01, int G3N79, int G3N69, int G3N33, int G3N32,
+				int G3N20, int G3N10, int LF3, int LF2, int MP1, int LF1) {
+			
+			if(configNum == 1) {
+				EQ = new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1);
+			} else if(configNum == 2) {
+				EQ2 = new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1);
+			}
+		}
 }

@@ -295,7 +295,7 @@ public class QueryManager extends MySQLManager {
 			int contador = 0;
 			//Porque solo hay 8 drones, por ahora
 			while(result.next()) {
-				Drone drone = new Drone(result.getInt("drone_level"), result.getString("drone_kind"));
+				Drone drone = new Drone(result.getInt("item_sale_id"), result.getInt("drone_level"), result.getString("drone_kind"));
 				
 				drones[contador] = drone;
 				contador++;
@@ -382,7 +382,8 @@ public class QueryManager extends MySQLManager {
 	 * @param config
 	 * @return Equipment object
 	 */
-	public static Equipment loadEquipment(int playerID, int config) {
+	public static Equipment loadEquipment(Player player, int config) {
+		int playerID = player.getPlayerID();
 		List<String> itemArray = new ArrayList<String>();
 		int currentShield = 0;
 		//Generators
@@ -416,19 +417,19 @@ public class QueryManager extends MySQLManager {
 			}
 			
 			/* get drones equipment */
-			query = "SELECT * FROM server_1_hangar_config_drones WHERE playerID=" + playerID;
-			
-			ResultSet dronesResult = query(query);
-			//Podría ser if porque solo deberia haber 1 resultado..
-			while(dronesResult.next()) {
-				if(!dronesResult.getString("EQ").isEmpty() && config == 1) {
-					itemArray.add(dronesResult.getString("EQ"));
-				}
+			/*for(Drone d : player.getDrones()) {
+				String droneEQ = "";
+				query = "SELECT * FROM server_1_hangar_config_drones WHERE playerID=" + playerID + " AND item_id=" + d.getDroneID();
+				ResultSet dronesResult = query(query);
 				
-				if(!dronesResult.getString("EQ2").isEmpty() && config == 2) {
-					itemArray.add(dronesResult.getString("EQ2"));
+				while(dronesResult.next()) {
+					if(config == 1) {
+						droneEQ += dronesResult.getString("EQ");
+					} else {
+						droneEQ += dronesResult.getString("EQ2");
+					}
 				}
-			}
+			}*/
 			
 			//Ahora busco cada item.. si el array no esta vacio
 			if(itemArray.size() > 0) {
@@ -538,12 +539,20 @@ public class QueryManager extends MySQLManager {
 		 * webPacket|equipment|lasers|1|1|27|16|18
 		 *	item 0: webPacket
 		 *	item 1: equipment
-		 *	item 2: lasers | generators | EQ | EQ2
+		 *	item 2: lasers | generators
 		 *	item 3: playerID
-		 *	item 4: config | droneID
+		 *	item 4: config
 		 *	item 5: 27
 		 *	item 6: 16
 		 *	item 7: 18
+		 *
+		 * webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
+		 *  item 0: webPacket
+		 *	item 1: droneEquipment
+		 *	item 2: droneID //no usado aun
+		 *	item 3: playerID
+		 *	item 4: config
+		 *	item 5: ITEMS[]
 		 */
 		
 		String[] p = packet.split("\\|");
@@ -631,33 +640,34 @@ public class QueryManager extends MySQLManager {
 			}
 		}
 		
+		Player player = null;
 		if(GameManager.playersMap.containsKey(playerID)) {
 			/*
 			 * Si el jugador se ha llegado a conectar se coge su cuenta del map y se actualiza su equipamiento para que si sigue online le cambie
 			 * y/o si se conecta de nuevo tenga el actualizado.
-			 * 
-			 * CurrentShield lo que hace es comprobar cuando escudo tenia en la configuracion que se va a sustituir para mantenerlo y 'dejar vacio'
-			 * el resto hasta completar el total.
 			 */
-			Player player = GameManager.getPlayer(playerID);
-			int currentShield = 0;
-			if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config1().getCurrentShield();}
-			
-			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
-			GameManager.updatePlayer(player);
+			player = GameManager.getPlayer(playerID);
 		} else {
 			/*
-			 * si es su primer login o ni siquiera se ha logueado aun y esta cambiando el equipamiento desde la web.
-			 * 
-			 * Lo mismo que arriba con la diferencia de que en vez de actualizar una cuenta, se añade una nueva al map
+			 * Sino se carga de la DB
 			 */
-			Player player = loadAccount(playerID);
-			int currentShield = 0;
-			if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config1().getCurrentShield();}
-			
-			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
-			GameManager.addPlayer(player);
+			player = loadAccount(playerID);
 		}
+		/*
+		 * CurrentShield lo que hace es comprobar cuando escudo tenia en la configuracion que se va a sustituir para mantenerlo y 'dejar vacio'
+		 * el resto hasta completar el total.
+		 */
+		int currentShield = 0;
+		if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config2().getCurrentShield();}
+		System.out.println(player);
+		if(p[1].equals("equipment")) { //significa equipamiento de la nave
+			System.out.println("LOLXD");
+			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
+		} else if(p[1].equals("droneEquipment")) {
+			
+		}
+		//Tambien añade la cuenta si no existia antes
+		GameManager.updatePlayer(player);
 	}
 	
 	/**

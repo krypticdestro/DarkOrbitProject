@@ -90,6 +90,7 @@ public class GameManager {
 		}
 		
 	/* Drones bought */
+		//TODO cambiar esto y guardar esta informacion al igual que el equipamiento, en el propio playerMap
 		public static Map<Integer, Drone[]> dronesBought = new TreeMap<Integer, Drone[]>();
 		
 		public static Drone[] getDrones(int playerID) {

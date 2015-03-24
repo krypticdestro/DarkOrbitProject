@@ -59,7 +59,7 @@
 		
 		
 		0|N|13|10|30|200|100|150|0 -> Respuesta al paquete SEL|playerID
-		0|N|PlayerID|shipID|shd|getMaxShield()|hp|maxHp|isCloacked
+		0|N|TargetID|TargetShipID|shd|getMaxShield()|hp|maxHp|shieldSkill
 		
 		0|n|ISH|1
 		0|n|SMB/ISH/EMP|playerID -> pos eso

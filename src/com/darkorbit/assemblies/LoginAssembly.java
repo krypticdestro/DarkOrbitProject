@@ -36,63 +36,59 @@ public class LoginAssembly extends Global {
 			//TODO: usar sessionID
 			this.playerID = Integer.parseInt(p[1]);
 			//this.sessionID = Long.parseLong(p[2]); no usado
-			//Solo se usa para comprobar que la cuenta esta registrada en la DB o en caso de 1º login
-			player = QueryManager.loadAccount(playerID);
-			
 		} catch(Exception e) {
 			if(Launcher.developmentMode) {
 				e.printStackTrace();
 			}
 		}
 		
-		//Si la cuenta existe
-		if(!player.equals(null)) {
 
-			//Pierde la conexion y se reconecta antes del timeOut 
-			if(GameManager.isOnline(player.getPlayerID())) {
-				try {
-					//Cierran los sockets antiguos que tenia abiertos y el timeout
-					GameManager.getConnectionManager(player.getPlayerID()).disconnectPlayer();
-					
-					player = GameManager.getPlayer(playerID);
-					
-					//login normal
-					startLogin();
-					Console.out("Player " + player.getPlayerID() + " reconnected!");
-					
-					return true;
-					
-				} catch (IOException e) {
-					//Error cerrando los sockets...
-					if(Launcher.developmentMode) {
-						e.printStackTrace();
-					}
-					
-					return false;
-				}
-				//Ha estado conectado hace rato
-			} else if(GameManager.playersMap.containsKey(playerID)){
+		//Pierde la conexion y se reconecta antes del timeOut 
+		if(GameManager.isOnline(playerID)) {
+			try {
+				//Cierran los sockets antiguos que tenia abiertos y el timeout
+				GameManager.getConnectionManager(playerID).disconnectPlayer();
+				
 				player = GameManager.getPlayer(playerID);
 				
 				//login normal
 				startLogin();
-				Console.out("Player " + player.getPlayerID() + " connected!");
+				Console.out("Player " + player.getPlayerID() + " reconnected!");
 				
 				return true;
 				
-			} else {
-				//El timeOut cierra los sockets solito... | Login normal
-				startLogin();
-				GameManager.addPlayer(player);
+			} catch (IOException e) {
+				//Error cerrando los sockets...
+				if(Launcher.developmentMode) {
+					e.printStackTrace();
+				}
 				
-				Console.out("Player " + player.getPlayerID() + " connected!");
-				return true;
+				return false;
 			}
+			//Ha estado conectado hace rato
+		} else if(GameManager.playersMap.containsKey(playerID)){
+			player = GameManager.getPlayer(playerID);
 			
+			//login normal
+			startLogin();
+			Console.out("Player " + player.getPlayerID() + " connected!");
+			
+			return true;
+			
+		} else if(!(player = QueryManager.loadAccount(playerID)).equals(null)) {
+			//Login normal si la cuenta existe
+			startLogin();
+			GameManager.addPlayer(player);
+			
+			Console.out("Player " + player.getPlayerID() + " connected!");
+			return true;
 		} else {
 			//La cuenta no ha podido ser cargada -> no hay login
+			Console.error("Player with ID " + playerID + " doesn't exist.");
 			return false;
 		}
+			
+		
 	}
 	
 	/**

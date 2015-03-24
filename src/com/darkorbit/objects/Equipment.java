@@ -46,7 +46,15 @@ public class Equipment {
 	/* get methods */
 		
 		public int getShield() {
-			return (numB02 * 10000) + (numB01 * 4000) + (numA03 * 5000) + (numA02 * 2000) + (numA01 * 1000);   
+			int maxShield = (numB02 * 10000) + (numB01 * 4000) + (numA03 * 5000) + (numA02 * 2000) + (numA01 * 1000);
+			if(maxShield <= 0) {
+				/*
+				 * Hago esto porque si el escudo es 0 se ve toda la barra de escudo llena, aunque sea 0 de 0 => 0|0
+				 */
+				return 1;
+			} else {
+				return maxShield;
+			}
 		}
 		
 		public int getSpeed() {

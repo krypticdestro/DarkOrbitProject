@@ -41,13 +41,12 @@ public class Launcher extends Global {
 		System.out.println("DarkOrbit Game Server (C) 2015 - " + version);
 		System.out.println("Starting up everything...\n");
 		if(developmentMode) {
-			Console.alert("Disable by default development mode in official releases!");
+			Console.error("Disable by default development mode in official releases!");
 		}
 		readConfigFile();
 		
 		Console.out("Connecting to MySQL...");
 		new MySQLManager(mysqlHost, mysqlUserName, mysqlPassword, mysqlDatabase);
-		
 		new GameServer(PORT);
 		
 		waitForCommands();

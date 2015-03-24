@@ -20,6 +20,12 @@ public class MovementSystem extends Global implements Runnable {
 	public MovementSystem(int playerID) {
 		this.player = GameManager.getConnectionManager(playerID).player();
 		
+		/*
+		 * Inicializo el destino como la posicion del jugador al conectarse para que no sea nulo en loginAssembly.checkPlayerPosition()
+		 * De serlo la funcion position se carga el server porque si el usuario se conecta pero no se mueve su "destino" es nulo, por lo que no 
+		 * se puede comprobar su posicion, tendria que al menos moverme 1mm o bien inicializarlo de esta forma :D
+		 */
+		this.destination = player.getPosition();
 		this.thread = new Thread(this, "MovementSystem Thread player" + player.getPlayerID());
 		thread.start();
 	}
@@ -136,7 +142,7 @@ public class MovementSystem extends Global implements Runnable {
 				return player.getPosition();
 			}
 		} else {
-			//player.setPosition(new Vector(destination.getX(), destination.getY()));
+			player.setPosition(new Vector(destination.getX(), destination.getY()));
 			return player.getPosition();
 		}
 	}

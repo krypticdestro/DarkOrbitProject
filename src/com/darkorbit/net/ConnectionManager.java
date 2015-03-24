@@ -144,7 +144,6 @@ public class ConnectionManager extends Global implements Runnable {
 		sendToMap(player.getMapID(), "0|R|" + playerID);
 		Console.out("Player " + player.getPlayerID() + " disconnected or exceeded max idle time");
 		GameManager.onlinePlayers.remove(playerID);
-		sendPacket(userSocket, "ERR|" + ServerCommands.NOT_LOGGED_IN);
 		closeConnection();
 	}
 	
@@ -371,11 +370,11 @@ public class ConnectionManager extends Global implements Runnable {
 						case WebCommands.EQUIPMENT_UPDATE:
 							//webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
 							QueryManager.checkObject(packet);
+							break;
 							
-							if(GameManager.isOnline(Integer.parseInt(p[3]))) {
-								player = GameManager.getConnectionManager(Integer.parseInt(p[3])).player();
-								//player.updateConfigs();
-							}
+						case WebCommands.DRONE_EQUIPMENT_UPDATE:
+							//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
+							QueryManager.checkObject(packet);
 							break;
 							
 						case WebCommands.BUY_DRONE:
@@ -395,7 +394,7 @@ public class ConnectionManager extends Global implements Runnable {
 							
 							//Y añado el dron al array
 							if(dronPosition < 8) {
-								player.addDrone(dronPosition, new Drone(1, p[3]));
+								player.addDrone(dronPosition, new Drone(Integer.parseInt(p[4]), 1, p[3]));
 							}
 							
 							if(GameManager.dronesBought.containsKey(player.getPlayerID())) {
@@ -505,7 +504,6 @@ public class ConnectionManager extends Global implements Runnable {
 										
 										portalFound = true; /* para bloquear el mensaje de portal no encontrado generado por el bucle for */
 										
-										sendPacket(userSocket, "0|A|STD|Jumping");
 										player.isJumping(true);
 										
 										jumpTimer = new Timer("Player" + player.getPlayerID() + " Jump Timer");
@@ -569,10 +567,17 @@ public class ConnectionManager extends Global implements Runnable {
 					
 				case ServerCommands.SELECT:
 					int targetID = Integer.parseInt(p[1]);
-					//0|N|PlayerID|shipID|shd|getMaxShield()|hp|maxHp|isCloacked
-					Player target = GameManager.getConnectionManager(targetID).player();
-					sendPacket(userSocket, "0|N|" + targetID + "|" + target.getShipID() + "|" + target.activeConfig().getCurrentShield() + "|" + target.activeConfig().getShield() + "|" + target.getHealth() + "|" + target.getShip().getShipHealth() + "|0");
-					//FIXME si alguien 'me tiene' seleccionado actualizar mi escudo al cambiar config
+					//0|N|TargetID|TargetShipID|shd|getMaxShield()|hp|maxHp|shieldSkill
+					
+					if(GameManager.isOnline(targetID)) {
+						//Si el objetivo en un usuario
+						Player target = GameManager.getConnectionManager(targetID).player();
+						sendPacket(userSocket, "0|N|" + targetID + "|" + target.getShipID() + "|" + target.activeConfig().getCurrentShield() + "|" + target.activeConfig().getShield() + "|" + target.getHealth() + "|" + target.getShip().getShipHealth() + "|0");
+						player.isPlayer(true);
+						player.setTarget(targetID);
+					} else {
+						//Es un NPC
+					}
 					break;
 
 				/*
@@ -694,7 +699,21 @@ public class ConnectionManager extends Global implements Runnable {
 											 * La velocidad se actualiza sola porque se coge directamente en el movementSystem.
 											 * Al igual que el daño
 											 */
-											Thread.sleep(5000);
+											
+											for(Entry<Integer, ConnectionManager> on : GameManager.onlinePlayers.entrySet()) {
+												/*Si algun jugador del mismo mapa que yo, me tiene selecionado mando de nuevo el paquete de 
+												 * seleccion con el escudo actualizado
+												 * 
+												 * 0|N|TargetID|TargetShipID|shd|getMaxShield()|hp|maxHp|shieldSkill
+												 */
+												if(on.getValue().player().getMapID() == player.getMapID() && on.getValue().player().getTargetID() == player.getPlayerID()) {
+													sendPacket(on.getValue().getSocket(), "0|N|" + player().getPlayerID() + "|" + player().getShipID() 
+															+ "|" + player().activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield()
+															+ "|" + player().getHealth() + "|" + player.getShip().getShipHealth() + "|0");
+												}
+											}
+											
+											Thread.sleep(100);
 											
 											configChanged = false;
 										} catch (InterruptedException e) {
