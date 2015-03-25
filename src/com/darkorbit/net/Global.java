@@ -10,6 +10,8 @@ import com.darkorbit.objects.Player;
 import com.darkorbit.utils.Console;
 
 public class Global {
+	public Global() {}
+	
 	private static PrintWriter out;
 	
 	/**

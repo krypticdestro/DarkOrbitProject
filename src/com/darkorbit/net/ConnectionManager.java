@@ -124,6 +124,7 @@ public class ConnectionManager extends Global implements Runnable {
 		timeOutTimer.cancel();
 		timeOutTimer.purge();
 		player.movement().close();
+		player.laserSystem().close();
 		userSocket.close();
 		in.close();
 	}		
@@ -154,12 +155,11 @@ public class ConnectionManager extends Global implements Runnable {
 	 */
 	public void jumpDisconnetion() throws IOException {
 		//TODO: if(player.canDisconnect()) - por si le estan atacando, etc... (PVP) dat stuff
-		saveData();
 		
 		GameManager.onlinePlayers.remove(playerID);
 		timeOutTimer.cancel();
 		timeOutTimer.purge();
-		//TODO BIATCH
+		player.laserSystem().close();
 		player.movement().close();
 	}
 	
@@ -451,8 +451,8 @@ public class ConnectionManager extends Global implements Runnable {
 								//A�ade el connectionManager al de jugadores online
 								GameManager.connectPlayer(this);
 								
-								//Inicia el movementHelper del player
-								player.setMovementSystem();
+								//Inicia los sistemas del player
+								player.setSystems();
 								
 								thread.setName("ConnectionManager-User_" + player.getPlayerID());
 								
@@ -521,10 +521,6 @@ public class ConnectionManager extends Global implements Runnable {
 													player.setMapID(portal.getValue().getToMapID());
 													saveData();
 																									
-													/*
-													 * TODO: Pos eso Tete, cancela los timer y deberia el thread del movimiento, pero no lo consigo.
-													 * No supone una gran carga porque esta suspendido, pero no es "bonito"
-													 */
 													GameManager.getConnectionManager(player.getPlayerID()).jumpDisconnetion();
 													
 													//Creo un nuevo paquete de conexion y magic :D
@@ -566,8 +562,8 @@ public class ConnectionManager extends Global implements Runnable {
 					break;
 					
 				case ServerCommands.SELECT:
-					int targetID = Integer.parseInt(p[1]);
 					//0|N|TargetID|TargetShipID|shd|getMaxShield()|hp|maxHp|shieldSkill
+					int targetID = Integer.parseInt(p[1]);
 					
 					if(GameManager.isOnline(targetID)) {
 						//Si el objetivo en un usuario
@@ -578,6 +574,19 @@ public class ConnectionManager extends Global implements Runnable {
 					} else {
 						//Es un NPC
 					}
+					break;
+					
+				case ClientCommands.SELECT_LASER:
+					player.selectedAmmo(Integer.parseInt(p[1]));
+					break;
+					
+				case ServerCommands.LASER_ATTACK:
+					player.isAttacking(true);
+					player.laserSystem().startAttack();
+					break;
+					
+				case ClientCommands.LASER_STOP:
+					player.isAttacking(false);
 					break;
 
 				/*

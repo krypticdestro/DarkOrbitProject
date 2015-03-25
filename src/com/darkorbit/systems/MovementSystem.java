@@ -70,17 +70,16 @@ public class MovementSystem extends Global implements Runnable {
 	        } catch (InterruptedException e){
 	        }
 	        
-	        //igual que si fuera while(true)
 	        //TODO
-	        //sendToMap(player.getMapID(), "0|A|STD|Speed: " + vel);
 	        playerMoving();
 		}
 	}
 	
 	public synchronized void close() {
+		//Pongo que se esta moviendo para que al cerrarlo no se vuelva a suspender xD
+		player.isMoving(true);
 		notifyAll();
 		thread = null;
-		
 	}
 	
 	/**

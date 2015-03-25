@@ -207,6 +207,7 @@ public class QueryManager extends MySQLManager {
 						
 					case "sab-50":
 						sab50 = result.getInt("Q");
+						System.out.println(sab50);
 						break;
 						
 					case "ucb-100":
@@ -413,21 +414,26 @@ public class QueryManager extends MySQLManager {
 				if(!result.getString("lasers").isEmpty()) {
 					itemArray.add(result.getString("lasers"));
 				}
-				//TODO: Add more equipment objects..
 			}
 			
 			/* get drones equipment */
 			/*for(Drone d : player.getDrones()) {
-				String droneEQ = "";
+				System.out.println("DRONE " + d.getDroneID());
+				//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
+				String droneEQ = "webPacket|droneEquipment|" + d.getDroneID() + "|" + playerID + "|" + config + "|";
 				query = "SELECT * FROM server_1_hangar_config_drones WHERE playerID=" + playerID + " AND item_id=" + d.getDroneID();
 				ResultSet dronesResult = query(query);
 				
-				while(dronesResult.next()) {
+				if(dronesResult.next()) {
 					if(config == 1) {
 						droneEQ += dronesResult.getString("EQ");
+						
 					} else {
 						droneEQ += dronesResult.getString("EQ2");
 					}
+					
+					System.out.println(droneEQ);
+					checkObject("webPacket|droneEquipment|83|1|1|54|55");
 				}
 			}*/
 			
@@ -524,6 +530,8 @@ public class QueryManager extends MySQLManager {
 		return new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1);
 	}
 	
+	
+	
 	/**
 	 * Comprueba los objetos equipados en la web
 	 * @param packet
@@ -565,7 +573,7 @@ public class QueryManager extends MySQLManager {
 			try {
 				itemResult = query(query);
 				
-				while(itemResult.next()) {
+				if(itemResult.next()) {
 					String[] item = itemResult.getString("lootid").split("_");
 					/*
 					 * TODO: Un poco cutre porque hay que copiar todo el switch de la funcion de arriba
@@ -653,15 +661,16 @@ public class QueryManager extends MySQLManager {
 			 */
 			player = loadAccount(playerID);
 		}
+		
 		/*
 		 * CurrentShield lo que hace es comprobar cuando escudo tenia en la configuracion que se va a sustituir para mantenerlo y 'dejar vacio'
 		 * el resto hasta completar el total.
 		 */
 		int currentShield = 0;
 		if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config2().getCurrentShield();}
-		System.out.println(player);
+		
 		if(p[1].equals("equipment")) { //significa equipamiento de la nave
-			System.out.println("LOLXD");
+			
 			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
 		} else if(p[1].equals("droneEquipment")) {
 			

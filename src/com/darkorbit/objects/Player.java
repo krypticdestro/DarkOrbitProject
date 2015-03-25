@@ -1,5 +1,6 @@
 package com.darkorbit.objects;
 
+import com.darkorbit.attack.LaserSystem;
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.systems.MovementSystem;
@@ -12,17 +13,18 @@ import com.darkorbit.utils.Vector;
  *
  */
 public class Player {
-	private int playerID, health, level, rank, rings, clanID, configNum, targetID;
+	private int playerID, health, level, rank, rings, clanID, configNum, targetID, selectedAmmo;
 	private String userName;
 	private short shipID, factionID, mapID;
 	private Vector position;
-	private boolean moving, isPremium, isJumping, isPlayer;
+	private boolean moving, isPremium, isJumping, isPlayer, isAttacking;
 	private long experience, credits, uridium, honor;
 	private double jackpot;
 	
 	private Settings playerSettings;
 	private Ship playerShip;
 	private MovementSystem movementSystem;
+	private LaserSystem laserSystem;
 	private Ammunition ammo;
 	private Rockets rockets;
 	private Drone[] drones;
@@ -58,6 +60,7 @@ public class Player {
 		this.moving = false;
 		this.isJumping = false;
 		this.isPlayer = false;
+		this.isAttacking = false;
 		
 		this.playerShip = GameManager.getShip(shipID);
 		this.ammo = QueryManager.loadAmmunition(playerID);
@@ -80,6 +83,9 @@ public class Player {
 			//Empty clan
 			this.clan = new Clan(0, "");
 		}
+		
+		this.selectedAmmo = 1;
+		
 	}
 	
 	
@@ -115,6 +121,8 @@ public class Player {
 		
 		public boolean isPremium() { return isPremium; }
 		
+		public boolean isAttacking() { return isAttacking; }
+		
 		public long getExperience() { return experience; }
 		
 		public long getCredits() { return credits; }
@@ -147,6 +155,9 @@ public class Player {
 		
 		public int getTargetID() { return targetID; }
 		
+		public LaserSystem laserSystem() { return laserSystem; }
+		
+		public int selectedAmmo() { return selectedAmmo; }
 	/* @end */
 		
 	/* set methods */
@@ -154,9 +165,11 @@ public class Player {
 		
 		public void isJumping(boolean j) { isJumping = j; }
 		
-		public void isPlayer(boolean p) { 
-			isPlayer = p;
-		}
+		public void isAttacking(boolean a) { isAttacking = a; }
+		
+		public void isPlayer(boolean p) { isPlayer = p; }
+		
+		public void selectedAmmo(int s) { selectedAmmo = s; }
 		
 		public void setTarget(int targetID) {
 			this.targetID = targetID;
@@ -199,12 +212,13 @@ public class Player {
 			}
 		}
 		
-		public void setMovementSystem() {
+		public void setSystems() {
 			/*
 			 * Porque el constructor del movementHelper necesita que el usuario este online en el connectionManager
 			 * asi que hago un metodo para desde el connectionManager iniciarlo cuando quiera...
 			 */
 			movementSystem = new MovementSystem(playerID);
+			laserSystem = new LaserSystem(playerID);
 		}
 		
 		public void setHealth(int h) { health = h; }
@@ -237,6 +251,23 @@ public class Player {
 			}
 		}
 
-
+		//Comprueba el rango respecto a un portal
+		public boolean isInRange(Player p) {
+			double range = 500;
+			//Actualiza la posicion del jugador y del target
+			movementSystem.position();
+			p.movement().position();
+			
+			double finalX = position.getX() - p.getPosition().getX();
+			double finalY = position.getY() - p.getPosition().getY();
+			
+			double distance = Math.sqrt(finalX * finalX + finalY * finalY);
+			
+			if(distance > range) {
+				return false;
+			} else {
+				return true;
+			}
+		}
 		
 }

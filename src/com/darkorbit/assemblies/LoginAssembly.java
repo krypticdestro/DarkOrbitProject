@@ -68,11 +68,10 @@ public class LoginAssembly extends Global {
 			//Ha estado conectado hace rato
 		} else if(GameManager.playersMap.containsKey(playerID)){
 			player = GameManager.getPlayer(playerID);
-			
+
 			//login normal
 			startLogin();
 			Console.out("Player " + player.getPlayerID() + " connected!");
-			
 			return true;
 			
 		} else if(!(player = QueryManager.loadAccount(playerID)).equals(null)) {
@@ -327,7 +326,7 @@ public class LoginAssembly extends Global {
 		//Carga la munici�n
 		private void setAmmunition() {
 			// 0|B|x1|x2|x3|x4|sab|rsb
-	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|0");
+	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|" + player.getAmmo().getSab50() + "|0");
 		}
 		
 		//Carga los misiles y minas
