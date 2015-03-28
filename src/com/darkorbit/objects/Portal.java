@@ -41,6 +41,6 @@ public class Portal {
 		
 		//Pinta el rango del portal
 		public void drawRange() {
-			Extra.drawRange(mapID, position.getX(), position.getY());
+			Extra.drawRange(mapID, position.getX(), position.getY(), 500);
 		}
 }

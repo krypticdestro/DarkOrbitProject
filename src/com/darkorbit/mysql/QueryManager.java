@@ -10,13 +10,18 @@ import com.darkorbit.net.GameManager;
 import com.darkorbit.objects.Ammunition;
 import com.darkorbit.objects.Clan;
 import com.darkorbit.objects.Drone;
+import com.darkorbit.objects.Engine;
 import com.darkorbit.objects.Equipment;
 import com.darkorbit.objects.GameMap;
+import com.darkorbit.objects.Generators;
+import com.darkorbit.objects.Laser;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
 import com.darkorbit.objects.Rockets;
 import com.darkorbit.objects.Settings;
+import com.darkorbit.objects.Shield;
 import com.darkorbit.objects.Ship;
+import com.darkorbit.objects.Weapons;
 import com.darkorbit.utils.Console;
 import com.darkorbit.utils.Vector;
 
@@ -273,44 +278,6 @@ public class QueryManager extends MySQLManager {
 		
 		return new Rockets(r310, plt2026, plt3030, plt2021);
 	}
-	
-	
-	/**
-	 * Carga los drones del player
-	 * @param playerID
-	 * @return Array of Drone
-	 */
-	public static Drone[] loadDrones(int playerID) {
-		query = "SELECT * FROM server_1_player_drones WHERE playerID=" + playerID;
-		ResultSet result;
-		//Vamos a poner 8 drones por ahora
-		Drone[] drones = new Drone[8];
-		for(int i=0; i<8; i++) {
-			//Inicializo el array en nulo por si las moscas...
-			drones[i] = null;
-		}
-		
-		try {
-			result = query(query);
-			
-			int contador = 0;
-			//Porque solo hay 8 drones, por ahora
-			while(result.next()) {
-				Drone drone = new Drone(result.getInt("item_sale_id"), result.getInt("drone_level"), result.getString("drone_kind"));
-				
-				drones[contador] = drone;
-				contador++;
-			}
-		} catch (SQLException e) {
-			Console.error("Couldn't load drones of player " + playerID);
-			if(Launcher.developmentMode) {
-				e.printStackTrace();
-			}
-		}
-		
-		return drones;
-	}
-	
 
 	/**
 	 * Carga la informaciï¿½n del clan del player
@@ -378,305 +345,187 @@ public class QueryManager extends MySQLManager {
 	}
 	
 	/**
-	 * Carga el equipamiento del jugador. Cargar configuracion 1 y 2 en player
+	 * Carga el equipamiento del jugador
 	 * @param playerID
 	 * @param config
-	 * @return Equipment object
+	 * @return
 	 */
-	public static Equipment loadEquipment(Player player, int config) {
-		int playerID = player.getPlayerID();
-		List<String> itemArray = new ArrayList<String>();
-		int currentShield = 0;
-		//Generators
-		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0, G3N79 = 0, G3N69 = 0, G3N33 = 0, G3N32 = 0, G3N20 = 0, G3N10 = 0;
-		//Lasers
-		int LF3 = 0, LF2 = 0, MP1 = 0, LF1 = 0;
-		
-		query = "SELECT * FROM server_1_hangar_config_ship WHERE playerID=" + playerID + " AND configNum=" + config;
-		ResultSet result;
+	public static Equipment loadEquipment(int playerID, int config) {
+		Equipment equipment = null;
 		
 		try {
-			/* player current shield */
-			ResultSet playerResult = query("SELECT shield" + config + " FROM server_1_players WHERE playerID=" + playerID);
-			while(playerResult.next()) {
-				currentShield = playerResult.getInt("shield" + config);
-			}
+			query = "SELECT * FROM server_1_hangar_config_ship WHERE playerID=" + playerID + " AND configNum=" + config;
+			ResultSet result = query(query);
 			
-			/* get ship equipment */
-			result = query(query);
-			//Podría ser if porque solo deberia haber 1 resultado..
-			while(result.next()) {
-				
-				if(!result.getString("generators").isEmpty()) {
-					itemArray.add(result.getString("generators"));
+			Generators generators 	= null;
+			Weapons weapons 		= null;
+			/* ----------------------- */
+			List<Shield> shields = new ArrayList<Shield>();
+			List<Engine> engines = new ArrayList<Engine>();
+			List<Laser> lasers   = new ArrayList<Laser>();
+			List<Drone> drones   = new ArrayList<Drone>();
+			/* ----------------------- */
+			String[] generatorsID 	= null;
+			String[] lasersID 		= null;
+
+			if(result.next()) {
+				//Generators
+				if(result.getString("generators") != "") {
+					generatorsID = result.getString("generators").split("\\|");
 				}
 				
-				if(!result.getString("lasers").isEmpty()) {
-					itemArray.add(result.getString("lasers"));
+				//Lasers
+				if(result.getString("lasers") != "") {
+					lasersID = result.getString("lasers").split("\\|");
 				}
 			}
 			
-			/* get drones equipment */
-			/*for(Drone d : player.getDrones()) {
-				System.out.println("DRONE " + d.getDroneID());
-				//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
-				String droneEQ = "webPacket|droneEquipment|" + d.getDroneID() + "|" + playerID + "|" + config + "|";
-				query = "SELECT * FROM server_1_hangar_config_drones WHERE playerID=" + playerID + " AND item_id=" + d.getDroneID();
-				ResultSet dronesResult = query(query);
+			//Drones part
+			query = "SELECT * FROM server_1_player_drones WHERE playerID=" + playerID;
+			ResultSet dronesResult = query(query);
+			
+			while(dronesResult.next()) {
+				int droneID = dronesResult.getInt("item_sale_id");
+				query = "SELECT * FROM server_1_hangar_config_drones WHERE item_id=" + droneID;
+				ResultSet droneObjectsResult = query(query);
 				
-				if(dronesResult.next()) {
+				List<Laser> droneLasers   = new ArrayList<Laser>();
+				List<Shield> droneShields = new ArrayList<Shield>();
+				
+				String[] droneObjects = null;
+				if(droneObjectsResult.next()) {
 					if(config == 1) {
-						droneEQ += dronesResult.getString("EQ");
-						
+						if(droneObjectsResult.getString("EQ") != "") {
+							droneObjects = droneObjectsResult.getString("EQ").split("\\|");
+						}
 					} else {
-						droneEQ += dronesResult.getString("EQ2");
-					}
-					
-					System.out.println(droneEQ);
-					checkObject("webPacket|droneEquipment|83|1|1|54|55");
-				}
-			}*/
-			
-			//Ahora busco cada item.. si el array no esta vacio
-			if(itemArray.size() > 0) {
-				for(int i=0; i<itemArray.size(); i++) {
-					for(int j=0; j<itemArray.get(i).split("\\|").length; j++) {
-						query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + itemArray.get(i).split("\\|")[j];
-						ResultSet itemResult = query(query);
-						
-						while(itemResult.next()) {
-							/*
-							 * equipment_generator_shield_sg3n-b02
-							 * [1] {
-							 * 	generator
-							 * 	weapon
-							 * 	-.-.-
-							 * }
-							 */
-							String[] item = itemResult.getString("lootid").split("_");
-							switch(item[1]) {
-								case "generator":
-									/*
-									 * Shields and engines.
-									 */
-									switch(item[3]) {
-										case "sg3n-b02":
-											B02++;
-											break;
-										case "sg3n-b01":
-											B01++;
-											break;
-										case "sg3n-a03":
-											A03++;
-											break;
-										case "sg3n-a02":
-											A02++;
-											break;
-										case "sg3n-a01":
-											A01++;
-											break;
-										case "g3n-7900":
-											G3N79++;
-											break;
-										case "g3n-6900":
-											G3N69++;
-											break;
-										case "g3n-3310":
-											G3N33++;
-											break;
-										case "g3n-3210":
-											G3N32++;
-											break;
-										case "g3n-2010":
-											G3N20++;
-											break;
-										case "g3n-1010":
-											G3N10++;
-											break;
-									}
-									break;
-									
-								case "weapon":
-									/*
-									 * Lasers and RocketLauncher?
-									 */
-									switch(item[3]) {
-										case "lf-3":
-											LF3++;
-											break;
-										case "lf-2":
-											LF2++;
-											break;
-										case "mp-1":
-											MP1++;
-											break;
-										case "lf-1":
-											LF1++;
-											break;
-									}
-									break;
-							}
+						if(droneObjectsResult.getString("EQ2") != "") {
+							droneObjects = droneObjectsResult.getString("EQ2").split("\\|");
 						}
 					}
 				}
+				
+				if(droneObjects != null) {
+					for(int i=0; i<droneObjects.length; i++) {
+						Object object = checkObject(Integer.parseInt(droneObjects[i]));
+						
+						switch(object.getClass().getSimpleName()) {
+							case "Shield":
+								droneShields.add((Shield) object);
+								break;
+							case "Laser":
+								droneLasers.add((Laser) object);
+								break;
+						}
+					}
+				}
+				
+				drones.add(new Drone(
+						droneID,
+						dronesResult.getInt("drone_level"),
+						dronesResult.getString("drone_kind").split("_")[1],
+						droneShields,
+						droneLasers
+						));
 			}
 			
-		} catch (SQLException e) {
-			Console.error("Couldn't load player " + playerID + " equipment");
-			if(Launcher.developmentMode) {
-				e.printStackTrace();
-			}
-		}
-		return new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1);
-	}
-	
-	
-	
-	/**
-	 * Comprueba los objetos equipados en la web
-	 * @param packet
-	 * @return
-	 */
-	public static void checkObject(String packet) {
-		//Generators
-		int B02 = 0, B01 = 0, A03 = 0, A02 = 0, A01 = 0, G3N79 = 0, G3N69 = 0, G3N33 = 0, G3N32 = 0, G3N20 = 0, G3N10 = 0;
-		//Lasers
-		int LF3 = 0, LF2 = 0, MP1 = 0, LF1 = 0;
-		
-		/*
-		 * webPacket|equipment|lasers|1|1|27|16|18
-		 *	item 0: webPacket
-		 *	item 1: equipment
-		 *	item 2: lasers | generators
-		 *	item 3: playerID
-		 *	item 4: config
-		 *	item 5: 27
-		 *	item 6: 16
-		 *	item 7: 18
-		 *
-		 * webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
-		 *  item 0: webPacket
-		 *	item 1: droneEquipment
-		 *	item 2: droneID //no usado aun
-		 *	item 3: playerID
-		 *	item 4: config
-		 *	item 5: ITEMS[]
-		 */
-		
-		String[] p = packet.split("\\|");
-		int playerID = Integer.parseInt(p[3]), config = Integer.parseInt(p[4]);
-		
-		//Empieza en 5 por el resumen de arriba, para empezar directamente a leer objectos
-		for(int i=5; i<p.length; i++) {
-			query = "SELECT * FROM server_1_player_all_items WHERE playerID=" + playerID + " AND id=" + p[i];
-			ResultSet itemResult;
-			try {
-				itemResult = query(query);
-				
-				if(itemResult.next()) {
-					String[] item = itemResult.getString("lootid").split("_");
-					/*
-					 * TODO: Un poco cutre porque hay que copiar todo el switch de la funcion de arriba
-					 */
-					switch(item[1]) {
-						case "generator":
-							/*
-							 * Shields and engines.
-							 */
-							switch(item[3]) {
-								case "sg3n-b02":
-									B02++;
-									break;
-								case "sg3n-b01":
-									B01++;
-									break;
-								case "sg3n-a03":
-									A03++;
-									break;
-								case "sg3n-a02":
-									A02++;
-									break;
-								case "sg3n-a01":
-									A01++;
-									break;
-								case "g3n-7900":
-									G3N79++;
-									break;
-								case "g3n-6900":
-									G3N69++;
-									break;
-								case "g3n-3310":
-									G3N33++;
-									break;
-								case "g3n-3210":
-									G3N32++;
-									break;
-								case "g3n-2010":
-									G3N20++;
-									break;
-								case "g3n-1010":
-									G3N10++;
-									break;
-							}
+			//Generators Setter
+			if(generatorsID != null) {
+				for(int i=0; i<generatorsID.length; i++) {
+					Object object = checkObject(Integer.parseInt(generatorsID[i]));
+					
+					switch(object.getClass().getSimpleName()) {
+						case "Shield":
+							shields.add((Shield) object);
 							break;
-							
-						case "weapon":
-							/*
-							 * Lasers and RocketLauncher?
-							 */
-							switch(item[3]) {
-								case "lf-3":
-									LF3++;
-									break;
-								case "lf-2":
-									LF2++;
-									break;
-								case "mp-1":
-									MP1++;
-									break;
-								case "lf-1":
-									LF1++;
-									break;
-							}
+						case "Engine":
+							engines.add((Engine) object);
 							break;
 					}
 				}
-			} catch (SQLException e) {
-				if(Launcher.developmentMode) {
-					e.printStackTrace();
+			}
+			
+			//Lasers Setter
+			if(lasersID != null) {
+				for(int i=0; i<lasersID.length; i++) {
+					Object object = checkObject(Integer.parseInt(lasersID[i]));
+					
+					switch(object.getClass().getSimpleName()) {
+						case "Laser":
+							lasers.add((Laser) object);
+							break;
+					}
 				}
 			}
-		}
-		
-		Player player = null;
-		if(GameManager.playersMap.containsKey(playerID)) {
-			/*
-			 * Si el jugador se ha llegado a conectar se coge su cuenta del map y se actualiza su equipamiento para que si sigue online le cambie
-			 * y/o si se conecta de nuevo tenga el actualizado.
-			 */
-			player = GameManager.getPlayer(playerID);
-		} else {
-			/*
-			 * Sino se carga de la DB
-			 */
-			player = loadAccount(playerID);
-		}
-		
-		/*
-		 * CurrentShield lo que hace es comprobar cuando escudo tenia en la configuracion que se va a sustituir para mantenerlo y 'dejar vacio'
-		 * el resto hasta completar el total.
-		 */
-		int currentShield = 0;
-		if(config == 1) { currentShield = player.config1().getCurrentShield(); } else if(config == 2) {currentShield = player.config2().getCurrentShield();}
-		
-		if(p[1].equals("equipment")) { //significa equipamiento de la nave
 			
-			player.setConfig(config, new Equipment(currentShield, B02, B01, A03, A02, A01, G3N79, G3N69, G3N33, G3N32, G3N20, G3N10, LF3, LF2, MP1, LF1));
-		} else if(p[1].equals("droneEquipment")) {
+			generators = new Generators(shields, engines);
+			weapons = new Weapons(lasers);
 			
+			query = "SELECT * FROM server_1_players WHERE playerID=" + playerID;
+			ResultSet playerResult = query(query);
+			
+			int currentShield = 0;
+			if(playerResult.next()) {
+				if(config == 1) {
+					currentShield = playerResult.getInt("shield1");
+				} else {
+					currentShield = playerResult.getInt("shield2");
+				}
+			}
+			equipment = new Equipment(generators, weapons, drones, currentShield);
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		//Tambien añade la cuenta si no existia antes
-		GameManager.updatePlayer(player);
+		
+		return equipment;
+	}
+	
+	/**
+	 * Comprueba que tipo de objeto es un ID dado
+	 * @param objectID
+	 * @return
+	 */
+	public static Object checkObject(int objectID) {
+		Object object = null;
+		try {
+			query = "SELECT * FROM server_1_player_all_items WHERE id=" + objectID;
+			ResultSet result = query(query);
+			
+			if(result.next()) {
+				//equipment_generator_shield_sg3n-b02
+				String[] lootID = result.getString("lootid").split("_");
+				
+				switch(lootID[1]) {
+					case "generator":
+						switch(lootID[2]) {
+							case "shield":
+								object = new Shield(objectID, lootID[3]);
+								break;
+								
+							case "speed":
+								object = new Engine(objectID, lootID[3]);
+								break;
+						}
+						break;
+						
+					case "weapon":
+						switch(lootID[2]) {
+							case "laser":
+								object = new Laser(objectID, lootID[3]);
+								break;
+								
+							case "rocketlauncher":
+								//TODO
+								break;
+						}
+						break;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return object;
 	}
 	
 	/**

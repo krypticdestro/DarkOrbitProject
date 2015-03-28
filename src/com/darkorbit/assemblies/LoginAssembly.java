@@ -2,6 +2,7 @@ package com.darkorbit.assemblies;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.darkorbit.main.Launcher;
@@ -102,7 +103,7 @@ public class LoginAssembly extends Global {
 		setSettings();
 		setPlayer();
 		sendMyShip();
-		/*
+		/* 
 		 * Lo hago de esta forma porque necesitaba que la funcion fuera estatica
 		 * para poder mandar los drones que son comprados desde el conection manager
 		 */
@@ -120,7 +121,6 @@ public class LoginAssembly extends Global {
 	}
 	
 	/* Login functions */
-		
 
 		//Manda las opciones del cliente
 		private void setSettings() {
@@ -143,6 +143,8 @@ public class LoginAssembly extends Global {
 			sendPacket(userSocket, "0|7|MAINMENU_POSITION,3|" + player.getSettings().MAINMENU_POSITION);
 			sendPacket(userSocket, "0|7|SLOTMENU_POSITION,3|" + player.getSettings().SLOTMENU_POSITION);
 			sendPacket(userSocket, "0|7|SLOTMENU_ORDER,3|" + player.getSettings().SLOTMENU_ORDER);
+			sendPacket(userSocket, "0|7|HS");
+			sendPacket(userSocket, "0|8");
 		}
 		
 		//Informacion basica del jugador
@@ -156,12 +158,16 @@ public class LoginAssembly extends Global {
 			
 			//Carga la ultima configuracion que habia usado
 			player.activeConfig(player.configNum());
-			sendPacket(userSocket, "0|A|CC|" + player.configNum());
 			
-			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|0|cloaked
-			String loginPacket = "0|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + (player.getShip().getShipSpeed() + player.activeConfig().getSpeed()) + "|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield() + "|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|0|0";
+			//0|I|playerID|username|shipID|maxSpeed|shield|maxShield|health|maxHealth|cargo|maxCargo|user.x|user.y|mapId|factionId|clanId|shipAmmo|shipRockets|expansion|premium|exp|honor|level|credits|uridium|jackpot|rank|clanTag|ggates|1|cloaked
+			String loginPacket = "RDY|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + (player.getShip().getShipSpeed() + player.activeConfig().getSpeed()) + "|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield() + "|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|" + premium + "|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|1|0|50|25";
 			sendPacket(userSocket, loginPacket);
 			
+			if(player.getShipID() == 98) {
+				//No se porque la admin ship no carga a la primera xD
+				String loginAdminPacket = "RDY|I|" + player.getPlayerID() + "|" + player.getUserName() + "|" + player.getShipID() + "|" + (player.getShip().getShipSpeed() + player.activeConfig().getSpeed()) + "|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield() + "|" + player.getHealth() + "|" + player.getShip().getShipHealth() + "|0|" + player.getShip().getMaxCargo() + "|" + player.getPosition().getX() + "|" + player.getPosition().getY() + "|" + player.getMapID() + "|" + player.getFactionID() + "|" + player.clan().getClanID() + "|" + player.getShip().getBatteries() + "|" + player.getShip().getRockets() + "|3|1|" + player.getExperience() + "|" + player.getHonor() + "|" + player.getLevel() + "|" + player.getCredits() + "|" + player.getUridium() + "|" + player.getJackpot() + "|" + player.getRank() + "|" + player.clan().getTagName() + "|" + player.getRings() + "|1|0|50|25";
+				sendPacket(userSocket, loginAdminPacket);
+			}
 			sendPacket(userSocket, "0|A|CC|" + player.configNum());
 		}
 		
@@ -177,31 +183,21 @@ public class LoginAssembly extends Global {
 		 * TODO: Rehacer de una mejor forma..
 		 */
 		public static String setDrones(Player p) {
-			Drone[] playerDrones = p.getDrones();
+			List<Drone> playerDrones = p.activeConfig().getDrones();
+			int numDrones = playerDrones.size();
 			String packet = "";
-			
-			//Suponiendo que la nave mira hacia arriba, ire poniendolos true cuando el grupo de drones se haya llenado
-			
-			//El array tiene 8 posiciones, pero pueden ser null... asi que busco cuantos drones de verdad hay
-			int numDrones = 0;
-			
-			for(int i=0; i<playerDrones.length; i++) {
-				if(!(playerDrones[i] == null)) {
-					numDrones++;
-				}
-			}
 			
 			//Si el usuario tiene activados los drones
 			if(p.getSettings().SHOW_DRONES.equals("1")) {
 				while(numDrones > 0) {
 					
-					/* Si solo se tienen entre 0 y 4 drones (bottom group) */
+					// Si solo se tienen entre 0 y 4 drones (bottom group)
 					if((numDrones > 0) && (numDrones <= 4)) {
 						//0|n|d|5|1/4-26-26-26-26 -> 4 drones
 						packet += "1/" + numDrones;
 						
 						for(int i=0; i < numDrones; i++) {
-							packet += "-" + playerDrones[i].getDronePacket();
+							packet += "-" + playerDrones.get(i).getDronePacket();
 						}
 						
 						//En esta parte del condicional se ponen del dron 1-4 asi que igualo a 0 para salir del bucle
@@ -218,8 +214,8 @@ public class LoginAssembly extends Global {
 							case 5:
 								packet += "3/1"; //right
 								
-								//playerDrones[4] -> porque es un array, dron 5 = [4]
-								packet += "-" + playerDrones[4].getDronePacket() + ",";
+								//playerDrones.get(4) -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones.get(4).getDronePacket() + ",";
 								numDrones--;
 								break;
 							
@@ -227,14 +223,14 @@ public class LoginAssembly extends Global {
 							case 6:
 								packet += "3/1"; //right
 								
-								//playerDrones[4] -> porque es un array, dron 5 = [4]
-								packet += "-" + playerDrones[4].getDronePacket() + ",";
+								//playerDrones.get(4) -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones.get(4).getDronePacket() + ",";
 								
 								//4 bot
 								packet += "2/4";
 								
 								for(int i=0; i < 4; i++) {
-									packet += "-" + playerDrones[i].getDronePacket();
+									packet += "-" + playerDrones.get(i).getDronePacket();
 								}
 								
 								packet += ",";
@@ -242,7 +238,7 @@ public class LoginAssembly extends Global {
 								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
 								
 								packet += "3/1";
-								packet += "-" + playerDrones[5].getDronePacket() ;
+								packet += "-" + playerDrones.get(5).getDronePacket() ;
 								
 								//Para salir del bucle
 								numDrones = 0;
@@ -252,14 +248,14 @@ public class LoginAssembly extends Global {
 							case 7:
 								packet += "3/2"; //right
 								
-								//playerDrones[4] -> porque es un array, dron 5 = [4]
-								packet += "-" + playerDrones[4].getDronePacket() + "-" + playerDrones[6].getDronePacket() + ",";
+								//playerDrones.get(4) -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones.get(4).getDronePacket() + "-" + playerDrones.get(6).getDronePacket() + ",";
 								
 								//4 bot
 								packet += "2/4";
 								
 								for(int i=0; i < 4; i++) {
-									packet += "-" + playerDrones[i].getDronePacket();
+									packet += "-" + playerDrones.get(i).getDronePacket();
 								}
 								
 								packet += ",";
@@ -267,7 +263,7 @@ public class LoginAssembly extends Global {
 								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
 								
 								packet += "3/1";
-								packet += "-" + playerDrones[5].getDronePacket() ;
+								packet += "-" + playerDrones.get(5).getDronePacket() ;
 								
 								//Para salir del bucle
 								numDrones = 0;
@@ -277,14 +273,14 @@ public class LoginAssembly extends Global {
 							case 8:
 								packet += "3/2"; //right
 								
-								//playerDrones[4] -> porque es un array, dron 5 = [4]
-								packet += "-" + playerDrones[4].getDronePacket() + "-" + playerDrones[6].getDronePacket() + ",";
+								//playerDrones.get(4) -> porque es un array, dron 5 = [4]
+								packet += "-" + playerDrones.get(4).getDronePacket() + "-" + playerDrones.get(6).getDronePacket() + ",";
 								
 								//4 bot
 								packet += "2/4";
 								
 								for(int i=0; i < 4; i++) {
-									packet += "-" + playerDrones[i].getDronePacket();
+									packet += "-" + playerDrones.get(i).getDronePacket();
 								}
 								
 								packet += ",";
@@ -292,7 +288,7 @@ public class LoginAssembly extends Global {
 								//por ahora iria asi -> 0|n|d|5|3/1-96,2/4-26-26-26-26,
 								
 								packet += "3/2";
-								packet += "-" + playerDrones[5].getDronePacket() + "-" + playerDrones[7].getDronePacket();
+								packet += "-" + playerDrones.get(5).getDronePacket() + "-" + playerDrones.get(7).getDronePacket();
 								
 								//Para salir del bucle
 								numDrones = 0;
@@ -309,7 +305,7 @@ public class LoginAssembly extends Global {
 
 				for(Drone d : playerDrones) {
 					if(!(d == null)) {
-						if(d.getDoneKind().equals("drone_iris")) {
+						if(d.getType().equals("iris")) {
 							numIris++;
 						} else {
 							numFlax++;
@@ -323,7 +319,7 @@ public class LoginAssembly extends Global {
 			return packet;
 		}
 		
-		//Carga la munici�n
+		//Carga la municion
 		private void setAmmunition() {
 			// 0|B|x1|x2|x3|x4|sab|rsb
 	        sendPacket(userSocket, "0|B|" + player.getAmmo().getLcb10() + "|" + player.getAmmo().getMcb25() + "|" + player.getAmmo().getMcb50() + "|" + player.getAmmo().getUcb100() + "|" + player.getAmmo().getSab50() + "|0");

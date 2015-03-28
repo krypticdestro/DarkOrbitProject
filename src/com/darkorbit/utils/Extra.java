@@ -8,8 +8,7 @@ import com.darkorbit.net.Global;
 public class Extra extends Global {
 	
 	//Pinta un circulo con phoenix xD
-	public static void drawRange(short mapId, double positionX, double positionY) {
-		double range = 500;
+	public static void drawRange(short mapId, double positionX, double positionY, double range) {
 		double x = Math.sin(Math.toRadians(45)) * range;
 		Random r = new Random();
 		int i = r.nextInt(Integer.MAX_VALUE);

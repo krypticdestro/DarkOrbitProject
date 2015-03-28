@@ -68,6 +68,9 @@
 		0|A|HPT/SHD/v|hp|shiphp -> Cambia hp, escudo, velocidad
 		0|A|v|vel
 		
+		0|A|HL|0|1|SHD|player.shield|recarga(int) -> recarga el escudo
+		SHD/HPT
+		
 		0|LM|ST|JPE|10000|10000
 		0|LM|ST|JPE|Premio|cantidadFinal -> JPE/CRE/URI Mensaje de recompensa
 		
@@ -108,6 +111,12 @@
 		
 		0|A|CPU|R|1 -> activa / desactiva cpu auto misiles (1,0)
 		
+		0|A|CLD|ROK|time -> cooldown de misiles
+		ROK/RSB/ISH/SMB/MIN(minas)/
+		
+		0|v|1|2|H|rocketType -> lanza un misil
+		H/
+		
 		0|n|w|(1-5) -> enemy warning
 		
 		0|n|INV|playerID|bool -> hace al usuario invisible
@@ -123,8 +132,10 @@
 		S|CFG|2 -> esta en config 1 y quiere cambiar a la dos
 		0|A|CC|1 -> packete cambia de config a la 1
 		
-		0|D|1046|713|1|0|0|0|0|0|1026|713 -> pone zona de no ataques (mensaje al menos)
-		0|D|0|0|0|0|0|0|0|0|0|0 -> lo quita
+		0|A|RS|bool -> pone el robot azul o no. Ejecutar antes que el de abajo
+		
+		0|D|1200|700|0|1|0|0|0|0 -> pone zona de no ataques (mensaje al menos)
+		0|D|playerX|playerY|zonaNoAtaques(bool)|repBot(bool)|trade(bool)|radiacion(bool)|0 (IDK)|instantRepair(int)
 		
 		0|n|t|" + user.userID + "|" + user.title -> titulo -> translationsSpacemap.php | t-pt
 		

@@ -1,9 +1,12 @@
 package com.darkorbit.objects;
 
+import java.util.List;
+
 import com.darkorbit.attack.LaserSystem;
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.net.GameManager;
 import com.darkorbit.systems.MovementSystem;
+import com.darkorbit.utils.Extra;
 import com.darkorbit.utils.Vector;
 
 
@@ -27,7 +30,6 @@ public class Player {
 	private LaserSystem laserSystem;
 	private Ammunition ammo;
 	private Rockets rockets;
-	private Drone[] drones;
 	private Clan clan;
 	private Equipment config1, config2, activeConfig;
 	
@@ -66,15 +68,15 @@ public class Player {
 		this.ammo = QueryManager.loadAmmunition(playerID);
 		this.rockets = QueryManager.loadRockets(playerID);
 		
-		if(GameManager.dronesBought.containsKey(playerID)) {
+		/*if(GameManager.dronesBought.containsKey(playerID)) {
 			this.drones = GameManager.getDrones(playerID);
 			
 		} else {
 			this.drones = QueryManager.loadDrones(playerID);
-		}
+		}*/
 		
-		this.config1 = QueryManager.loadEquipment(this, 1);
-		this.config2 = QueryManager.loadEquipment(this, 2);
+		this.config1 = QueryManager.loadEquipment(playerID, 1);
+		this.config2 = QueryManager.loadEquipment(playerID, 2);
 		this.configNum = 1;
 		
 		if(hasClan()) {
@@ -115,7 +117,7 @@ public class Player {
 		
 		public Ammunition getAmmo() { return ammo; }
 		
-		public Drone[] getDrones() { return drones; }
+		public List<Drone> getDrones() { return activeConfig.getDrones(); }
 		
 		public Rockets getRocket() { return rockets; }
 		
@@ -179,13 +181,13 @@ public class Player {
 		
 		public void setMapID(short m) { mapID = m; }
 		
-		public void addDrone(int position, Drone newDrone) {
+		/*public void addDrone(int position, Drone newDrone) {
 			drones[position] = newDrone;
 		}
 		
 		/*
 		 * Para que cuando se compra uno el cambio en el cliente sea instantaneo
-		 */
+		 *
 		public void updateDrones() {
 			if(GameManager.dronesBought.containsKey(playerID)) {
 				this.drones = GameManager.getDrones(playerID);
@@ -193,7 +195,7 @@ public class Player {
 			} else {
 				this.drones = QueryManager.loadDrones(playerID);
 			}
-		}
+		}*/
 		
 		public void setConfig(int configNum, Equipment config) {
 			if(configNum == 1) {
@@ -253,7 +255,7 @@ public class Player {
 
 		//Comprueba el rango respecto a un portal
 		public boolean isInRange(Player p) {
-			double range = 500;
+			double range = 600;
 			//Actualiza la posicion del jugador y del target
 			movementSystem.position();
 			p.movement().position();
@@ -270,4 +272,8 @@ public class Player {
 			}
 		}
 		
+		//Pinta el rango del portal
+		public void drawRange() {
+			Extra.drawRange(mapID, position.getX(), position.getY(), 600);
+		}
 }

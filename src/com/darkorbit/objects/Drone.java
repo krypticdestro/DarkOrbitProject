@@ -1,15 +1,19 @@
 package com.darkorbit.objects;
 
-public class Drone {
-	private int droneID, droneLevel, dronePacket;
-	private String droneKind;
+import java.util.List;
 
-	public Drone(int droneID, int droneLevel, String droneKind) {
-		this.droneID = droneID;
-		this.droneLevel = droneLevel;
-		this.droneKind = droneKind;
-		
-		String[] arrayKind = droneKind.split("_");
+public class Drone {
+	private int id, level, dronePacket;
+	private String type;
+	private List<Shield> shields;
+	private List<Laser> lasers;
+
+	public Drone(int id, int level, String type, List<Shield> shields, List<Laser> lasers) {
+		this.id = id;
+		this.level = level;
+		this.type = type;
+		this.shields = shields;
+		this.lasers = lasers;
 		
 		/*
 		 * 10 -> flax (hercules)
@@ -19,36 +23,57 @@ public class Drone {
 		 * 50 -> zeus
 		 * 70 -> apis
 		 */
-		switch(arrayKind[1]) {
+		switch(type) {
 			case "iris":
 				//20 es el codigo del iris
-				dronePacket = 20 + droneLevel;
+				dronePacket = 20 + level;
 				break;
 				
 			case "flax":
 				//Flax hercules, no se el pacquete del normal :/
-				dronePacket = 10 + droneLevel;
+				dronePacket = 10 + level;
 				break;
 				
 		}
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public List<Shield> getShields() {
+		return shields;
+	}
+
+	public List<Laser> getLasers() {
+		return lasers;
+	}
 	
-	/* get methods */
-		
-		public int getDroneID() { return droneID; }
-	
-		public int getDroneLevel() {
-			return droneLevel;
-		}
-		
-		public String getDoneKind() {
-			return droneKind;
-		}
-		
-		public int getDronePacket() {
-			return dronePacket;
-		}
-	/* @end */
-		
-	/* set methods */
+	public int getDronePacket() {
+		return dronePacket;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setShields(List<Shield> shields) {
+		this.shields = shields;
+	}
+
+	public void setLasers(List<Laser> lasers) {
+		this.lasers = lasers;
+	}
 }

@@ -12,9 +12,9 @@ import java.util.TimerTask;
 import com.darkorbit.assemblies.LoginAssembly;
 import com.darkorbit.main.Launcher;
 import com.darkorbit.mysql.QueryManager;
-import com.darkorbit.objects.Drone;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
+import com.darkorbit.objects.Weapons;
 import com.darkorbit.packets.ClientCommands;
 import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.packets.WebCommands;
@@ -22,7 +22,7 @@ import com.darkorbit.utils.Console;
 
 /**
  * Administra las conexiones entrantes
- * @author Borja Sanchidri�n
+ * @author Borja Sanchidriï¿½n
  */
 
 public class ConnectionManager extends Global implements Runnable {
@@ -224,7 +224,7 @@ public class ConnectionManager extends Global implements Runnable {
 			while(in.read(packetChar, 0, 1) != -1) {
 				//Comprueba que el caracter no sea ni nulo, espacio en blanco, linea nueva
 				if(packetChar[0] != '\u0000' && packetChar[0] != '\n' && packetChar[0] != '\r') {
-					//Si no a�ade el caracter a packet
+					//Si no aï¿½ade el caracter a packet
 					packet += packetChar[0];
 					
 				} else if(!packet.isEmpty()) {
@@ -368,11 +368,21 @@ public class ConnectionManager extends Global implements Runnable {
 				case WebCommands.WEB_PACKET:
 					switch(p[1]) {
 						case WebCommands.EQUIPMENT_UPDATE:
-							//webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
-							QueryManager.checkObject(packet);
+							/*
+							 * webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
+							 * 	p[0] = webPacket
+							 *	p[1] = equipment
+							 *	p[2] = lasers
+							 *	p[3] = playerID
+							 *	p[4] = configNum
+							 *	p[5] = items[]
+							 */
+							for(int i=5; i<p.length; i++) {
+								System.out.println("p[" + i + "] = " + p[i]);
+							}
 							break;
 							
-						case WebCommands.DRONE_EQUIPMENT_UPDATE:
+						/*case WebCommands.DRONE_EQUIPMENT_UPDATE:
 							//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
 							QueryManager.checkObject(packet);
 							break;
@@ -384,7 +394,7 @@ public class ConnectionManager extends Global implements Runnable {
 							int dronPosition = 0;
 							/*
 							 * El array de drones tiene 8 posiciones, pero pueden ser nulas, por lo que veo el numero real ocupadas..
-							 */
+							 *
 							for(int i=0; i<player.getDrones().length; i++) {
 								if(!(player.getDrones()[i] == null)) {
 									dronPosition++;
@@ -392,7 +402,7 @@ public class ConnectionManager extends Global implements Runnable {
 							}
 							//numDrones puede ir de 0 a 7 => 8 drones
 							
-							//Y a�ado el dron al array
+							//Y añado el dron al array
 							if(dronPosition < 8) {
 								player.addDrone(dronPosition, new Drone(Integer.parseInt(p[4]), 1, p[3]));
 							}
@@ -413,7 +423,7 @@ public class ConnectionManager extends Global implements Runnable {
 								
 								sendToOthers(playerCM.player(), LoginAssembly.setDrones(playerCM.player()));
 							}
-							break;
+							break;*/
 					}
 					break;
 					
@@ -448,7 +458,7 @@ public class ConnectionManager extends Global implements Runnable {
 								player = loginAssembly.getPlayer();
 								playerID = player.getPlayerID();
 
-								//A�ade el connectionManager al de jugadores online
+								//Aï¿½ade el connectionManager al de jugadores online
 								GameManager.connectPlayer(this);
 								
 								//Inicia los sistemas del player
@@ -555,7 +565,7 @@ public class ConnectionManager extends Global implements Runnable {
 					
 					//Si no se ha encontrado un portal y el usuario no esta saltando--
 					 if(!portalFound && !player.isJumping()) {
-							//No esta en rango, mando paquete que avisa de ello..
+							//No esta en rango, mando paquete que avisa de ello..…•źεкяом•…
 							sendPacket(userSocket, "0|A|STM|jumpgate_failed_no_gate");
 					 }
 					
@@ -574,6 +584,11 @@ public class ConnectionManager extends Global implements Runnable {
 					} else {
 						//Es un NPC
 					}
+					break;
+				
+				case "b":
+					sendPacket(userSocket, "0|A|STD|Damage: " + player.activeConfig().getDamage());
+					sendPacket(userSocket, "0|A|STD|Speed: " + player.activeConfig().getSpeed());
 					break;
 					
 				case ClientCommands.SELECT_LASER:
@@ -706,7 +721,7 @@ public class ConnectionManager extends Global implements Runnable {
 											sendPacket(userSocket, "0|A|SHD|" + player.activeConfig().getCurrentShield() + "|" + player.activeConfig().getShield());
 											/*
 											 * La velocidad se actualiza sola porque se coge directamente en el movementSystem.
-											 * Al igual que el da�o
+											 * Al igual que el daño
 											 */
 											
 											for(Entry<Integer, ConnectionManager> on : GameManager.onlinePlayers.entrySet()) {
