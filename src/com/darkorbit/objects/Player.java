@@ -145,9 +145,13 @@ public class Player {
 		
 		public boolean isJumping() { return isJumping; }
 		
-		public Equipment config1() { return config1; }
-		
-		public Equipment config2() { return config2; }
+		public Equipment getConfig(int num) {
+			if(num == 1) {
+				return config1;
+			} else {
+				return config2;
+			}
+		}
 		
 		public Equipment activeConfig() { return activeConfig; }
 		
@@ -272,7 +276,7 @@ public class Player {
 			}
 		}
 		
-		//Pinta el rango del portal
+		//Pinta el rango de ataque
 		public void drawRange() {
 			Extra.drawRange(mapID, position.getX(), position.getY(), 600);
 		}

@@ -28,8 +28,8 @@ public class Launcher extends Global {
 	private static String mysqlDatabase = null;
 	
 	private static BufferedReader configReader = null;
-	public static boolean developmentMode = true;
-	private static final String version = "Development version v0.1.7";
+	public static boolean developmentMode = false;
+	private static final String version = "Development version v0.2";
 	private static Scanner in = new Scanner(System.in);
 
 	/**

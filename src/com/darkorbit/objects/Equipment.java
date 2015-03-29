@@ -75,6 +75,14 @@ public class Equipment {
 	
 	public int getDamage() {
 		int damage = 0;
+		if(drones.size() > 0) {
+			for(Drone d : drones) {
+				for(Laser l : d.getLasers()) {
+					damage += l.getValue();
+				}
+			}
+		}
+		
 		for(Laser l : weapons.getLasers()) {
 			damage += l.getValue();
 		}

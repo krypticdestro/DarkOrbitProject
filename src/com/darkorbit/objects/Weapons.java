@@ -16,5 +16,4 @@ public class Weapons extends Object {
 	public void setLasers(List<Laser> lasers) {
 		this.lasers = lasers;
 	}
-	
 }

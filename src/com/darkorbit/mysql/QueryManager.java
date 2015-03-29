@@ -116,6 +116,7 @@ public class QueryManager extends MySQLManager {
 							playerResult.getInt("clanId")
 							);
 					
+					GameManager.addPlayer(player);
 					return player;
 				} else {
 					//Sino pues n�!
@@ -416,6 +417,9 @@ public class QueryManager extends MySQLManager {
 							case "Laser":
 								droneLasers.add((Laser) object);
 								break;
+							default:
+								System.out.println("ITEM DESCONOCIDO");
+								break;
 						}
 					}
 				}
@@ -441,6 +445,9 @@ public class QueryManager extends MySQLManager {
 						case "Engine":
 							engines.add((Engine) object);
 							break;
+						default:
+							System.out.println("ITEM DESCONOCIDO");
+							break;
 					}
 				}
 			}
@@ -453,6 +460,9 @@ public class QueryManager extends MySQLManager {
 					switch(object.getClass().getSimpleName()) {
 						case "Laser":
 							lasers.add((Laser) object);
+							break;
+						default:
+							System.out.println("ITEM DESCONOCIDO");
 							break;
 					}
 				}
@@ -479,6 +489,88 @@ public class QueryManager extends MySQLManager {
 		
 		return equipment;
 	}
+	
+	/**
+	 * Actualiza en el jugador el equipamiento una vez el servidor esta abierto ^^
+	 * @param packet
+	 */
+	public static void webEquipment(String packet) {
+		/*
+		 * webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
+		 * 	p[0] = webPacket
+		 *	p[1] = equipment
+		 *	p[2] = lasers | generators | heavy_guns 
+		 *	p[3] = playerID
+		 *	p[4] = configNum
+		 *	p[5] = items[]
+		 */
+		
+		String[] p = packet.split("\\|");
+		int playerID = Integer.parseInt(p[3]);
+		Player player;
+		
+		if(GameManager.isOnline(playerID)) {
+			//Si esta online en el momento
+			player = GameManager.getConnectionManager(playerID).player();
+		} else if(GameManager.playersMap.containsKey(playerID)) {
+			//Si el usuario ya se habia conectado antes
+			player = GameManager.getPlayer(playerID);
+		} else {
+			//Es la primera vez que entra
+			player = loadAccount(playerID);
+		}
+		
+		List<Shield> shields = new ArrayList<Shield>();
+		List<Engine> engines = new ArrayList<Engine>();
+		List<Laser> lasers   = new ArrayList<Laser>();
+		for(int i=5; i<p.length; i++) {
+			Object o = checkObject(Integer.parseInt(p[i]));
+			
+			switch(o.getClass().getSimpleName()) {
+				case "Shield":
+					shields.add((Shield) o);
+					break;
+				case "Engine":
+					engines.add((Engine) o);
+					break;
+				case "Laser":
+					lasers.add((Laser) o);
+					break;
+				default:
+					System.out.println("ITEM DESCONOCIDO");
+					break;
+			}
+		}
+		
+		if(p[1].equals("equipment")) {
+			//p[2] = lasers | generators | heavy_guns 
+			switch(p[2]) {
+				case "generators":
+					player.getConfig(Integer.parseInt(p[4])).setGenerators(new Generators(shields, engines));
+					break;
+				case "lasers":
+					player.getConfig(Integer.parseInt(p[4])).setWeapons(new Weapons(lasers));
+					break;
+			}
+		} else if(p[1].equals("droneEquipment")) {
+			//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
+			int config = 0;
+			if(p[4].equals("EQ")) {
+				config = 1;
+			} else {
+				config = 2;
+			}
+			
+			for(Drone d : player.getConfig(config).getDrones()) {
+				if(d.getId() == Integer.parseInt(p[2])) {
+					d.setLasers(lasers);
+					d.setShields(shields);
+					System.out.println("DRONE " + d.getId() + " UPDATED");
+				}
+			}
+		}
+	}
+	
 	
 	/**
 	 * Comprueba que tipo de objeto es un ID dado

@@ -76,9 +76,8 @@ public class LoginAssembly extends Global {
 			return true;
 			
 		} else if(!(player = QueryManager.loadAccount(playerID)).equals(null)) {
-			//Login normal si la cuenta existe
+			//Login normal si la cuenta existe y se añade al mapa en el querymanager
 			startLogin();
-			GameManager.addPlayer(player);
 			
 			Console.out("Player " + player.getPlayerID() + " connected!");
 			return true;

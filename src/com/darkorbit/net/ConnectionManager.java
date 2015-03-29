@@ -14,7 +14,6 @@ import com.darkorbit.main.Launcher;
 import com.darkorbit.mysql.QueryManager;
 import com.darkorbit.objects.Player;
 import com.darkorbit.objects.Portal;
-import com.darkorbit.objects.Weapons;
 import com.darkorbit.packets.ClientCommands;
 import com.darkorbit.packets.ServerCommands;
 import com.darkorbit.packets.WebCommands;
@@ -31,7 +30,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private Socket userSocket;
 	private Thread thread;
 	private Player player = null;
-	private Timer timeOutTimer, jumpTimer, configTimer;
+	private Timer timeOutTimer = null, jumpTimer = null, configTimer = null;
 	
 	private LoginAssembly loginAssembly;
 	
@@ -121,8 +120,10 @@ public class ConnectionManager extends Global implements Runnable {
 	 * @throws IOException
 	 */
 	public void closeConnection() throws IOException {
-		timeOutTimer.cancel();
-		timeOutTimer.purge();
+		if(timeOutTimer != null) {
+			timeOutTimer.cancel();
+			timeOutTimer.purge();
+		}
 		player.movement().close();
 		player.laserSystem().close();
 		userSocket.close();
@@ -169,6 +170,7 @@ public class ConnectionManager extends Global implements Runnable {
 	private void saveData() {
 		savePlayerData();
 		savePlayerSettings();
+		GameManager.updatePlayer(player);
 	}
 	
 	private void savePlayerData() {
@@ -180,7 +182,7 @@ public class ConnectionManager extends Global implements Runnable {
 			
 			//Actualizo y guardo la posicion del usuario
 			query += "x=" + player.getPosition().getX() + ", y=" + player.getPosition().getY() + ", mapId=" + player.getMapID() + ", ";
-			query += "shield1=" + player.config1().getCurrentShield() + ", shield2=" + player.config2().getCurrentShield();
+			query += "shield1=" + player.getConfig(1).getCurrentShield() + ", shield2=" + player.getConfig(2).getCurrentShield();
 			query += " WHERE playerID=" + player.getPlayerID();
 		
 			QueryManager.updateSql(query);
@@ -280,7 +282,10 @@ public class ConnectionManager extends Global implements Runnable {
 				case "/p":
 					//Envia un paquete directamente al usuario
 					try {
-						sendToMap(player.getMapID(), p[1]);
+						if(player.getPlayerID() == 1) {
+						sendToAll(p[1]);
+						 }
+						
 					} catch(Exception e) {
 						if(Launcher.developmentMode) {
 							e.printStackTrace();
@@ -368,25 +373,14 @@ public class ConnectionManager extends Global implements Runnable {
 				case WebCommands.WEB_PACKET:
 					switch(p[1]) {
 						case WebCommands.EQUIPMENT_UPDATE:
-							/*
-							 * webPacket|equipment|TYPE|PLAYERID|CONFIGNUM|27|16|18 objects
-							 * 	p[0] = webPacket
-							 *	p[1] = equipment
-							 *	p[2] = lasers
-							 *	p[3] = playerID
-							 *	p[4] = configNum
-							 *	p[5] = items[]
-							 */
-							for(int i=5; i<p.length; i++) {
-								System.out.println("p[" + i + "] = " + p[i]);
-							}
+							QueryManager.webEquipment(packet);
 							break;
 							
-						/*case WebCommands.DRONE_EQUIPMENT_UPDATE:
+						case WebCommands.DRONE_EQUIPMENT_UPDATE:
 							//webPacket|droneEquipment|DRONEID|PLAYERID|CONFIGNUM|ITEMS[]
-							QueryManager.checkObject(packet);
+							QueryManager.webEquipment(packet);
 							break;
-							
+						/*	
 						case WebCommands.BUY_DRONE:
 							//Obtengo la cuenta del jugador que compra el vant
 							//webPacket|buydrone|".$playerID."|".$kind."|".$item_id
@@ -595,14 +589,14 @@ public class ConnectionManager extends Global implements Runnable {
 					player.selectedAmmo(Integer.parseInt(p[1]));
 					break;
 					
-				case ServerCommands.LASER_ATTACK:
+				/*case ServerCommands.LASER_ATTACK:
 					player.isAttacking(true);
 					player.laserSystem().startAttack();
 					break;
 					
 				case ClientCommands.LASER_STOP:
 					player.isAttacking(false);
-					break;
+					break;*/
 
 				/*
 				 * Cuando el jugador cambia alguna opcion del cliente :D
@@ -751,9 +745,6 @@ public class ConnectionManager extends Global implements Runnable {
 							} else {
 								sendPacket(userSocket, "0|A|STM|config_change_failed_time");
 							}
-							
-							
-							
 							break;
 					}
 					break;
